@@ -1,4 +1,7 @@
+import { Types } from 'mongoose';
+
 export interface IStore {
+  bussiness: Types.ObjectId;
   name: string;
   phone: string;
   email: string;

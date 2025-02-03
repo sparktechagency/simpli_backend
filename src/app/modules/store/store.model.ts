@@ -3,6 +3,11 @@ import { IStore } from './store.interface';
 
 const StoreSchema: Schema = new Schema<IStore>(
   {
+    bussiness: {
+      type: Schema.Types.ObjectId,
+      ref: 'Bussiness',
+      required: true,
+    },
     name: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true, unique: true },
