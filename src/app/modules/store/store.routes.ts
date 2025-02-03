@@ -14,12 +14,10 @@ router.post(
   StoreController.createStore,
 );
 router.patch(
-  '/update-compliance-info/:id',
+  '/update-store/:id',
   auth(USER_ROLE.bussinessOwner),
-  validateRequest(
-    complicanceInfoValidations.updateComplianceInfoValidationSchema,
-  ),
-  ComplianceInfoController.updateComplianceInfo,
+  validateRequest(StoreValidations.updateStoreValidationSchema),
+  StoreController.updateStore,
 );
 
 export const complianceInfoRoutes = router;

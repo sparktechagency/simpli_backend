@@ -12,9 +12,24 @@ const createStore = async (profileId: string, payload: IStore) => {
   const result = await Store.create({ ...payload, bussiness: profileId });
   return result;
 };
-
+const updateStoreIntoDB = async (
+  profileId: string,
+  id: string,
+  payload: Partial<IStore>,
+) => {
+  const store = await Store.findOne({ bussiness: profileId, _id: id });
+  if (!store) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Store not found');
+  }
+  const result = await Store.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
 const StoreService = {
   createStore,
+  updateStoreIntoDB,
 };
 
 export default StoreService;
