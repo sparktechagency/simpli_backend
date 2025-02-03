@@ -49,6 +49,18 @@ const BussinessSchema = new Schema<IBussiness>(
     bussinessLicense: {
       type: String,
     },
+    isBussinessDocumentProvided: {
+      type: Boolean,
+      default: false,
+    },
+    isBussinessInfoProvided: {
+      type: Boolean,
+      default: false,
+    },
+    isComplianceInfoProvided: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

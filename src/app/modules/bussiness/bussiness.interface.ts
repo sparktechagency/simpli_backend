@@ -20,4 +20,7 @@ export interface IBussiness {
   instagram: string;
   website: string;
   linkedin: string;
+  isBussinessDocumentProvided: boolean;
+  isComplianceInfoProvided: boolean;
+  isBussinessInfoProvided: boolean;
 }
