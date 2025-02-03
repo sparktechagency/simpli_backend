@@ -17,8 +17,23 @@ const addBussinessInformation = catchAsync(async (req, res) => {
   });
 });
 
+const addBussinessDocument = catchAsync(async (req, res) => {
+  const result = await BussinessService.addBussinessDocumentIntoDB(
+    req.user.profileId,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Bussiness document added successfully',
+    data: result,
+  });
+});
+
 const BussinessController = {
   addBussinessInformation,
+  addBussinessDocument,
 };
 
 export default BussinessController;
