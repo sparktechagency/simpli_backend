@@ -7,10 +7,14 @@ const addBussinessInformation = async (
   profileId: string,
   payload: Partial<IBussiness>,
 ) => {
-  const result = await Bussiness.findByIdAndUpdate(profileId, payload, {
-    new: true,
-    runValidators: true,
-  });
+  const result = await Bussiness.findByIdAndUpdate(
+    profileId,
+    { ...payload, isBussinessInfoProvided: true },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
   return result;
 };
 
@@ -23,10 +27,14 @@ const addBussinessDocumentIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
   }
 
-  const result = await Bussiness.findByIdAndUpdate(profileId, payload, {
-    new: true,
-    runValidators: true,
-  });
+  const result = await Bussiness.findByIdAndUpdate(
+    profileId,
+    { ...payload, isBussinessDocumentProvided: true },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
   return result;
 };
 
