@@ -1,4 +1,4 @@
-export interface IStoreInformation {
+export interface IStore {
   name: string;
   phone: string;
   email: string;
