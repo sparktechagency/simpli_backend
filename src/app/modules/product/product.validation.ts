@@ -13,7 +13,6 @@ export const variantSchema = z.object({
   images: z.array(z.string().url('Invalid image URL')).optional(),
 });
 export const createProductValidationSchema = z.object({
-  bussiness: z.string().min(1, 'Business ID is required'),
   name: z.string().min(3, 'Product name must be at least 3 characters long'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   category: z.string().min(1, 'Category ID is required'),
