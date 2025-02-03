@@ -7,7 +7,7 @@ const BussinessSchema = new Schema<IBussiness>(
     bussinessName: {
       type: String,
     },
-    companyEmail: {
+    email: {
       type: String,
       required: true,
       unique: true,

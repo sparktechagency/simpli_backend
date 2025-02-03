@@ -8,7 +8,7 @@ export interface TUser {
   phone: string;
   password: string;
   passwordChangedAt?: Date;
-  role: 'user' | 'admin' | 'superAdmin';
+  role: 'bussinessOwner' | 'samplier' | 'superAdmin';
   status: 'in-progress' | 'blocked';
   verifyCode: number;
   resetCode: number;

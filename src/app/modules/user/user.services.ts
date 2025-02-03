@@ -3,7 +3,6 @@
 import { User } from './user.model';
 import AppError from '../../error/appError';
 import httpStatus from 'http-status';
-import { INormalUser } from '../normalUser/normalUser.interface';
 import mongoose from 'mongoose';
 import { TUser } from './user.interface';
 import { USER_ROLE } from './user.constant';
@@ -12,14 +11,16 @@ import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail
 import cron from 'node-cron';
 import sendEmail from '../../utilities/sendEmail';
 import { JwtPayload } from 'jsonwebtoken';
+import { IBussiness } from '../bussiness/bussiness.interface';
+import Bussiness from '../bussiness/bussiness.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
 
-const registerUser = async (
+const registerBussinessOwner = async (
   password: string,
   confirmPassword: string,
-  userData: INormalUser,
+  bussinessData: IBussiness,
 ) => {
   if (password !== confirmPassword) {
     throw new AppError(
@@ -28,7 +29,7 @@ const registerUser = async (
     );
   }
 
-  const emailExist = await User.findOne({ email: userData.email });
+  const emailExist = await User.findOne({ email: bussinessData.email });
   if (emailExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'This email already exist');
   }
@@ -38,10 +39,9 @@ const registerUser = async (
   try {
     const verifyCode = generateVerifyCode();
     const userDataPayload: Partial<TUser> = {
-      email: userData?.email,
-      phone: userData?.phone,
+      email: bussinessData?.email,
       password: password,
-      role: USER_ROLE.user,
+      role: USER_ROLE.bussinessOwner,
       verifyCode,
       codeExpireIn: new Date(Date.now() + 2 * 60000),
     };
@@ -50,13 +50,13 @@ const registerUser = async (
     const user = await User.create([userDataPayload], { session });
 
     const normalUserPayload = {
-      ...userData,
+      ...bussinessData,
       user: user[0]._id,
     };
     const result = await NormalUser.create([normalUserPayload], { session });
 
     sendEmail({
-      email: userData.email,
+      email: bussinessData.email,
       subject: 'Activate Your Account',
       html: registrationSuccessEmailBody(result[0].name, user[0].verifyCode),
     });
@@ -119,9 +119,10 @@ const resendVerifyCode = async (email: string) => {
 
 const getMyProfile = async (userData: JwtPayload) => {
   let result = null;
-  if (userData.role === USER_ROLE.user) {
-    result = await NormalUser.findOne({ email: userData.email });
+  if (userData.role === USER_ROLE.bussinessOwner) {
+    result = await Bussiness.findOne({ email: userData.email });
   }
+  //! TODO: need to get other user data
   return result;
 };
 
@@ -192,7 +193,7 @@ const changeUserStatus = async (id: string, status: string) => {
 };
 
 const userServices = {
-  registerUser,
+  registerBussinessOwner,
   verifyCode,
   resendVerifyCode,
   getMyProfile,
