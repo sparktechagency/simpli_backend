@@ -5,6 +5,8 @@ import { ManageRoutes } from '../modules/manage-web/manage.routes';
 import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 
 import { notificationRoutes } from '../modules/notification/notification.routes';
+import { complianceInfoRoutes } from '../modules/complianceInfo/complianceInfo.routes';
+import { bussinessRoutes } from '../modules/bussiness/bussiness.routes';
 
 const router = Router();
 
@@ -29,6 +31,14 @@ const moduleRoutes = [
   {
     path: '/notification',
     router: notificationRoutes,
+  },
+  {
+    path: '/compliance-info',
+    router: complianceInfoRoutes,
+  },
+  {
+    path: '/bussiness',
+    router: bussinessRoutes,
   },
 ];
 
