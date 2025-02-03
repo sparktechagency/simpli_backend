@@ -1,6 +1,6 @@
 export const ENUM_PRODUCT_STATUS = {
-  AVAILABLE: 'available',
-  UNAVAILABLE: 'unavailable',
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
 } as const;
 
 export const ENUM_PAYMENT_STATUS = {

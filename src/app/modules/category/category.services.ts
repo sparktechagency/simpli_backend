@@ -41,7 +41,6 @@ const deleteCategoryFromDB = async (categoryId: string) => {
   }
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     const deletedCategory = await Category.findByIdAndDelete(categoryId, {
       session,
@@ -56,7 +55,6 @@ const deleteCategoryFromDB = async (categoryId: string) => {
 
     await session.commitTransaction();
     session.endSession();
-
     return deletedCategory;
   } catch (error) {
     await session.abortTransaction();
