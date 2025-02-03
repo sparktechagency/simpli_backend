@@ -9,7 +9,7 @@ import ProductController from './product.controller';
 const router = express.Router();
 
 router.patch(
-  '/update-profile',
+  '/create-product',
   auth(USER_ROLE.bussinessOwner),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
