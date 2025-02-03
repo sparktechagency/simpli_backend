@@ -26,7 +26,6 @@ const addBussinessDocumentIntoDB = async (
   if (!bussiness) {
     throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
   }
-
   const result = await Bussiness.findByIdAndUpdate(
     profileId,
     { ...payload, isBussinessDocumentProvided: true },
@@ -37,7 +36,6 @@ const addBussinessDocumentIntoDB = async (
   );
   return result;
 };
-
 const BussinessService = {
   addBussinessInformation,
   addBussinessDocumentIntoDB,
