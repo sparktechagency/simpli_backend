@@ -20,8 +20,25 @@ const addBussinessInfoValidationSchema = z.object({
   }),
 });
 
+const addBussinessDocumentValidationSchema = z.object({
+  body: z.object({
+    einNumber: z.number({
+      required_error: 'Ein number is required',
+      invalid_type_error: 'Ein number must be number',
+    }),
+    incorporationCertificate: z.string({
+      required_error: 'Incorporation certificate is required',
+      invalid_type_error: 'Incorporation certificate must be string',
+    }),
+    bussinessLicense: z.string({
+      required_error: 'Bussiness license is required',
+      invalid_type_error: 'Bussiness license must be string',
+    }),
+  }),
+});
 const bussinessValidations = {
   addBussinessInfoValidationSchema,
+  addBussinessDocumentValidationSchema,
 };
 
 export default bussinessValidations;
