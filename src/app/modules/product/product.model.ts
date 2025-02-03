@@ -3,7 +3,7 @@ import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 import { IProduct, IVariant } from './product.interface';
 
 const VariantSchema = new Schema<IVariant>({
-  sku: { type: String, unique: true, required: true },
+  //   sku: { type: String, unique: true, required: true },
   color: { type: String, required: false },
   size: { type: String, required: false },
   weight: { type: String, required: false },
