@@ -41,4 +41,4 @@ router.delete(
   VariantController.deleteVariant,
 );
 
-export const productRoutes = router;
+export const variantRoutes = router;
