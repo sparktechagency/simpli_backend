@@ -30,10 +30,29 @@ const saveProductAsDraft = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const publishProductFromDraft = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'product_image' in files) {
+    const newImages = files['product_image'].map((file) => file.path);
+    req.body.images.push(...newImages);
+  }
+  const result = await ProductService.publishProductFromDraft(
+    req.user.profileId,
+    req.params.id,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Publish product from draft successfully',
+    data: result,
+  });
+});
 
 const ProductController = {
   createProduct,
   saveProductAsDraft,
+  publishProductFromDraft,
 };
 
 export default ProductController;

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
-import { IBussiness } from '../bussiness/bussiness.interface';
 import Variant from '../variant/variant.model';
 import { IProduct } from './product.interface';
 import Product from './product.model';
+import unlinkFile from '../../helper/unLinkFile';
 
 const createProductIntoDB = async (
   profileId: string,
@@ -79,7 +79,7 @@ const saveProductAsDraftIntoDB = async (
 const publishProductFromDraft = async (
   profileId: string,
   id: string,
-  payload: IBussiness,
+  payload: IProduct,
 ) => {
   const product = await Product.findOne({ bussiness: profileId, _id: id });
   if (!product) {
@@ -97,6 +97,15 @@ const publishProductFromDraft = async (
     new: true,
     runValidators: true,
   });
+
+  //TODO: if you want to uplaod images in cloud then need to change here
+  if (product.images && product.images?.length > 0) {
+    for (const imageUrl of product.images) {
+      if (!payload.images?.includes(imageUrl)) {
+        unlinkFile(imageUrl);
+      }
+    }
+  }
   return result;
 };
 
