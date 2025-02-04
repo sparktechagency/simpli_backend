@@ -76,12 +76,28 @@ const softDeleteSingleProduct = catchAsync(async (req, res) => {
   });
 });
 
+// change product status
+
+const changeProductStatus = catchAsync(async (req, res) => {
+  const result = await ProductService.changeProductStatus(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Product is now ${result?.status}`,
+    data: result,
+  });
+});
+
 const ProductController = {
   createProduct,
   saveProductAsDraft,
   publishProductFromDraft,
   deleteSingleProduct,
   softDeleteSingleProduct,
+  changeProductStatus,
 };
 
 export default ProductController;

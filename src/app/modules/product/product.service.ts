@@ -132,12 +132,28 @@ const softDeleteSingleProduct = async (profileId: string, id: string) => {
   return result;
 };
 
+// change product status -------------
+
+const changeProductStatus = async (profileId: string, id: string) => {
+  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+  const result = await Product.findByIdAndUpdate(
+    id,
+    { status: !product.status },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
 const ProductService = {
   createProductIntoDB,
   saveProductAsDraftIntoDB,
   publishProductFromDraft,
   deleteSingleProduct,
   softDeleteSingleProduct,
+  changeProductStatus,
 };
 
 export default ProductService;

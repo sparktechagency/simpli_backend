@@ -59,5 +59,9 @@ router.delete(
   auth(USER_ROLE.bussinessOwner),
   ProductController.softDeleteSingleProduct,
 );
-
+router.patch(
+  '/change-status/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.changeProductStatus,
+);
 export const productRoutes = router;
