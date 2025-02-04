@@ -49,10 +49,39 @@ const publishProductFromDraft = catchAsync(async (req, res) => {
   });
 });
 
+// delete single publich product
+const deleteSingleProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.deleteSingleProduct(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Product deleted successfully',
+    data: result,
+  });
+});
+// delete single publich product
+const softDeleteSingleProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.softDeleteSingleProduct(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Product deleted permanently',
+    data: result,
+  });
+});
+
 const ProductController = {
   createProduct,
   saveProductAsDraft,
   publishProductFromDraft,
+  deleteSingleProduct,
+  softDeleteSingleProduct,
 };
 
 export default ProductController;
