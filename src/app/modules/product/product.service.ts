@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import { IBussiness } from '../bussiness/bussiness.interface';
 import Variant from '../variant/variant.model';
 import { IProduct } from './product.interface';
 import Product from './product.model';
@@ -66,15 +69,41 @@ const saveProductAsDraftIntoDB = async (
     ...payload,
     bussiness: profileId,
     images: productImages,
+    isDraft: true,
     // variants: updatedVariants,
   });
 
   return result;
 };
 
+const publishProductFromDraft = async (
+  profileId: string,
+  id: string,
+  payload: IBussiness,
+) => {
+  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+  const variant = await Variant.findOne({ product: product._id });
+  if (!variant) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You need to add minimum one variant for that product',
+    );
+  }
+
+  const result = await Product.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 const ProductService = {
   createProductIntoDB,
   saveProductAsDraftIntoDB,
+  publishProductFromDraft,
 };
 
 export default ProductService;

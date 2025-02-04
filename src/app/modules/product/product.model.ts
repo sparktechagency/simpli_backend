@@ -26,6 +26,7 @@ const ProductSchema = new Schema<IProduct>(
     },
     images: { type: [String], required: false },
     tags: { type: [String], required: false },
+    isDraft: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
