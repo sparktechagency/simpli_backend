@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface IVariant {
+  bussiness: Types.ObjectId;
   product: Types.ObjectId;
   sku: string;
   color?: string;

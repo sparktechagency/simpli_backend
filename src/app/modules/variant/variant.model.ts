@@ -2,6 +2,7 @@ import { model, Schema } from 'mongoose';
 import { IVariant } from './variant.interface';
 
 const variantSchema = new Schema<IVariant>({
+  bussiness: { type: Schema.Types.ObjectId, required: true },
   product: { type: Schema.Types.ObjectId, required: true },
   sku: { type: String, unique: true, required: true },
   color: { type: String, required: false },
