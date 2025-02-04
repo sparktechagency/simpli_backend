@@ -35,4 +35,29 @@ router.patch(
   ProductController.createProduct,
 );
 
+router.post(
+  '/publish-product-from-draft/:id',
+  auth(USER_ROLE.bussinessOwner),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  validateRequest(ProductValidations.createProductValidationSchema),
+  ProductController.publishProductFromDraft,
+);
+
+router.delete(
+  '/delete-product/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.deleteSingleProduct,
+);
+router.delete(
+  '/soft-delete-product/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.softDeleteSingleProduct,
+);
+
 export const productRoutes = router;
