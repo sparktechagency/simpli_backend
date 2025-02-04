@@ -34,7 +34,7 @@ router.patch(
   validateRequest(VariantValidations.updateVariantValidationSchema),
   VariantController.updateVariant,
 );
-
+// delete variant
 router.delete(
   '/delete-variant/:id',
   auth(USER_ROLE.bussinessOwner),
