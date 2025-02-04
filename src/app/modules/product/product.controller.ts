@@ -17,8 +17,23 @@ const createProduct = catchAsync(async (req, res) => {
   });
 });
 
+const saveProductAsDraft = catchAsync(async (req, res) => {
+  const result = await ProductService.saveProductAsDraftIntoDB(
+    req.user.profileId,
+    req.body,
+    req.files,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Product save as draft successfully',
+    data: result,
+  });
+});
+
 const ProductController = {
   createProduct,
+  saveProductAsDraft,
 };
 
 export default ProductController;

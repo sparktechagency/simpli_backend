@@ -14,7 +14,11 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/category';
       } else if (file.fieldname === 'product_image') {
         uploadPath = 'uploads/images/product_image';
-      } else if (file.fieldname === 'variant_image') {
+      }
+      // else if (file.fieldname === 'variant_image') {
+      //   uploadPath = 'uploads/images/variant_image';
+      // }
+      else if (file.fieldname.startsWith('variant_image')) {
         uploadPath = 'uploads/images/variant_image';
       } else if (file.fieldname === 'team_bg_image') {
         uploadPath = 'uploads/images/team_bg_image';

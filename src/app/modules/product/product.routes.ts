@@ -21,5 +21,18 @@ router.patch(
   validateRequest(ProductValidations.createProductValidationSchema),
   ProductController.createProduct,
 );
+router.patch(
+  '/save-product-as-draft',
+  auth(USER_ROLE.bussinessOwner),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  validateRequest(ProductValidations.saveAsDraftProductValidationSchema),
+  ProductController.createProduct,
+);
 
 export const productRoutes = router;
