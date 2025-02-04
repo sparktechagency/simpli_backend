@@ -10,7 +10,7 @@ const variantSchema = new Schema<IVariant>({
   weight: { type: String, required: false },
   price: { type: Number, required: true },
   stock: { type: Number, required: true, default: 0 },
-  images: { type: [String], required: false },
+  images: { type: [String], default: [] },
 });
 
 const Variant = model<IVariant>('Variant', variantSchema);

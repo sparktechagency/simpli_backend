@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { IVariant } from './variant.interface';
 import Variant from './variant.model';
+import unlinkFile from '../../helper/unLinkFile';
 
 const createVariantIntoDB = async (profileId: string, payload: IVariant) => {
   const result = await Variant.create({ ...payload, bussiness: profileId });
@@ -18,6 +19,14 @@ const updateVariantIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Variant not found');
   }
 
+  //TODO: if you want to uplaod images in cloud then need to change here
+  if (variant.images && variant.images?.length > 0) {
+    for (const imageUrl of variant.images) {
+      if (!payload.images?.includes(imageUrl)) {
+        unlinkFile(imageUrl);
+      }
+    }
+  }
   const result = await Variant.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
