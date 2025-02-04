@@ -24,4 +24,5 @@ export interface IProduct {
   createdAt?: Date;
   updatedAt?: Date;
   isDraft: boolean;
+  isDeleted: boolean;
 }

@@ -100,10 +100,35 @@ const publishProductFromDraft = async (
   return result;
 };
 
+const deleteSingleProduct = async (profileId: string, id: string) => {
+  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  const result = await Product.findByIdAndDelete(id);
+  return result;
+};
+const softDeleteSingleProduct = async (profileId: string, id: string) => {
+  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  const result = await Product.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
 const ProductService = {
   createProductIntoDB,
   saveProductAsDraftIntoDB,
   publishProductFromDraft,
+  deleteSingleProduct,
+  softDeleteSingleProduct,
 };
 
 export default ProductService;
