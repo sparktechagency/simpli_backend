@@ -7,14 +7,7 @@ const userSchema = new Schema<TUser>(
   {
     email: {
       type: String,
-      required: function () {
-        return this.role === 'user'; // Only required if the role is 'user'
-      },
-      // unique: true,
-      match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        'Please provide a valid email address',
-      ],
+      required: true,
     },
     phone: {
       type: String,
@@ -29,7 +22,7 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: ['user', 'team', 'player', 'superAdmin'],
+      enum: ['bussinessOwner', 'sampler', 'superAdmin'],
       required: true,
     },
     status: {
