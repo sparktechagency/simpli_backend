@@ -26,14 +26,18 @@ const addBussinessDocumentValidationSchema = z.object({
       required_error: 'Ein number is required',
       invalid_type_error: 'Ein number must be number',
     }),
-    incorporationCertificate: z.string({
-      required_error: 'Incorporation certificate is required',
-      invalid_type_error: 'Incorporation certificate must be string',
-    }),
-    bussinessLicense: z.string({
-      required_error: 'Bussiness license is required',
-      invalid_type_error: 'Bussiness license must be string',
-    }),
+    incorporationCertificate: z
+      .string({
+        required_error: 'Incorporation certificate is required',
+        invalid_type_error: 'Incorporation certificate must be string',
+      })
+      .optional(),
+    bussinessLicense: z
+      .string({
+        required_error: 'Bussiness license is required',
+        invalid_type_error: 'Bussiness license must be string',
+      })
+      .optional(),
   }),
 });
 const bussinessValidations = {

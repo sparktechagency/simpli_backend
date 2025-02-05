@@ -18,6 +18,19 @@ const addBussinessInformation = catchAsync(async (req, res) => {
 });
 
 const addBussinessDocument = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'bussinessLicense' in files) {
+    req.body.bussinessLicense = files['bussinessLicense'][0].path;
+  }
+  if (
+    files &&
+    typeof files === 'object' &&
+    'incorparationCertificate' in files
+  ) {
+    req.body.incorparationCertificate =
+      files['incorparationCertificate'][0].path;
+  }
+
   const result = await BussinessService.addBussinessDocumentIntoDB(
     req.user.profileId,
     req.body,
