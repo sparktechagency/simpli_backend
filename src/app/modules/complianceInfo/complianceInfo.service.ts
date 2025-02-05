@@ -49,10 +49,16 @@ const deleteComplianceInfo = async (profileId: string, id: string) => {
   return result;
 };
 
+const getComplianceInfoForBussiness = async (bussinessId: string) => {
+  const result = await ComplianceInfo.find({ bussiness: bussinessId });
+  return result;
+};
+
 const ComplianceInfoService = {
   createComplianceInfo,
   deleteComplianceInfo,
   editComplianceInfo,
+  getComplianceInfoForBussiness,
 };
 
 export default ComplianceInfoService;

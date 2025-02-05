@@ -24,10 +24,10 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/team_bg_image';
       } else if (file.fieldname === 'player_image') {
         uploadPath = 'uploads/images/player_image';
-      } else if (file.fieldname === 'player_bg_image') {
-        uploadPath = 'uploads/images/player_bg_image';
-      } else if (file.fieldname === 'reward_image') {
-        uploadPath = 'uploads/images/reward_image';
+      } else if (file.fieldname === 'bussinessLicense') {
+        uploadPath = 'uploads/document/bussiness';
+      } else if (file.fieldname === 'incorparationCertificate') {
+        uploadPath = 'uploads/document/bussiness';
       } else {
         uploadPath = 'uploads';
       }
@@ -41,7 +41,8 @@ export const uploadFile = () => {
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
         file.mimetype === 'image/webp' ||
-        file.mimetype === 'video/mp4'
+        file.mimetype === 'video/mp4' ||
+        file.mimetype === 'application/pdf'
       ) {
         cb(null, uploadPath);
       } else {
@@ -63,8 +64,8 @@ export const uploadFile = () => {
       'category_image',
       'variant_image',
       'team_bg_image',
-      'player_image',
-      'player_bg_image',
+      'bussinessLicense',
+      'incorparationCertificate',
       'reward_image',
       'video',
     ];
@@ -78,7 +79,8 @@ export const uploadFile = () => {
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
         file.mimetype === 'image/webp' ||
-        file.mimetype === 'video/mp4'
+        file.mimetype === 'video/mp4' ||
+        file.mimetype === 'application/pdf'
       ) {
         cb(null, true);
       } else {
@@ -99,8 +101,8 @@ export const uploadFile = () => {
     { name: 'sub_category_image', maxCount: 1 },
     { name: 'product_image', maxCount: 5 },
     { name: 'variant_image', maxCount: 5 },
-    { name: 'team_bg_image', maxCount: 1 },
-    { name: 'player_image', maxCount: 1 },
+    { name: 'bussinessLicense', maxCount: 1 },
+    { name: 'incorparationCertificate', maxCount: 1 },
     { name: 'player_bg_image', maxCount: 1 },
     { name: 'reward_image', maxCount: 1 },
     { name: 'video', maxCount: 1 },

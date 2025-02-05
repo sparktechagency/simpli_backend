@@ -4,32 +4,29 @@ import { User } from './user.model';
 import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, TUserRole } from './user.interface';
 import { USER_ROLE } from './user.constant';
 import NormalUser from '../normalUser/normalUser.model';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import cron from 'node-cron';
 import sendEmail from '../../utilities/sendEmail';
 import { JwtPayload } from 'jsonwebtoken';
-import { IBussiness } from '../bussiness/bussiness.interface';
 import Bussiness from '../bussiness/bussiness.model';
+import { createToken } from './user.utils';
+import config from '../../config';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
 
-const registerBussinessOwner = async (
-  password: string,
-  confirmPassword: string,
-  bussinessData: IBussiness,
-) => {
-  if (password !== confirmPassword) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Password and confirm password doesn't match",
-    );
-  }
+const registerBussinessOwner = async (email: string, password: string) => {
+  // if (password !== confirmPassword) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "Password and confirm password doesn't match",
+  //   );
+  // }
 
-  const emailExist = await User.findOne({ email: bussinessData.email });
+  const emailExist = await User.findOne({ email: email });
   if (emailExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'This email already exist');
   }
@@ -39,7 +36,7 @@ const registerBussinessOwner = async (
   try {
     const verifyCode = generateVerifyCode();
     const userDataPayload: Partial<TUser> = {
-      email: bussinessData?.email,
+      email: email,
       password: password,
       role: USER_ROLE.bussinessOwner,
       verifyCode,
@@ -49,16 +46,16 @@ const registerBussinessOwner = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const user = await User.create([userDataPayload], { session });
 
-    const normalUserPayload = {
-      ...bussinessData,
+    const bussinessOwnerPayload = {
+      email,
       user: user[0]._id,
     };
-    const result = await NormalUser.create([normalUserPayload], { session });
+    const result = await Bussiness.create([bussinessOwnerPayload], { session });
 
     sendEmail({
-      email: bussinessData.email,
+      email: email,
       subject: 'Activate Your Account',
-      html: registrationSuccessEmailBody(result[0].name, user[0].verifyCode),
+      html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
     });
 
     await session.commitTransaction();
@@ -83,13 +80,31 @@ const verifyCode = async (email: string, verifyCode: number) => {
   if (verifyCode !== user.verifyCode) {
     throw new AppError(httpStatus.BAD_REQUEST, "Code doesn't match");
   }
-  const result = await User.findOneAndUpdate(
+  await User.findOneAndUpdate(
     { email: email },
     { isVerified: true },
     { new: true, runValidators: true },
   );
 
-  return result;
+  const jwtPayload = {
+    id: user?._id,
+    email: user?.email,
+    role: user?.role as TUserRole,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const resendVerifyCode = async (email: string) => {

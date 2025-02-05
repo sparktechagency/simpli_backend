@@ -2,15 +2,14 @@ import validateRequest from '../../middlewares/validateRequest';
 import userControllers from './user.controller';
 import { Router } from 'express';
 import userValidations from './user.validation';
-import normalUserValidations from '../normalUser/normalUser.validation';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from './user.constant';
 
 const router = Router();
 
 router.post(
-  '/register-user',
-  validateRequest(normalUserValidations.createNormalUserSchema),
+  '/register-bussiness',
+  validateRequest(userValidations.registerBussinessOwnerValidationSchema),
   userControllers.registerUser,
 );
 

@@ -2,15 +2,13 @@ import { z } from 'zod';
 import { ENUM_USER_STATUS } from '../../utilities/enum';
 
 // Zod schema for user creation
-export const registerUserValidationSchema = z.object({
+export const registerBussinessOwnerValidationSchema = z.object({
   body: z.object({
-    name: z.string().min(1, 'Name is required').max(100),
     email: z
       .string({ invalid_type_error: 'Please add a valid email' })
       .email('Invalid email format')
       .optional(),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    phone: z.string().min(1, 'Phone number is required').max(15).optional(),
   }),
 });
 
@@ -75,7 +73,7 @@ const deleteUserAccountValidationSchema = z.object({
 });
 
 const userValidations = {
-  registerUserValidationSchema,
+  registerBussinessOwnerValidationSchema,
   loginValidationSchema,
   changePasswordValidationSchema,
   refreshTokenValidationSchema,

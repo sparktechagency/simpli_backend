@@ -8,23 +8,16 @@ import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
 import { USER_ROLE } from '../modules/user/user.constant';
-import NormalUser from '../modules/normalUser/normalUser.model';
 import SuperAdmin from '../modules/superAdmin/superAdmin.model';
-
-// make costume interface
+import Bussiness from '../modules/bussiness/bussiness.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    // check if the token is sent from client -----
     const token = req?.headers?.authorization;
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Your are not authorized 1');
     }
-    // check if the token is valid-
-    // checking if the given token is valid
-
     let decoded;
-
     try {
       decoded = jwt.verify(
         token,
@@ -35,14 +28,11 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, role, email, username, iat } = decoded;
-
     if (!decoded) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
     // get the user if that here ---------
-    const user = await User.findOne({
-      $or: [{ email: email }, { username: username }],
-    });
+    const user = await User.findById(id);
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
     }
@@ -57,8 +47,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     let profileData;
-    if (role === USER_ROLE.user) {
-      profileData = await NormalUser.findOne({ user: id }).select('_id');
+    if (role === USER_ROLE.bussinessOwner) {
+      profileData = await Bussiness.findOne({ user: id }).select('_id');
     } else if (role === USER_ROLE.superAdmin) {
       profileData = await SuperAdmin.findOne({ user: id }).select('_id');
     }

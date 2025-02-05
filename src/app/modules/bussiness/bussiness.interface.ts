@@ -1,6 +1,8 @@
+import { Types } from 'mongoose';
 import { bussinessType, industryType } from './bussiness.constant';
 
 export interface IBussiness {
+  user: Types.ObjectId;
   bussinessName: string;
   email: string;
   tradeName: string;

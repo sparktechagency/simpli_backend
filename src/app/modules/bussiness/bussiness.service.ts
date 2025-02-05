@@ -7,6 +7,10 @@ const addBussinessInformation = async (
   profileId: string,
   payload: Partial<IBussiness>,
 ) => {
+  const bussiness = await Bussiness.findById(profileId);
+  if (!bussiness) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
+  }
   const result = await Bussiness.findByIdAndUpdate(
     profileId,
     { ...payload, isBussinessInfoProvided: true },

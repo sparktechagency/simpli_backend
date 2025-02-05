@@ -4,6 +4,11 @@ import { IBussiness } from './bussiness.interface';
 
 const BussinessSchema = new Schema<IBussiness>(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
     bussinessName: {
       type: String,
     },

@@ -4,15 +4,14 @@ import sendResponse from '../../utilities/sendResponse';
 import userServices from './user.services';
 
 const registerUser = catchAsync(async (req, res) => {
-  const result = await userServices.registerUser(
+  const result = await userServices.registerBussinessOwner(
+    req.body.email,
     req.body.password,
-    req.body.confirmPassword,
-    req.body.userData,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User registration successful.Check email for verify your email',
+    message: 'Registration successful.Check email for verify your email',
     data: result,
   });
 });

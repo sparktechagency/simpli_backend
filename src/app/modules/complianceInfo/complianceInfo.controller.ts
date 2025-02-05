@@ -41,11 +41,23 @@ const deleteComplianceInfo = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getComplianceInfoForBussiness = catchAsync(async (req, res) => {
+  const result = await ComplianceInfoService.getComplianceInfoForBussiness(
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Compliance Info created successfully',
+    data: result,
+  });
+});
 
 const ComplianceInfoController = {
   createComplianceInfo,
   updateComplianceInfo,
   deleteComplianceInfo,
+  getComplianceInfoForBussiness,
 };
 
 export default ComplianceInfoController;

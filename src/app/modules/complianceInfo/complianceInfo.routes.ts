@@ -29,4 +29,8 @@ router.delete(
   auth(USER_ROLE.bussinessOwner),
   ComplianceInfoController.deleteComplianceInfo,
 );
+router.get(
+  '/get-compliance-info-for-bussiness/:id',
+  ComplianceInfoController.getComplianceInfoForBussiness,
+);
 export const complianceInfoRoutes = router;
