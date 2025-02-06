@@ -43,10 +43,43 @@ const addBussinessDocument = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateBussinessInfo = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'bussinessLicense' in files) {
+    req.body.bussinessLicense = files['bussinessLicense'][0].path;
+  }
+  if (
+    files &&
+    typeof files === 'object' &&
+    'incorparationCertificate' in files
+  ) {
+    req.body.incorparationCertificate =
+      files['incorparationCertificate'][0].path;
+  }
+  if (files && typeof files === 'object' && 'coverImage' in files) {
+    req.body.coverImage = files['coverImage'][0].path;
+  }
+  if (files && typeof files === 'object' && 'logo' in files) {
+    req.body.logo = files['logo'][0].path;
+  }
+
+  const result = await BussinessService.updateBussinessInfoIntoDB(
+    req.user.profileId,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Bussiness updated successfully',
+    data: result,
+  });
+});
 
 const BussinessController = {
   addBussinessInformation,
   addBussinessDocument,
+  updateBussinessInfo,
 };
 
 export default BussinessController;

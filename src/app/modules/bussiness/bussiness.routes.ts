@@ -26,4 +26,16 @@ router.post(
   validateRequest(bussinessValidations.addBussinessDocumentValidationSchema),
   BussinessController.addBussinessDocument,
 );
+router.post(
+  '/update-bussiness-info',
+  auth(USER_ROLE.bussinessOwner),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  BussinessController.updateBussinessInfo,
+);
 export const bussinessRoutes = router;

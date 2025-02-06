@@ -28,6 +28,10 @@ export const uploadFile = () => {
         uploadPath = 'uploads/document/bussiness';
       } else if (file.fieldname === 'incorparationCertificate') {
         uploadPath = 'uploads/document/bussiness';
+      } else if (file.fieldname === 'logo') {
+        uploadPath = 'uploads/images/bussiness_logo';
+      } else if (file.fieldname === 'coverImage') {
+        uploadPath = 'uploads/images/bussinessCover';
       } else {
         uploadPath = 'uploads';
       }
