@@ -26,7 +26,7 @@ router.post(
   validateRequest(bussinessValidations.addBussinessDocumentValidationSchema),
   BussinessController.addBussinessDocument,
 );
-router.post(
+router.patch(
   '/update-bussiness-info',
   auth(USER_ROLE.bussinessOwner),
   uploadFile(),

@@ -42,6 +42,24 @@ const BussinessSchema = new Schema<IBussiness>(
         'Please use a valid website URL.',
       ],
     },
+    logo: {
+      type: String,
+    },
+    coverImage: {
+      type: String,
+    },
+    facebook: {
+      type: String,
+    },
+    twiter: {
+      type: String,
+    },
+    linkedin: {
+      type: String,
+    },
+    instagram: {
+      type: String,
+    },
     taxtIndentificationNumber: {
       type: Number,
     },

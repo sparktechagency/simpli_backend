@@ -70,6 +70,8 @@ export const uploadFile = () => {
       'team_bg_image',
       'bussinessLicense',
       'incorparationCertificate',
+      'coverImage',
+      'logo',
       'reward_image',
       'video',
     ];
@@ -108,7 +110,8 @@ export const uploadFile = () => {
     { name: 'bussinessLicense', maxCount: 1 },
     { name: 'incorparationCertificate', maxCount: 1 },
     { name: 'player_bg_image', maxCount: 1 },
-    { name: 'reward_image', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'logo', maxCount: 1 },
     { name: 'video', maxCount: 1 },
   ]);
 

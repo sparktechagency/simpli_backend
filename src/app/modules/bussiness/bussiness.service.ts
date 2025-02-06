@@ -58,16 +58,24 @@ const updateBussinessInfoIntoDB = async (
 
   //!TODO : if you use external could for files you need to change here
   if (payload.bussinessLicense) {
-    unlinkFile(bussiness?.bussinessLicense);
+    if (bussiness.bussinessLicense) {
+      unlinkFile(bussiness?.bussinessLicense);
+    }
   }
   if (payload.incorparationCertificate) {
-    unlinkFile(bussiness.incorparationCertificate);
+    if (bussiness.incorparationCertificate) {
+      unlinkFile(bussiness.incorparationCertificate);
+    }
   }
   if (payload.coverImage) {
-    unlinkFile(bussiness.coverImage);
+    if (bussiness.coverImage) {
+      unlinkFile(bussiness.coverImage);
+    }
   }
   if (payload.logo) {
-    unlinkFile(bussiness.logo);
+    if (bussiness.logo) {
+      unlinkFile(bussiness.logo);
+    }
   }
   return result;
 };
