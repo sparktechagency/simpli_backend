@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { IComplianceInfo } from './complianceInfo.interface';
 import ComplianceInfo from './complianceInfo.model';
+import Bussiness from '../bussiness/bussiness.model';
 
 const createComplianceInfo = async (
   profileId: string,
@@ -11,6 +12,12 @@ const createComplianceInfo = async (
     ...payload,
     bussiness: profileId,
   });
+
+  await Bussiness.findByIdAndUpdate(
+    profileId,
+    { isComplianceInfoProvided: true },
+    { new: true, runValidators: true },
+  );
   return result;
 };
 
