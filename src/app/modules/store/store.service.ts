@@ -27,9 +27,15 @@ const updateStoreIntoDB = async (
   });
   return result;
 };
+
+const getBussinessStore = async (bussinessId: string) => {
+  const result = await Store.find({ bussiness: bussinessId });
+  return result;
+};
 const StoreService = {
   createStore,
   updateStoreIntoDB,
+  getBussinessStore,
 };
 
 export default StoreService;

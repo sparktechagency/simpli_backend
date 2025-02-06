@@ -20,4 +20,6 @@ router.patch(
   StoreController.updateStore,
 );
 
-export const complianceInfoRoutes = router;
+router.get('/get-bussiness-store/:id', StoreController.getBussinessStore);
+
+export const storeRoutes = router;

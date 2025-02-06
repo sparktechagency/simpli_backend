@@ -25,10 +25,20 @@ const updateStore = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getBussinessStore = catchAsync(async (req, res) => {
+  const result = await StoreService.getBussinessStore(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Store retrieved successfully successfully',
+    data: result,
+  });
+});
 
 const StoreController = {
   createStore,
   updateStore,
+  getBussinessStore,
 };
 
 export default StoreController;

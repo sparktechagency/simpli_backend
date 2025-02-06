@@ -9,6 +9,7 @@ import { complianceInfoRoutes } from '../modules/complianceInfo/complianceInfo.r
 import { bussinessRoutes } from '../modules/bussiness/bussiness.routes';
 import { productRoutes } from '../modules/product/product.routes';
 import { variantRoutes } from '../modules/variant/variant.routes';
+import { storeRoutes } from '../modules/store/store.routes';
 
 const router = Router();
 
@@ -49,6 +50,10 @@ const moduleRoutes = [
   {
     path: '/variant',
     router: variantRoutes,
+  },
+  {
+    path: '/store',
+    router: storeRoutes,
   },
 ];
 
