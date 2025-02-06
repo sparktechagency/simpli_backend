@@ -40,9 +40,26 @@ const addBussinessDocumentIntoDB = async (
   );
   return result;
 };
+
+const updateBussinessInfoIntoDB = async (
+  bussinessId: string,
+  payload: Partial<IBussiness>,
+) => {
+  const bussiness = await Bussiness.findById(bussinessId);
+  if (!bussiness) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
+  }
+
+  const result = await Bussiness.findByIdAndUpdate(bussinessId, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
 const BussinessService = {
   addBussinessInformation,
   addBussinessDocumentIntoDB,
+  updateBussinessInfoIntoDB,
 };
 
 export default BussinessService;

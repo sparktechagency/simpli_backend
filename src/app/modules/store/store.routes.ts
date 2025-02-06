@@ -13,6 +13,7 @@ router.post(
   validateRequest(StoreValidations.createStoreValidationSchema),
   StoreController.createStore,
 );
+
 router.patch(
   '/update-store/:id',
   auth(USER_ROLE.bussinessOwner),
