@@ -1,6 +1,4 @@
 import express, { NextFunction, Request, Response } from 'express';
-import auth from '../../middlewares/auth';
-import { USER_ROLE } from '../user/user.constant';
 import validateRequest from '../../middlewares/validateRequest';
 import categoryValidation from './category.validation';
 import categoryController from './category.controller';
@@ -10,7 +8,6 @@ const router = express.Router();
 
 router.post(
   '/create-category',
-  auth(USER_ROLE.superAdmin),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -23,7 +20,6 @@ router.post(
 );
 router.patch(
   '/update-category/:id',
-  auth(USER_ROLE.superAdmin),
   uploadFile(),
   validateRequest(categoryValidation.updateCategoryValidationSchema),
   categoryController.updateCategory,
@@ -31,10 +27,6 @@ router.patch(
 
 router.get('/all-categories', categoryController.getAllCategories);
 router.get('/get-single-category/:id', categoryController.getSingleCategory);
-router.delete(
-  '/delete-category/:id',
-  auth(USER_ROLE.superAdmin),
-  categoryController.deleteCategory,
-);
+router.delete('/delete-category/:id', categoryController.deleteCategory);
 
 export const categoryRoutes = router;

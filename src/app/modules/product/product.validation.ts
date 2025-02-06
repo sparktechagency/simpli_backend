@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
+import { createVariantValidationSchema } from '../variant/variant.validation';
 
 const ProductStatusSchema = z.nativeEnum(ENUM_PRODUCT_STATUS);
 
@@ -9,7 +10,9 @@ export const createProductValidationSchema = z.object({
   category: z.string().min(1, 'Category ID is required'),
   brand: z.string().optional(),
   status: ProductStatusSchema.default(ENUM_PRODUCT_STATUS.ACTIVE),
-  //   variants: z.array(variantSchema).min(1, 'At least one variant is required'),
+  variants: z
+    .array(createVariantValidationSchema)
+    .min(1, 'At least one variant is required'),
   images: z.array(z.string().url('Invalid image URL')).optional(),
   tags: z.array(z.string().min(1)).optional(),
 });

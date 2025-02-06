@@ -10,6 +10,7 @@ import { bussinessRoutes } from '../modules/bussiness/bussiness.routes';
 import { productRoutes } from '../modules/product/product.routes';
 import { variantRoutes } from '../modules/variant/variant.routes';
 import { storeRoutes } from '../modules/store/store.routes';
+import { categoryRoutes } from '../modules/category/category.routes';
 
 const router = Router();
 
@@ -54,6 +55,10 @@ const moduleRoutes = [
   {
     path: '/store',
     router: storeRoutes,
+  },
+  {
+    path: '/category',
+    router: categoryRoutes,
   },
 ];
 
