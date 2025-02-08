@@ -206,6 +206,27 @@ const getSingleProductFromDB = async (id: string) => {
   return result;
 };
 
+// update product
+
+const updateProductIntoDB = async (
+  bussinessId: string,
+  productId: string,
+  payload: Partial<IProduct>,
+) => {
+  const product = await Product.findOne({
+    bussiness: bussinessId,
+    _id: productId,
+  });
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+  const result = await Product.findByIdAndUpdate(productId, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 const ProductService = {
   createProductIntoDB,
   saveProductAsDraftIntoDB,
@@ -215,6 +236,7 @@ const ProductService = {
   changeProductStatus,
   getAllProduct,
   getSingleProductFromDB,
+  updateProductIntoDB,
 };
 
 export default ProductService;
