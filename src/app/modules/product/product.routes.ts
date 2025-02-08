@@ -65,4 +65,14 @@ router.patch(
   auth(USER_ROLE.bussinessOwner),
   ProductController.changeProductStatus,
 );
+router.patch(
+  '/get-all-product',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.getAllProduct,
+);
+router.patch(
+  '/get-single-product/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.getSingleProduct,
+);
 export const productRoutes = router;
