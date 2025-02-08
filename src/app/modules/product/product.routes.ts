@@ -35,7 +35,6 @@ router.post(
   validateRequest(ProductValidations.saveAsDraftProductValidationSchema),
   ProductController.createProduct,
 );
-
 router.post(
   '/publish-product-from-draft/:id',
   auth(USER_ROLE.bussinessOwner),
@@ -65,14 +64,14 @@ router.patch(
   auth(USER_ROLE.bussinessOwner),
   ProductController.changeProductStatus,
 );
-router.patch(
+router.get(
   '/get-all-product',
-  auth(USER_ROLE.bussinessOwner),
+  // auth(USER_ROLE.bussinessOwner),
   ProductController.getAllProduct,
 );
-router.patch(
+router.get(
   '/get-single-product/:id',
-  auth(USER_ROLE.bussinessOwner),
+  // auth(USER_ROLE.bussinessOwner),
   ProductController.getSingleProduct,
 );
 export const productRoutes = router;

@@ -24,6 +24,10 @@ const ProductSchema = new Schema<IProduct>(
       enum: Object.values(ENUM_PRODUCT_STATUS),
       default: ENUM_PRODUCT_STATUS.ACTIVE,
     },
+    price: {
+      type: Number,
+      required: true,
+    },
     images: { type: [String], required: false },
     tags: { type: [String], required: false },
     isDraft: { type: Boolean, default: false },

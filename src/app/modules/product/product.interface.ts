@@ -16,6 +16,7 @@ export interface IProduct {
   name: string;
   description: string;
   category: Types.ObjectId;
+  price: number;
   brand?: string;
   status: (typeof ENUM_PRODUCT_STATUS)[keyof typeof ENUM_PRODUCT_STATUS];
   variants: IVariant[];
