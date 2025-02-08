@@ -33,7 +33,7 @@ router.post(
     next();
   },
   validateRequest(ProductValidations.saveAsDraftProductValidationSchema),
-  ProductController.createProduct,
+  ProductController.saveProductAsDraft,
 );
 router.post(
   '/publish-product-from-draft/:id',

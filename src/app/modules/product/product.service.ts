@@ -57,41 +57,6 @@ const createProductIntoDB = async (
 };
 
 // save as drafh -----------------
-// const saveProductAsDraftIntoDB = async (
-//   profileId: string,
-//   payload: IProduct,
-//   files: any,
-// ) => {
-//   const productImages = files?.product_image
-//     ? files.product_image.map((file: any) => file.path)
-//     : [];
-
-//   const variantImagesMap: { [key: string]: string[] } = {};
-//   if (files) {
-//     Object.keys(files).forEach((key) => {
-//       if (key.startsWith('variant_image_')) {
-//         const sku = key.replace('variant_image_', '');
-//         variantImagesMap[sku] = files[key].map((file: any) => file.path);
-//       }
-//     });
-//   }
-//   const updatedVariants = payload.variants.map((variant) => ({
-//     ...variant,
-//     images: variantImagesMap[variant.sku] || [],
-//   }));
-
-//   await Variant.insertMany(updatedVariants);
-
-//   const result = await Product.create({
-//     ...payload,
-//     bussiness: profileId,
-//     images: productImages,
-//     isDraft: true,
-//     // variants: updatedVariants,
-//   });
-
-//   return result;
-// };
 
 const saveProductAsDraftIntoDB = async (
   profileId: string,
@@ -149,7 +114,7 @@ const publishProductFromDraft = async (
   const product = await Product.findOne({
     bussiness: profileId,
     _id: id,
-    satus: ENUM_PRODUCT_STATUS.DRAFT,
+    status: ENUM_PRODUCT_STATUS.DRAFT,
   });
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
@@ -161,7 +126,7 @@ const publishProductFromDraft = async (
       'You need to add minimum one variant for that product',
     );
   }
-
+  payload.status = ENUM_PRODUCT_STATUS.ACTIVE;
   const result = await Product.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,

@@ -28,7 +28,7 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
-    images: { type: [String], required: false },
+    images: { type: [String], required: false, default: [] },
     tags: { type: [String], required: false },
   },
   { timestamps: true },
