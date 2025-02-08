@@ -6,6 +6,7 @@ import { IProduct } from './product.interface';
 import Product from './product.model';
 import unlinkFile from '../../helper/unLinkFile';
 import Category from '../category/category.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createProductIntoDB = async (
   profileId: string,
@@ -197,7 +198,6 @@ const softDeleteSingleProduct = async (profileId: string, id: string) => {
   );
   return result;
 };
-
 // change product status -------------
 
 const changeProductStatus = async (profileId: string, id: string) => {
@@ -213,6 +213,32 @@ const changeProductStatus = async (profileId: string, id: string) => {
   return result;
 };
 
+const getAllProduct = async (query: Record<string, unknown>) => {
+  const productQuery = new QueryBuilder(Product.find(), query)
+    .search([''])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getSingleProductFromDB = async (id: string) => {
+  const result = await Product.findById(id);
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  return result;
+};
+
 const ProductService = {
   createProductIntoDB,
   saveProductAsDraftIntoDB,
@@ -220,6 +246,8 @@ const ProductService = {
   deleteSingleProduct,
   softDeleteSingleProduct,
   changeProductStatus,
+  getAllProduct,
+  getSingleProductFromDB,
 };
 
 export default ProductService;
