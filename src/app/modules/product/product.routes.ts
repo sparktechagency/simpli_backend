@@ -22,7 +22,7 @@ router.post(
   validateRequest(ProductValidations.createProductValidationSchema),
   ProductController.createProduct,
 );
-router.patch(
+router.post(
   '/save-product-as-draft',
   auth(USER_ROLE.bussinessOwner),
   uploadFile(),
@@ -46,7 +46,7 @@ router.post(
     }
     next();
   },
-  validateRequest(ProductValidations.createProductValidationSchema),
+  // validateRequest(ProductValidations.createProductValidationSchema),
   ProductController.publishProductFromDraft,
 );
 

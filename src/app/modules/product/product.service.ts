@@ -36,7 +36,6 @@ const createProductIntoDB = async (
       }
     });
   }
-
   const result = await Product.create({
     ...payload,
     bussiness: profileId,
@@ -56,38 +55,85 @@ const createProductIntoDB = async (
 };
 
 // save as drafh -----------------
+// const saveProductAsDraftIntoDB = async (
+//   profileId: string,
+//   payload: IProduct,
+//   files: any,
+// ) => {
+//   const productImages = files?.product_image
+//     ? files.product_image.map((file: any) => file.path)
+//     : [];
+
+//   const variantImagesMap: { [key: string]: string[] } = {};
+//   if (files) {
+//     Object.keys(files).forEach((key) => {
+//       if (key.startsWith('variant_image_')) {
+//         const sku = key.replace('variant_image_', '');
+//         variantImagesMap[sku] = files[key].map((file: any) => file.path);
+//       }
+//     });
+//   }
+//   const updatedVariants = payload.variants.map((variant) => ({
+//     ...variant,
+//     images: variantImagesMap[variant.sku] || [],
+//   }));
+
+//   await Variant.insertMany(updatedVariants);
+
+//   const result = await Product.create({
+//     ...payload,
+//     bussiness: profileId,
+//     images: productImages,
+//     isDraft: true,
+//     // variants: updatedVariants,
+//   });
+
+//   return result;
+// };
+
 const saveProductAsDraftIntoDB = async (
   profileId: string,
   payload: IProduct,
   files: any,
 ) => {
-  const productImages = files?.product_image
-    ? files.product_image.map((file: any) => file.path)
-    : [];
+  const category = await Category.findById(payload.category);
+  if (!category) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+  }
 
+  let productImages: string[] = [];
+  if (Array.isArray(files)) {
+    productImages = files
+      .filter((file: any) => file.fieldname === 'product_image')
+      .map((file: any) => file.path);
+  }
+  // variant images
   const variantImagesMap: { [key: string]: string[] } = {};
-  if (files) {
-    Object.keys(files).forEach((key) => {
-      if (key.startsWith('variant_image_')) {
-        const sku = key.replace('variant_image_', '');
-        variantImagesMap[sku] = files[key].map((file: any) => file.path);
+  if (Array.isArray(files)) {
+    files.forEach((file: any) => {
+      if (file.fieldname.startsWith('variant_image_')) {
+        const sku = file.fieldname.replace('variant_image_', '');
+        if (!variantImagesMap[sku]) {
+          variantImagesMap[sku] = [];
+        }
+        variantImagesMap[sku].push(file.path);
       }
     });
   }
-  const updatedVariants = payload.variants.map((variant) => ({
-    ...variant,
-    images: variantImagesMap[variant.sku] || [],
-  }));
-
-  await Variant.insertMany(updatedVariants);
-
   const result = await Product.create({
     ...payload,
     bussiness: profileId,
     images: productImages,
-    isDraft: true,
-    // variants: updatedVariants,
   });
+
+  const updatedVariants = payload.variants.map((variant) => ({
+    ...variant,
+    images: variantImagesMap[variant.sku] || [],
+    product: result._id,
+    bussiness: profileId,
+  }));
+
+  await Variant.insertMany(updatedVariants);
 
   return result;
 };
@@ -97,7 +143,11 @@ const publishProductFromDraft = async (
   id: string,
   payload: IProduct,
 ) => {
-  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  const product = await Product.findOne({
+    bussiness: profileId,
+    _id: id,
+    isDraft: true,
+  });
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
