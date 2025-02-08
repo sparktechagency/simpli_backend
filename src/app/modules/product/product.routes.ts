@@ -78,6 +78,13 @@ router.get(
 router.patch(
   '/update-product/:id',
   auth(USER_ROLE.bussinessOwner),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
   ProductController.updateProduct,
 );
 export const productRoutes = router;
