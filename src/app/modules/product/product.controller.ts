@@ -91,6 +91,25 @@ const changeProductStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getAllProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getAllProduct(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Product retrieved successfully`,
+    data: result,
+  });
+});
+const getSingleProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getSingleProductFromDB(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Product retrieved successfully`,
+    data: result,
+  });
+});
+
 const ProductController = {
   createProduct,
   saveProductAsDraft,
@@ -98,6 +117,8 @@ const ProductController = {
   deleteSingleProduct,
   softDeleteSingleProduct,
   changeProductStatus,
+  getAllProduct,
+  getSingleProduct,
 };
 
 export default ProductController;
