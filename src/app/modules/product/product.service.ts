@@ -37,7 +37,6 @@ const createProductIntoDB = async (
     });
   }
 
-  console.log('profie id', profileId);
   const result = await Product.create({
     ...payload,
     bussiness: profileId,
