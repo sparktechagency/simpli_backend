@@ -3,7 +3,7 @@
 import { Request } from 'express';
 import multer from 'multer';
 import fs from 'fs';
-export const uploadFile = () => {
+export const uploadDynamicFile = () => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       let uploadPath = '';
@@ -100,26 +100,26 @@ export const uploadFile = () => {
     }
   };
 
+  //   const upload = multer({
+  //     storage: storage,
+  //     fileFilter: fileFilter,
+  //   }).fields([
+  //     { name: 'image', maxCount: 1 },
+  //     { name: 'profile_image', maxCount: 1 },
+  //     { name: 'category_image', maxCount: 1 },
+  //     { name: 'sub_category_image', maxCount: 1 },
+  //     { name: 'product_image', maxCount: 5 },
+  //     { name: 'variant_image', maxCount: 5 },
+  //     { name: 'bussinessLicense', maxCount: 1 },
+  //     { name: 'incorparationCertificate', maxCount: 1 },
+  //     { name: 'player_bg_image', maxCount: 1 },
+  //     { name: 'coverImage', maxCount: 1 },
+  //     { name: 'logo', maxCount: 1 },
+  //     { name: 'video', maxCount: 1 },
+  //   ]);
   const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
-  }).fields([
-    { name: 'image', maxCount: 1 },
-    { name: 'profile_image', maxCount: 1 },
-    { name: 'category_image', maxCount: 1 },
-    { name: 'sub_category_image', maxCount: 1 },
-    { name: 'product_image', maxCount: 5 },
-    { name: 'variant_image', maxCount: 5 },
-    { name: 'bussinessLicense', maxCount: 1 },
-    { name: 'incorparationCertificate', maxCount: 1 },
-    { name: 'player_bg_image', maxCount: 1 },
-    { name: 'coverImage', maxCount: 1 },
-    { name: 'logo', maxCount: 1 },
-    { name: 'video', maxCount: 1 },
-  ]);
-  // const upload = multer({
-  //   storage: storage,
-  //   fileFilter: fileFilter,
-  // }).any();
+  }).any();
   return upload;
 };

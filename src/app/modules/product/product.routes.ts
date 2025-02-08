@@ -5,13 +5,14 @@ import { uploadFile } from '../../helper/fileUploader';
 import validateRequest from '../../middlewares/validateRequest';
 import ProductValidations from './product.validation';
 import ProductController from './product.controller';
+import { uploadDynamicFile } from '../../helper/dynamicFileUploader';
 
 const router = express.Router();
 
-router.patch(
+router.post(
   '/create-product',
   auth(USER_ROLE.bussinessOwner),
-  uploadFile(),
+  uploadDynamicFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);

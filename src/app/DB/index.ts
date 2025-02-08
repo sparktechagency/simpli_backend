@@ -17,6 +17,7 @@ const seedSuperAdmin = async () => {
     console.log('Admin already exits');
     return;
   }
+  console.log('what is this');
   const session = await mongoose.startSession();
   session.startTransaction();
 
