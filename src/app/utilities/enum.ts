@@ -1,6 +1,8 @@
 export const ENUM_PRODUCT_STATUS = {
   ACTIVE: 'active',
   INACTIVE: 'inactive',
+  DRAFT: 'draft',
+  ARCHIVED: 'archived',
 } as const;
 
 export const ENUM_PAYMENT_STATUS = {

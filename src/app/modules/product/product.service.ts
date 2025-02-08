@@ -7,6 +7,7 @@ import Product from './product.model';
 import unlinkFile from '../../helper/unLinkFile';
 import Category from '../category/category.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 
 const createProductIntoDB = async (
   profileId: string,
@@ -125,6 +126,7 @@ const saveProductAsDraftIntoDB = async (
     ...payload,
     bussiness: profileId,
     images: productImages,
+    status: ENUM_PRODUCT_STATUS.DRAFT,
   });
 
   const updatedVariants = payload.variants.map((variant) => ({
@@ -147,7 +149,7 @@ const publishProductFromDraft = async (
   const product = await Product.findOne({
     bussiness: profileId,
     _id: id,
-    isDraft: true,
+    satus: ENUM_PRODUCT_STATUS.DRAFT,
   });
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
@@ -193,7 +195,7 @@ const softDeleteSingleProduct = async (profileId: string, id: string) => {
 
   const result = await Product.findByIdAndUpdate(
     id,
-    { isDeleted: true },
+    { status: ENUM_PRODUCT_STATUS.ARCHIVED },
     { new: true, runValidators: true },
   );
   return result;

@@ -24,6 +24,4 @@ export interface IProduct {
   tags?: string[];
   createdAt?: Date;
   updatedAt?: Date;
-  isDraft: boolean;
-  isDeleted: boolean;
 }
