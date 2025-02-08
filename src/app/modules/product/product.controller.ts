@@ -109,6 +109,24 @@ const getSingleProduct = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateProduct = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'product_image' in files) {
+    const newImages = files['product_image'].map((file) => file.path);
+    req.body.images.push(...newImages);
+  }
+  const result = await ProductService.updateProductIntoDB(
+    req.user.profileId,
+    req.params.id,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Product updated successfully`,
+    data: result,
+  });
+});
 
 const ProductController = {
   createProduct,
@@ -119,6 +137,7 @@ const ProductController = {
   changeProductStatus,
   getAllProduct,
   getSingleProduct,
+  updateProduct,
 };
 
 export default ProductController;

@@ -74,4 +74,10 @@ router.get(
   // auth(USER_ROLE.bussinessOwner),
   ProductController.getSingleProduct,
 );
+
+router.patch(
+  '/update-product/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ProductController.updateProduct,
+);
 export const productRoutes = router;
