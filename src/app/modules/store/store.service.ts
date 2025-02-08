@@ -12,6 +12,7 @@ const createStore = async (profileId: string, payload: IStore) => {
   const result = await Store.create({ ...payload, bussiness: profileId });
   return result;
 };
+
 const updateStoreIntoDB = async (
   profileId: string,
   id: string,

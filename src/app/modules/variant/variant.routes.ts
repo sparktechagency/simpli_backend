@@ -8,7 +8,7 @@ import VariantController from './variant.controller';
 
 const router = express.Router();
 
-router.patch(
+router.post(
   '/create-variant',
   auth(USER_ROLE.bussinessOwner),
   uploadFile(),
@@ -22,7 +22,7 @@ router.patch(
   VariantController.createVariant,
 );
 router.patch(
-  '/update-variant.:id',
+  '/update-variant/:id',
   auth(USER_ROLE.bussinessOwner),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
@@ -40,5 +40,7 @@ router.delete(
   auth(USER_ROLE.bussinessOwner),
   VariantController.deleteVariant,
 );
+
+router.get('/get-product-variant/:id', VariantController.getProductVariant);
 
 export const variantRoutes = router;

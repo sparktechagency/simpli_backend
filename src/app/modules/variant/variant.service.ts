@@ -3,8 +3,16 @@ import AppError from '../../error/appError';
 import { IVariant } from './variant.interface';
 import Variant from './variant.model';
 import unlinkFile from '../../helper/unLinkFile';
+import Product from '../product/product.model';
 
 const createVariantIntoDB = async (profileId: string, payload: IVariant) => {
+  const product = await Product.findById(payload.product);
+  if (!product) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Product not found that you provided ',
+    );
+  }
   const result = await Variant.create({ ...payload, bussiness: profileId });
   return result;
 };
