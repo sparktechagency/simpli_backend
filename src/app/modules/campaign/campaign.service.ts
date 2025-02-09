@@ -5,6 +5,7 @@ import { ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 import stripe from '../../utilities/stripe';
 import { ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
+import config from '../../config';
 
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
@@ -13,17 +14,21 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const amountInCents = totalAmount * 100;
 
   if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product is required');
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
-  const result = await Campaign.create(payload);
+  const result = await Campaign.create({
+    ...payload,
+    totalFee: totalAmount,
+    bussiness: bussinessId,
+  });
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     mode: 'payment',
     line_items: [
       {
         price_data: {
-          currency: 'eur',
+          currency: 'usd',
           product_data: {
             name: `Campaign Run`,
           },
@@ -33,16 +38,13 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
       },
     ],
     metadata: {
-      bookingId: result._id.toString(),
+      campaignId: result._id.toString(),
       paymentPurpose: ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN,
     },
-    success_url: `${config.stripe.booking_payment_success_url}`,
-    cancel_url: `${config.stripe.payment_cancel_url}`,
+    success_url: `${config.stripe.stripe_campaign_run_payment_success_url}`,
+    cancel_url: `${config.stripe.stripe_campaign_run_payment_cancel_url}`,
   });
-
-  // console.log('return url', session.url);
   return { url: session.url };
-  return result;
 };
 
 const CampaignService = {

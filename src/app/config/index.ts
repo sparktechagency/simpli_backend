@@ -17,10 +17,14 @@ export default {
   cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
-  super_admin_email:process.env.SUPER_ADMIN_EMAIL,
+  super_admin_email: process.env.SUPER_ADMIN_EMAIL,
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
   stripe: {
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
+    stripe_campaign_run_payment_success_url:
+      process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_SUCCESS_URL,
+    stripe_campaign_run_payment_cancel_url:
+      process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
   },
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,

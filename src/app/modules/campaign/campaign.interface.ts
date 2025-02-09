@@ -12,4 +12,5 @@ export interface ICampaign {
   endDate: Date;
   gender: string;
   location: string;
+  totalFee: number;
 }

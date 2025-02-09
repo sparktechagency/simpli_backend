@@ -58,6 +58,10 @@ const CampaignSchema = new Schema<ICampaign>(
       required: true,
       trim: true,
     },
+    totalFee: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true },
 );
