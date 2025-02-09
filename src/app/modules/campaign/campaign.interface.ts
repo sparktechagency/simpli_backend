@@ -6,7 +6,7 @@ export interface ICampaign {
   name: string;
   amountForEachReview: number;
   numberOfReviewers: number;
-  ageRange: number;
+  minAge: number;
   maxAge: number;
   startDate: Date;
   endDate: Date;
