@@ -76,7 +76,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
 
   // Check if campaign is scheduled
   const currentDate = new Date();
-  if (currentDate < payload.startDate) {
+  if (currentDate < new Date(payload.startDate)) {
     payload.status = CAMPAIGN_STATUS.SCHEDULED;
   }
 
@@ -177,6 +177,21 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
     });
   }
 };
+
+// crone jobs for campaign --------------------
+
+import cron from 'node-cron';
+
+cron.schedule('0 0 * * *', async () => {
+  console.log('Cron job executed at:', new Date());
+
+  const currentDate = new Date();
+  const result = await Campaign.updateMany(
+    { startDate: { $lte: currentDate }, status: { $ne: 'Active' } },
+    { $set: { status: 'Active' } },
+  );
+  console.log(`Campaigns updated: ${result.modifiedCount}`);
+});
 
 const CampaignService = {
   createCampaign,
