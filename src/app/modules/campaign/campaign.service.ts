@@ -4,7 +4,11 @@ import Product from '../product/product.model';
 import { ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 import stripe from '../../utilities/stripe';
-import { CAMPAIGN_STATUS, ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
+import {
+  CAMPAIGN_STATUS,
+  ENUM_PAYMENT_METHOD,
+  ENUM_PAYMENT_PURPOSE,
+} from '../../utilities/enum';
 import config from '../../config';
 
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
@@ -27,29 +31,33 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
     totalFee: totalAmount,
     bussiness: bussinessId,
   });
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'payment',
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Campaign Run`,
+  if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Campaign Run`,
+            },
+            unit_amount: amountInCents,
           },
-          unit_amount: amountInCents,
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      metadata: {
+        campaignId: result._id.toString(),
+        paymentPurpose: ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN,
       },
-    ],
-    metadata: {
-      campaignId: result._id.toString(),
-      paymentPurpose: ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN,
-    },
-    success_url: `${config.stripe.stripe_campaign_run_payment_success_url}`,
-    cancel_url: `${config.stripe.stripe_campaign_run_payment_cancel_url}`,
-  });
-  return { url: session.url };
+      success_url: `${config.stripe.stripe_campaign_run_payment_success_url}`,
+      cancel_url: `${config.stripe.stripe_campaign_run_payment_cancel_url}`,
+    });
+    return { url: session.url };
+  } else if (payload.paymentMethod === ENUM_PAYMENT_METHOD.PAYPAL) {
+    console.log('paypal payment');
+  }
 };
 
 const CampaignService = {

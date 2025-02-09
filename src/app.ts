@@ -3,21 +3,19 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express, { Application, Request, Response, application } from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import router from './app/routes';
 import notFound from './app/middlewares/notFound';
 const app: Application = express();
-import multer from 'multer';
-import auth from './app/middlewares/auth';
-import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import handleWebhook from './app/handleStripe/webhook';
-const upload = multer({ dest: 'uploads/' });
+import handlePaypalWebhook from './app/handlePaypalEvents/handlePaypalWebhook';
 // parser
 app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+router.post('/paypal-webhook', express.json(), handlePaypalWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
