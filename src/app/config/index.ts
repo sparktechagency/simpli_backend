@@ -25,6 +25,7 @@ export default {
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_SUCCESS_URL,
     stripe_campaign_run_payment_cancel_url:
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
+    webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
   },
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,

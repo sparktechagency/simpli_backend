@@ -4,7 +4,7 @@ import Product from '../product/product.model';
 import { ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 import stripe from '../../utilities/stripe';
-import { ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
+import { CAMPAIGN_STATUS, ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
 import config from '../../config';
 
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
@@ -17,6 +17,11 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
+  // check scheduled or not---
+  const currentDate = new Date();
+  if (currentDate < payload.startDate) {
+    payload.status = CAMPAIGN_STATUS.SCHEDULED;
+  }
   const result = await Campaign.create({
     ...payload,
     totalFee: totalAmount,

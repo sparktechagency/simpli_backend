@@ -14,8 +14,10 @@ import multer from 'multer';
 import auth from './app/middlewares/auth';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
+import handleWebhook from './app/handleStripe/webhook';
 const upload = multer({ dest: 'uploads/' });
 // parser
+app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
