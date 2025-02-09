@@ -14,7 +14,11 @@ import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import handleWebhook from './app/handleStripe/webhook';
 import handlePaypalWebhook from './app/handlePaypalEvents/handlePaypalWebhook';
 // parser
-app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+app.post(
+  '/simpli-webhook',
+  express.raw({ type: 'application/json' }),
+  handleWebhook,
+);
 router.post('/paypal-webhook', express.json(), handlePaypalWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

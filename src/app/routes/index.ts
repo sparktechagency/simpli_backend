@@ -11,6 +11,7 @@ import { productRoutes } from '../modules/product/product.routes';
 import { variantRoutes } from '../modules/variant/variant.routes';
 import { storeRoutes } from '../modules/store/store.routes';
 import { categoryRoutes } from '../modules/category/category.routes';
+import { campaignRoutes } from '../modules/campaign/campaign.routes';
 
 const router = Router();
 
@@ -62,7 +63,7 @@ const moduleRoutes = [
   },
   {
     path: '/campaign',
-    router: categoryRoutes,
+    router: campaignRoutes,
   },
 ];
 

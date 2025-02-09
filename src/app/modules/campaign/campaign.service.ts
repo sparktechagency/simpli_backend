@@ -11,6 +11,7 @@ import {
 } from '../../utilities/enum';
 import config from '../../config';
 import paypal from '../../utilities/paypal';
+import { platformFeeForCampaignParcentage } from '../../constant';
 
 // const createCampaign = async (bussinessId: string, payload: ICampaign) => {
 //   const product = await Product.findById(payload.product);
@@ -64,7 +65,9 @@ import paypal from '../../utilities/paypal';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
 
-  const totalAmount = payload.amountForEachReview * payload.numberOfReviewers;
+  const reviewCost = payload.amountForEachReview * payload.numberOfReviewers;
+  const adminFee = reviewCost * platformFeeForCampaignParcentage;
+  const totalAmount = reviewCost + adminFee;
   const amountInCents = totalAmount * 100;
 
   if (!product) {

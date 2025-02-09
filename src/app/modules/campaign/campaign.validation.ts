@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Types } from 'mongoose';
+import { ENUM_PAYMENT_METHOD } from '../../utilities/enum';
 
 export const createCampaignValidationSchema = z.object({
   body: z.object({
@@ -38,6 +39,9 @@ export const createCampaignValidationSchema = z.object({
     ),
     gender: z.enum(['male', 'female', 'other']),
     location: z.string().min(1, 'Location is required'),
+    paymentMethod: z.enum(
+      Object.values(ENUM_PAYMENT_METHOD) as [string, ...string[]],
+    ),
   }),
 });
 
