@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import handlePaypalPaymentSucess from './handlePaypalPaymentSuccess';
 
 const handlePaypalWebhook = async (req: Request, res: Response) => {
   const event = req.body;
@@ -7,7 +8,7 @@ const handlePaypalWebhook = async (req: Request, res: Response) => {
   try {
     switch (event.event_type) {
       case 'PAYMENT.CAPTURE.COMPLETED':
-        // await handleBusinessOwnerPayment(event.resource);
+        await handlePaypalPaymentSucess(event.resource);
         console.log('paypal complted');
         break;
 

@@ -27,6 +27,12 @@ export default {
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
     webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
   },
+  paypal: {
+    paypal_campaign_run_payment_success_url:
+      process.env.PAYPAL_CAMPAIGN_RUN_PAYMENT_SUCCESS_URL,
+    paypal_campaign_run_payment_cancel_url:
+      process.env.PAYPAL_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
+  },
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
     authToken: process.env.TWILIO_AUTH_TOKEN,
