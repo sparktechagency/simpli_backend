@@ -68,3 +68,8 @@ export const CAMPAIGN_STATUS = {
   PAUSED: 'Paused',
   CANCELLED: 'CAncelled',
 };
+
+export const TRANSACTION_STATUS = {
+  SUCCESSFULL: 'Successful',
+  FAILED: 'Failed',
+};
