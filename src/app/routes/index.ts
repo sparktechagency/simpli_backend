@@ -60,6 +60,10 @@ const moduleRoutes = [
     path: '/category',
     router: categoryRoutes,
   },
+  {
+    path: '/campaign',
+    router: categoryRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.router));

@@ -58,3 +58,7 @@ export const ENUM_TRANSACTION_STATUS = {
   PENDING: 'Pending',
   SUCCESS: 'Success',
 };
+
+export const ENUM_PAYMENT_PURPOSE = {
+  CAMPAIGN_RUN: 'Campaign Run',
+};
