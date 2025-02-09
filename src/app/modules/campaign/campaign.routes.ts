@@ -13,5 +13,9 @@ router.post(
   validateRequest(CampaignValidations.createCampaignValidationSchema),
   CampaignController.createCampaign,
 );
-
+router.get(
+  '/get-all-campaign',
+  auth(USER_ROLE.sampler, USER_ROLE.sampler),
+  CampaignController.getAllCampaign,
+);
 export const campaignRoutes = router;

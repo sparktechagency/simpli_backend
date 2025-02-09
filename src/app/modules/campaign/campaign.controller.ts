@@ -15,8 +15,18 @@ const createCampaign = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllCampaign = catchAsync(async (req, res) => {
+  const result = await CampaignService.getAllCampaignFromDB(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Campaign retreived successfully`,
+    data: result,
+  });
+});
 
 const CampaignController = {
   createCampaign,
+  getAllCampaign,
 };
 export default CampaignController;
