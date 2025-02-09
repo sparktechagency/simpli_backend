@@ -12,6 +12,7 @@ import { variantRoutes } from '../modules/variant/variant.routes';
 import { storeRoutes } from '../modules/store/store.routes';
 import { categoryRoutes } from '../modules/category/category.routes';
 import { campaignRoutes } from '../modules/campaign/campaign.routes';
+import { transactionRoutes } from '../modules/transaction/transaction.routes';
 
 const router = Router();
 
@@ -64,6 +65,10 @@ const moduleRoutes = [
   {
     path: '/campaign',
     router: campaignRoutes,
+  },
+  {
+    path: '/transaction',
+    router: transactionRoutes,
   },
 ];
 
