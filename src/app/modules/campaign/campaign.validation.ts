@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Types } from 'mongoose';
 
-export const CampaignValidationSchema = z.object({
+export const createCampaignValidationSchema = z.object({
   body: z.object({
     product: z
       .string({ required_error: 'Product id is required' })
@@ -40,3 +40,9 @@ export const CampaignValidationSchema = z.object({
     location: z.string().min(1, 'Location is required'),
   }),
 });
+
+const CampaignValidations = {
+  createCampaignValidationSchema,
+};
+
+export default CampaignValidations;
