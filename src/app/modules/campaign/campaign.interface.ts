@@ -1,5 +1,9 @@
 import { Types } from 'mongoose';
-import { ENUM_PAYMENT_METHOD, ENUM_PAYMENT_STATUS } from '../../utilities/enum';
+import {
+  CAMPAIGN_STATUS,
+  ENUM_PAYMENT_METHOD,
+  ENUM_PAYMENT_STATUS,
+} from '../../utilities/enum';
 
 export interface ICampaign {
   bussiness: Types.ObjectId;
@@ -16,4 +20,5 @@ export interface ICampaign {
   totalFee: number;
   paymentStatus: (typeof ENUM_PAYMENT_STATUS)[keyof typeof ENUM_PAYMENT_STATUS];
   paymentMethod: (typeof ENUM_PAYMENT_METHOD)[keyof typeof ENUM_PAYMENT_METHOD];
+  status: (typeof CAMPAIGN_STATUS)[keyof typeof CAMPAIGN_STATUS];
 }

@@ -1,6 +1,10 @@
 import { Schema, model } from 'mongoose';
 import { ICampaign } from './campaign.interface';
-import { ENUM_PAYMENT_METHOD, ENUM_PAYMENT_STATUS } from '../../utilities/enum';
+import {
+  CAMPAIGN_STATUS,
+  ENUM_PAYMENT_METHOD,
+  ENUM_PAYMENT_STATUS,
+} from '../../utilities/enum';
 
 const CampaignSchema = new Schema<ICampaign>(
   {
@@ -72,6 +76,11 @@ const CampaignSchema = new Schema<ICampaign>(
       type: String,
       enum: Object.values(ENUM_PAYMENT_STATUS),
       default: ENUM_PAYMENT_STATUS.PENDING,
+    },
+    status: {
+      type: String,
+      enum: Object.values(CAMPAIGN_STATUS),
+      default: CAMPAIGN_STATUS.ACTIVE,
     },
   },
   { timestamps: true },
