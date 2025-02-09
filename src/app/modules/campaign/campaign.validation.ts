@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Types } from 'mongoose';
-import { ENUM_PAYMENT_METHOD } from '../../utilities/enum';
+import { CAMPAIGN_STATUS, ENUM_PAYMENT_METHOD } from '../../utilities/enum';
 
 export const createCampaignValidationSchema = z.object({
   body: z.object({
@@ -45,8 +45,15 @@ export const createCampaignValidationSchema = z.object({
   }),
 });
 
+const changeCampaignStatusValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(Object.values(CAMPAIGN_STATUS) as [string, ...string[]]),
+  }),
+});
+
 const CampaignValidations = {
   createCampaignValidationSchema,
+  changeCampaignStatusValidationSchema,
 };
 
 export default CampaignValidations;

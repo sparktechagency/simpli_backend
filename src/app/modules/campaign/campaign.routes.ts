@@ -18,4 +18,10 @@ router.get(
   auth(USER_ROLE.sampler, USER_ROLE.sampler),
   CampaignController.getAllCampaign,
 );
+router.patch(
+  '/change-campaign-status/:id',
+  auth(USER_ROLE.bussinessOwner),
+  validateRequest(CampaignValidations.changeCampaignStatusValidationSchema),
+  CampaignController.changeCampaignStatus,
+);
 export const campaignRoutes = router;

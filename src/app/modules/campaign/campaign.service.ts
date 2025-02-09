@@ -154,6 +154,47 @@ const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+// change campaign status
+
+const changeCampaignStatus = async (
+  bussinessId: string,
+  id: string,
+  status: string,
+) => {
+  let result;
+  if (status === CAMPAIGN_STATUS.PAUSED) {
+    result = await pauseCampaign(bussinessId, id, status);
+  } else if (status === CAMPAIGN_STATUS.CANCELLED) {
+    result = await cancelCampaign(bussinessId, id, status);
+  }
+  return result;
+};
+
+const pauseCampaign = async (
+  bussinessId: string,
+  id: string,
+  status: string,
+) => {
+  const campaign = await Campaign.findOne({ _id: id, bussiness: bussinessId });
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+  const result = await Campaign.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
+// chancel campaign
+const cancelCampaign = async (
+  bussinessId: string,
+  id: string,
+  status: string,
+) => {
+  console.log(bussinessId, id, status);
+};
 // crone jobs for campaign --------------------
 
 import cron from 'node-cron';
@@ -173,6 +214,7 @@ cron.schedule('0 0 * * *', async () => {
 const CampaignService = {
   createCampaign,
   getAllCampaignFromDB,
+  changeCampaignStatus,
 };
 
 export default CampaignService;
