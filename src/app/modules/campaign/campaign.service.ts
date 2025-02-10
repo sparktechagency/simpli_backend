@@ -137,8 +137,56 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   }
 };
 
-// get campaigns
+// update campaign
+const updateCampaignIntoDB = async (
+  bussinessId: string,
+  id: string,
+  payload: Partial<ICampaign>,
+) => {
+  const campaign = await Campaign.findOne({ bussiness: bussinessId, _id: id });
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+  if (campaign.status === CAMPAIGN_STATUS.CANCELLED) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Your can't edit cancelled campaign",
+    );
+  }
+  if (payload.startDate && payload.endDate) {
+    if (new Date(payload.startDate) > new Date(payload.endDate)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Start date can not be grater then end date',
+      );
+    }
+  } else if (payload.startDate) {
+    if (new Date(payload.startDate) > campaign.endDate) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Start date can not be grater then end date',
+      );
+    }
+    if (new Date(payload.startDate) > new Date()) {
+      payload.status = CAMPAIGN_STATUS.SCHEDULED;
+    }
+  } else if (payload.endDate) {
+    if (new Date(payload.endDate) < campaign.startDate) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'End date can not be less then start date',
+      );
+    }
+  }
 
+  const result = await Campaign.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
+// get campaigns
 const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
   const campaignQuery = new QueryBuilder(
     Campaign.find().populate('product'),
@@ -185,11 +233,29 @@ const changeCampaignStatus = async (
     result = await pauseCampaign(bussinessId, id, status);
   } else if (status === CAMPAIGN_STATUS.CANCELLED) {
     result = await cancelCampaign(bussinessId, id, status);
+  } else if (status === CAMPAIGN_STATUS.ACTIVE) {
+    result = await makeCampaignActive(bussinessId, id, status);
   }
   return result;
 };
 
 const pauseCampaign = async (
+  bussinessId: string,
+  id: string,
+  status: string,
+) => {
+  const campaign = await Campaign.findOne({ _id: id, bussiness: bussinessId });
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+  const result = await Campaign.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+const makeCampaignActive = async (
   bussinessId: string,
   id: string,
   status: string,
@@ -258,6 +324,7 @@ const cancelCampaign = async (
     console.log('paypal refund');
   }
 };
+
 // crone jobs for campaign --------------------
 
 import cron from 'node-cron';
@@ -281,6 +348,7 @@ const CampaignService = {
   getAllCampaignFromDB,
   changeCampaignStatus,
   getSingleCampaignFromDB,
+  updateCampaignIntoDB,
 };
 
 export default CampaignService;

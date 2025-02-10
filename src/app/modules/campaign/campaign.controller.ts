@@ -33,13 +33,14 @@ const changeCampaignStatus = catchAsync(async (req, res) => {
     req.params.id,
     req.body.status,
   );
-
   let resMessage;
   if (result?.status === CAMPAIGN_STATUS.CANCELLED) {
     resMessage =
       'Campaign cancel successfully and you got refund the rest of amount from bugget';
   } else if (result?.status === CAMPAIGN_STATUS.PAUSED) {
     resMessage = 'Campaign paused successfully';
+  } else if (result?.status === CAMPAIGN_STATUS.ACTIVE) {
+    resMessage = 'Campaign activate successfully';
   }
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -48,6 +49,7 @@ const changeCampaignStatus = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const getSingleCampaign = catchAsync(async (req, res) => {
   const result = await CampaignService.getSingleCampaignFromDB(
     req.params.id,
