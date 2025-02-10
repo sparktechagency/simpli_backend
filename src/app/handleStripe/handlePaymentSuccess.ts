@@ -44,7 +44,10 @@ const handleCampaignRunPaymentSuccess = async (
   // update campaign
   await Campaign.findByIdAndUpdate(
     campaignId,
-    { paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS },
+    {
+      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+      paymentIntentId: transactionId,
+    },
     { new: true, runValidators: true },
   );
   // create transaction

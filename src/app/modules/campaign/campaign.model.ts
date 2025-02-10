@@ -82,6 +82,13 @@ const CampaignSchema = new Schema<ICampaign>(
       enum: Object.values(CAMPAIGN_STATUS),
       default: CAMPAIGN_STATUS.ACTIVE,
     },
+    paymentIntentId: {
+      type: String,
+    },
+    totalBugget: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true },
 );

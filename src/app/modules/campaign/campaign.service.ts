@@ -18,7 +18,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
 
   const reviewCost = payload.amountForEachReview * payload.numberOfReviewers;
-  const adminFee = reviewCost * platformFeeForCampaignParcentage;
+  const adminFee = (reviewCost * platformFeeForCampaignParcentage) / 100;
   const totalAmount = reviewCost + adminFee;
   const amountInCents = totalAmount * 100;
 
@@ -43,6 +43,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
     ...payload,
     totalFee: totalAmount,
     bussiness: bussinessId,
+    totalBugget: reviewCost,
   });
 
   if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
@@ -205,13 +206,57 @@ const pauseCampaign = async (
   return result;
 };
 
-// chancel campaign
+// chancel campaign--------------------------------
 const cancelCampaign = async (
   bussinessId: string,
   id: string,
   status: string,
 ) => {
-  console.log(bussinessId, id, status);
+  const campaign = await Campaign.findOne({ _id: id, bussiness: bussinessId });
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+  //TODO: need to do database operation with review
+  const totalReviewCount = 10;
+  const amountForEachReview = campaign.amountForEachReview;
+  const totalSpent = totalReviewCount * amountForEachReview;
+  const refundAmount = campaign.totalBugget - totalSpent;
+
+  if (campaign.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
+    if (!campaign.paymentIntentId) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'No payment intent found for this campaign',
+      );
+    }
+
+    try {
+      const refund = await stripe.refunds.create({
+        payment_intent: campaign.paymentIntentId,
+        amount: Math.round(refundAmount * 100),
+      });
+
+      console.log('Refund successful:', refund.id);
+
+      const result = await Campaign.findByIdAndUpdate(
+        id,
+        { status: status },
+        { new: true, runValidators: true },
+      );
+      return result;
+
+      return refund;
+    } catch (error) {
+      console.error('Stripe refund error:', error);
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to process refund',
+      );
+    }
+  } else if (campaign.paymentMethod === ENUM_PAYMENT_METHOD.PAYPAL) {
+    //TODO: paypal refund need
+    console.log('paypal refund');
+  }
 };
 // crone jobs for campaign --------------------
 

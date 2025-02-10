@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import CampaignService from './campaign.service';
+import { CAMPAIGN_STATUS } from '../../utilities/enum';
 
 const createCampaign = catchAsync(async (req, res) => {
   const result = await CampaignService.createCampaign(
@@ -24,16 +25,26 @@ const getAllCampaign = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// change campaign status -------------------------
 const changeCampaignStatus = catchAsync(async (req, res) => {
   const result = await CampaignService.changeCampaignStatus(
     req.user.profileId,
     req.params.id,
     req.body.status,
   );
+
+  let resMessage;
+  if (result?.status === CAMPAIGN_STATUS.CANCELLED) {
+    resMessage =
+      'Campaign cancel successfully and you got refund the rest of amount from bugget';
+  } else if (result?.status === CAMPAIGN_STATUS.PAUSED) {
+    resMessage = 'Campaign paused successfully';
+  }
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: `Campaign status changed  successfully`,
+    message: resMessage,
     data: result,
   });
 });

@@ -66,7 +66,7 @@ export const CAMPAIGN_STATUS = {
   SCHEDULED: 'Scheduled',
   COMPLETED: 'Completed',
   PAUSED: 'Paused',
-  CANCELLED: 'CAncelled',
+  CANCELLED: 'Cancelled',
 };
 
 export const TRANSACTION_STATUS = {

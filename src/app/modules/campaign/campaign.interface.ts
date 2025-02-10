@@ -11,6 +11,7 @@ export interface ICampaign {
   name: string;
   amountForEachReview: number;
   numberOfReviewers: number;
+  totalBugget: number;
   minAge: number;
   maxAge: number;
   startDate: Date;
@@ -21,4 +22,5 @@ export interface ICampaign {
   paymentStatus: (typeof ENUM_PAYMENT_STATUS)[keyof typeof ENUM_PAYMENT_STATUS];
   paymentMethod: (typeof ENUM_PAYMENT_METHOD)[keyof typeof ENUM_PAYMENT_METHOD];
   status: (typeof CAMPAIGN_STATUS)[keyof typeof CAMPAIGN_STATUS];
+  paymentIntentId: string;
 }
