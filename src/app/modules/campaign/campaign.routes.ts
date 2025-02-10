@@ -14,6 +14,13 @@ router.post(
   validateRequest(CampaignValidations.createCampaignValidationSchema),
   CampaignController.createCampaign,
 );
+
+router.patch(
+  '/update-campaign/:id',
+  auth(USER_ROLE.bussinessOwner),
+  CampaignController.updateCampaign,
+);
+
 router.get(
   '/get-campaign',
   // auth(USER_ROLE.sampler, USER_ROLE.sampler),

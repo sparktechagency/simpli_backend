@@ -45,6 +45,36 @@ export const createCampaignValidationSchema = z.object({
   }),
 });
 
+export const updateCampaignValidationSchema = z.object({
+  body: z.object({
+    name: z.string({ required_error: 'Name is required' }).optional(),
+    minAge: z.number().optional(),
+    maxAge: z.number().optional(),
+    startDate: z
+      .preprocess(
+        (arg) =>
+          typeof arg === 'string' || arg instanceof Date
+            ? new Date(arg)
+            : undefined,
+        z.date().refine((date) => date >= new Date(), {
+          message: 'Start date cannot be in the past',
+        }),
+      )
+      .optional(),
+    endDate: z
+      .preprocess(
+        (arg) =>
+          typeof arg === 'string' || arg instanceof Date
+            ? new Date(arg)
+            : undefined,
+        z.date(),
+      )
+      .optional(),
+    gender: z.enum(['male', 'female', 'other']),
+    location: z.string().min(1, 'Location is required'),
+  }),
+});
+
 const changeCampaignStatusValidationSchema = z.object({
   body: z.object({
     status: z.enum(Object.values(CAMPAIGN_STATUS) as [string, ...string[]]),
@@ -54,6 +84,7 @@ const changeCampaignStatusValidationSchema = z.object({
 const CampaignValidations = {
   createCampaignValidationSchema,
   changeCampaignStatusValidationSchema,
+  updateCampaignValidationSchema,
 };
 
 export default CampaignValidations;

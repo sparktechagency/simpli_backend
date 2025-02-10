@@ -16,6 +16,19 @@ const createCampaign = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateCampaign = catchAsync(async (req, res) => {
+  const result = await CampaignService.updateCampaignIntoDB(
+    req.user.profileId,
+    req.params.id,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Campaign updated successfully`,
+    data: result,
+  });
+});
 const getAllCampaign = catchAsync(async (req, res) => {
   const result = await CampaignService.getAllCampaignFromDB(req.query);
   sendResponse(res, {
@@ -68,5 +81,6 @@ const CampaignController = {
   getAllCampaign,
   changeCampaignStatus,
   getSingleCampaign,
+  updateCampaign,
 };
 export default CampaignController;
