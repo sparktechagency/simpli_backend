@@ -13,6 +13,7 @@ const app: Application = express();
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import handleWebhook from './app/handleStripe/webhook';
 import handlePaypalWebhook from './app/handlePaypalEvents/handlePaypalWebhook';
+import capturePayPalPayment from './app/handlePaypalEvents/capturePaypalPayment';
 // parser
 app.post(
   '/simpli-webhook',
@@ -45,9 +46,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/', router);
 app.post('/contact-us', sendContactUsEmail);
 
-app.get('/nice', async (req, res) => {
-  res.send({ message: 'nice to meet you' });
-});
+app.get('/capture-payment', capturePayPalPayment);
 
 // global error handler
 app.use(globalErrorHandler);
