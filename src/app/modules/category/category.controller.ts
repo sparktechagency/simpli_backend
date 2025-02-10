@@ -9,7 +9,6 @@ const createCategory = catchAsync(async (req, res) => {
     req.body.category_image = files['category_image'][0].path;
   }
   const result = await categoryService.createCategoryIntoDB(req?.body);
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

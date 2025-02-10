@@ -146,7 +146,6 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
           brand_name: 'Your Business Name',
           landing_page: 'LOGIN',
           user_action: 'PAY_NOW',
-          // return_url: `${config.paypal.paypal_campaign_run_payment_success_url}?order_id=${result._id}`,
           return_url: `${config.paypal.payment_capture_url}`,
           cancel_url: `${config.paypal.paypal_campaign_run_payment_cancel_url}`,
         },
