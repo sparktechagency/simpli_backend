@@ -139,7 +139,10 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
 // get campaigns
 
 const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
-  const campaignQuery = new QueryBuilder(Campaign.find(), query)
+  const campaignQuery = new QueryBuilder(
+    Campaign.find().populate('product'),
+    query,
+  )
     .search([''])
     .filter()
     .sort()

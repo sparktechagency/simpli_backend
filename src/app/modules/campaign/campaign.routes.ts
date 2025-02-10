@@ -14,12 +14,12 @@ router.post(
   CampaignController.createCampaign,
 );
 router.get(
-  '/get-all-campaign',
-  auth(USER_ROLE.sampler, USER_ROLE.sampler),
+  '/get-campaign',
+  // auth(USER_ROLE.sampler, USER_ROLE.sampler),
   CampaignController.getAllCampaign,
 );
 router.patch(
-  '/change-campaign-status/:id',
+  '/change-status/:id',
   auth(USER_ROLE.bussinessOwner),
   validateRequest(CampaignValidations.changeCampaignStatusValidationSchema),
   CampaignController.changeCampaignStatus,
