@@ -157,6 +157,21 @@ const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+// get single campaign
+// TODO : need to work for bussiness owner for get campaign overview
+const getSingleCampaignFromDB = async (id: string, userData: JwtPayload) => {
+  if (userData?.role === USER_ROLE.bussinessOwner) {
+    const result = await Campaign.findOne({
+      _id: id,
+      bussiness: userData?.profileId,
+    }).populate('product');
+    return result;
+  } else {
+    const result = await Campaign.findById(id).populate('product');
+    return result;
+  }
+};
+
 // change campaign status
 
 const changeCampaignStatus = async (
@@ -202,6 +217,8 @@ const cancelCampaign = async (
 
 import cron from 'node-cron';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { JwtPayload } from 'jsonwebtoken';
+import { USER_ROLE } from '../user/user.constant';
 
 cron.schedule('0 0 * * *', async () => {
   console.log('Cron job executed at:', new Date());
@@ -218,6 +235,7 @@ const CampaignService = {
   createCampaign,
   getAllCampaignFromDB,
   changeCampaignStatus,
+  getSingleCampaignFromDB,
 };
 
 export default CampaignService;

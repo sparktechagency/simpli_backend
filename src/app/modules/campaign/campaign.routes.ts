@@ -4,6 +4,7 @@ import { USER_ROLE } from '../user/user.constant';
 import validateRequest from '../../middlewares/validateRequest';
 import CampaignValidations from './campaign.validation';
 import CampaignController from './campaign.controller';
+import simpleAuth from '../../middlewares/simpleAuth';
 
 const router = express.Router();
 
@@ -23,5 +24,11 @@ router.patch(
   auth(USER_ROLE.bussinessOwner),
   validateRequest(CampaignValidations.changeCampaignStatusValidationSchema),
   CampaignController.changeCampaignStatus,
+);
+
+router.get(
+  '/get-single-campaign/:id',
+  simpleAuth,
+  CampaignController.getSingleCampaign,
 );
 export const campaignRoutes = router;

@@ -37,10 +37,23 @@ const changeCampaignStatus = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getSingleCampaign = catchAsync(async (req, res) => {
+  const result = await CampaignService.getSingleCampaignFromDB(
+    req.params.id,
+    req.user,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Campaign retrived successfully`,
+    data: result,
+  });
+});
 
 const CampaignController = {
   createCampaign,
   getAllCampaign,
   changeCampaignStatus,
+  getSingleCampaign,
 };
 export default CampaignController;
