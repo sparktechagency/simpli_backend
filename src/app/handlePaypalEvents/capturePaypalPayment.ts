@@ -3,8 +3,7 @@ import paypalClient from '../utilities/paypal';
 import { Request, Response } from 'express';
 
 const capturePayPalPayment = async (req: Request, res: Response) => {
-  const orderId = req.query.token; // PayPal sends order ID as `token`
-
+  const orderId = req.query.token;
   try {
     const captureRequest = new paypal.orders.OrdersCaptureRequest(
       orderId as string,
