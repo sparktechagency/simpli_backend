@@ -79,3 +79,9 @@ export const GENDER = {
   FEMALE: 'Female',
   Other: 'Other',
 };
+
+export const INTEREST_STATUS = {
+  COMPLETED: 'Completed',
+  SKIPPED: 'Skipped',
+  IN_PROGRESS: 'In-Progress',
+};

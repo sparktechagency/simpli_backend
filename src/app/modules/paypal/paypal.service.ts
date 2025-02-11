@@ -11,8 +11,10 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
+
   try {
     const accessToken = await getPayPalAccessToken();
+    console.log('Access token:', accessToken);
 
     const response = await axios.post(
       `${config.paypal.base_url}/v2/customer/partner-referrals`,
@@ -28,7 +30,6 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
             },
           },
         ],
-        // if  need to add more features then-------
         products: ['PAYOUTS'],
         legal_consents: [
           {
@@ -51,6 +52,8 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
       },
     );
 
+    console.log('PayPal Response:', response.data);
+
     const onboardingLink = response.data.links.find(
       (link: any) => link.rel === 'action_url',
     )?.href;
@@ -65,7 +68,13 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
     return {
       link: onboardingLink,
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Error creating onboarding link for PayPal partner:', error);
+
+    if (error.response) {
+      console.error('PayPal API Error:', error.response.data);
+    }
+
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
       'Internal server error',

@@ -69,6 +69,10 @@ const registerBussinessOwner = async (email: string, password: string) => {
   }
 };
 
+// register reviewer
+
+const registerReviewer = async();
+
 const verifyCode = async (email: string, verifyCode: number) => {
   const user = await User.findOne({ email: email });
   if (!user) {
