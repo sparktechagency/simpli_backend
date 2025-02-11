@@ -1,6 +1,8 @@
+import { Types } from 'mongoose';
 import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
 export interface IReviewer {
+  user: Types.ObjectId;
   name: string;
   username: string;
   city: string;
@@ -12,4 +14,5 @@ export interface IReviewer {
   shippingInformationStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   socailInfoStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   profileDetailStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
+  isProfileInfoProvided: boolean;
 }

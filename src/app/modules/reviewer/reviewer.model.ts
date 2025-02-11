@@ -4,12 +4,16 @@ import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
 const ReviewerSchema: Schema = new Schema<IReviewer>(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     name: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
-    city: { type: String, required: true },
-    zipcode: { type: Number, required: true },
-    gender: { type: String, enum: Object.values(GENDER), required: true },
-    age: { type: Number, required: true },
+    city: { type: String },
+    zipcode: { type: Number },
+    gender: { type: String, enum: Object.values(GENDER) },
+    age: { type: Number },
     interestedProductStatus: {
       type: String,
       enum: Object.values(INTEREST_STATUS),
@@ -34,6 +38,10 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: String,
       enum: Object.values(INTEREST_STATUS),
       default: INTEREST_STATUS.IN_PROGRESS,
+    },
+    isProfileInfoProvided: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

@@ -15,6 +15,7 @@ import { campaignRoutes } from '../modules/campaign/campaign.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { stripeRoutes } from '../modules/stripe/stripe.routes';
 import { paypalRoutes } from '../modules/paypal/paypal.routes';
+import { reviewRoutes } from '../modules/reviewer/reviewer.routes';
 
 const router = Router();
 
@@ -79,6 +80,10 @@ const moduleRoutes = [
   {
     path: '/paypal',
     router: paypalRoutes,
+  },
+  {
+    path: '/reviewer',
+    router: reviewRoutes,
   },
 ];
 

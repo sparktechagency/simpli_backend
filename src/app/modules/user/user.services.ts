@@ -20,13 +20,6 @@ const generateVerifyCode = (): number => {
 };
 
 const registerBussinessOwner = async (email: string, password: string) => {
-  // if (password !== confirmPassword) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     "Password and confirm password doesn't match",
-  //   );
-  // }
-
   const emailExist = await User.findOne({ email: email });
   if (emailExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'This email already exist');

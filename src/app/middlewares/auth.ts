@@ -10,6 +10,7 @@ import { User } from '../modules/user/user.model';
 import { USER_ROLE } from '../modules/user/user.constant';
 import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 import Bussiness from '../modules/bussiness/bussiness.model';
+import Reviewer from '../modules/reviewer/reviewer.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -33,6 +34,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
     // get the user if that here ---------
     const user = await User.findById(id);
+    console.log(user);
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
     }
@@ -49,10 +51,14 @@ const auth = (...requiredRoles: TUserRole[]) => {
     let profileData;
     if (role === USER_ROLE.bussinessOwner) {
       profileData = await Bussiness.findOne({ user: id }).select('_id');
+    } else if (role === USER_ROLE.reviewer) {
+      profileData = await Reviewer.findOne({ user: id }).select('_id');
     } else if (role === USER_ROLE.superAdmin) {
       profileData = await SuperAdmin.findOne({ user: id }).select('_id');
     }
-
+    if (!profileData) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Unauthorized , user not found');
+    }
     decoded.profileId = profileData?._id;
     // if (
     //   user?.passwordChangedAt &&
