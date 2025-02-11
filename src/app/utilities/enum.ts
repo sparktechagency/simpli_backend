@@ -73,3 +73,9 @@ export const TRANSACTION_STATUS = {
   SUCCESSFULL: 'Successful',
   FAILED: 'Failed',
 };
+
+export const GENDER = {
+  MALE: 'Male',
+  FEMALE: 'Female',
+  Other: 'Other',
+};
