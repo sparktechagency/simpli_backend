@@ -55,6 +55,8 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
+    isStripeAccountConnected: { type: Boolean, default: false },
+    stripeConnectedAccountId: { type: String },
   },
   {
     timestamps: true,

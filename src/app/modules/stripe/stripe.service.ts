@@ -3,27 +3,19 @@ import AppError from '../../error/appError';
 import stripe from '../../utilities/stripe';
 import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
-import Bussiness from '../bussiness/bussiness.model';
+import { User } from '../user/user.model';
 
 const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
 ) => {
-  let userInfo;
-  if (userData?.role === USER_ROLE.bussinessOwner) {
-    userInfo = await Bussiness.findById(userData?.profileId);
-  } else if (userData?.role === USER_ROLE.reviewer) {
-    // TODO: need to work for reviewer--------
-    userInfo = null;
-  }
+  const userInfo = await User.findById(userData.id);
   if (!userInfo) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  const isStripeConnected = userInfo.isStripeAccountConnected;
-
-  if (isStripeConnected) {
+  if (userInfo?.isStripeAccountConnected) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Stripe is already connected');
   }
+
   const account = await stripe.accounts.create({
     type: 'express',
     email: userInfo.email,
@@ -36,14 +28,15 @@ const createConnectedAccountAndOnboardingLink = async (
     },
   });
 
-  if (userData?.role === USER_ROLE.bussinessOwner) {
-    await Bussiness.findByIdAndUpdate(userData?.profileId, {
-      stripeConnectedAccountId: account?.id,
-    });
-  } else if (userData?.role === USER_ROLE.reviewer) {
-    //TODO: work with reviewer
+  const updateUserData = await User.findByIdAndUpdate(userData.id, {
+    stripeConnectedAccountId: account?.id,
+  });
+  if (!updateUserData) {
+    throw new AppError(
+      httpStatus.SERVICE_UNAVAILABLE,
+      'Unable to add account id in user data',
+    );
   }
-
   const onboardingLink = await stripe.accountLinks.create({
     account: account.id,
     refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,

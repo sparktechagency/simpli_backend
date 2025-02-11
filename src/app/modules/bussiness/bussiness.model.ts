@@ -84,13 +84,6 @@ const BussinessSchema = new Schema<IBussiness>(
       type: Boolean,
       default: false,
     },
-    isStripeAccountConnected: {
-      type: Boolean,
-      default: false,
-    },
-    stripeConnectedAccountId: {
-      type: String,
-    },
   },
   {
     timestamps: true,

@@ -10,8 +10,6 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     zipcode: { type: Number, required: true },
     gender: { type: String, enum: Object.values(GENDER), required: true },
     age: { type: Number, required: true },
-    isStripeAccountConnected: { type: Boolean, default: false },
-    stripeConnectedAccountId: { type: String },
   },
   { timestamps: true },
 );

@@ -7,6 +7,4 @@ export interface IReviewer {
   zipcode: number;
   gender: (typeof GENDER)[keyof typeof GENDER];
   age: number;
-  isStripeAccountConnected: boolean;
-  stripeConnectedAccountId: string;
 }
