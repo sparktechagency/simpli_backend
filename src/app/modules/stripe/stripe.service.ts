@@ -46,8 +46,25 @@ const createConnectedAccountAndOnboardingLink = async (
   return onboardingLink.url;
 };
 
+const updateOnboardingLink = async (userId: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Shop not found');
+  }
+
+  const accountLink = await stripe.accountLinks.create({
+    account: user.stripeConnectedAccountId as string,
+    refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
+    return_url: config.stripe.onboarding_return_url,
+    type: 'account_onboarding',
+  });
+
+  return { link: accountLink.url };
+};
+
 const StripeService = {
   createConnectedAccountAndOnboardingLink,
+  updateOnboardingLink,
 };
 
 export default StripeService;
