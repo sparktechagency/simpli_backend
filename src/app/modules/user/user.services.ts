@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 
 import { User } from './user.model';
@@ -10,10 +11,10 @@ import NormalUser from '../normalUser/normalUser.model';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import cron from 'node-cron';
 import sendEmail from '../../utilities/sendEmail';
-import { JwtPayload } from 'jsonwebtoken';
 import Bussiness from '../bussiness/bussiness.model';
 import { createToken } from './user.utils';
 import config from '../../config';
+import Reviewer from '../reviewer/reviewer.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -71,7 +72,50 @@ const registerBussinessOwner = async (email: string, password: string) => {
 
 // register reviewer
 
-const registerReviewer = async();
+const registerReviewer = async (payload: any) => {
+  const emailExist = await User.findOne({ email: payload.email });
+  if (emailExist) {
+    throw new AppError(httpStatus.CONFLICT, 'This email already exist');
+  }
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const verifyCode = generateVerifyCode();
+    const userDataPayload: Partial<TUser> = {
+      email: payload.email,
+      password: payload.password,
+      role: USER_ROLE.reviewer,
+      verifyCode,
+      codeExpireIn: new Date(Date.now() + 2 * 60000),
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const user = await User.create([userDataPayload], { session });
+
+    const reviewerPayload = {
+      email: payload.email,
+      name: payload.name,
+      user: user[0]._id,
+    };
+    const result = await Reviewer.create([reviewerPayload], { session });
+    // ! TODO: need to upgrade the email template
+    sendEmail({
+      email: payload.email,
+      subject: 'Activate Your Account',
+      html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
+    });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result[0];
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
 
 const verifyCode = async (email: string, verifyCode: number) => {
   const user = await User.findOne({ email: email });
@@ -136,31 +180,6 @@ const resendVerifyCode = async (email: string) => {
   return null;
 };
 
-const getMyProfile = async (userData: JwtPayload) => {
-  let result = null;
-  if (userData.role === USER_ROLE.bussinessOwner) {
-    result = await Bussiness.findOne({ email: userData.email });
-  }
-  //! TODO: need to get other user data
-  return result;
-};
-
-const deleteUserAccount = async (user: JwtPayload, password: string) => {
-  const userData = await User.findById(user.id);
-
-  if (!userData) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-  }
-  if (!(await User.isPasswordMatched(password, userData?.password))) {
-    throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
-  }
-
-  await NormalUser.findByIdAndDelete(user.profileId);
-  await User.findByIdAndDelete(user.id);
-
-  return null;
-};
-
 // all cron jobs for users
 
 cron.schedule('*/2 * * * *', async () => {
@@ -213,11 +232,10 @@ const changeUserStatus = async (id: string, status: string) => {
 
 const userServices = {
   registerBussinessOwner,
+  registerReviewer,
   verifyCode,
   resendVerifyCode,
-  getMyProfile,
   changeUserStatus,
-  deleteUserAccount,
 };
 
 export default userServices;

@@ -12,6 +12,19 @@ export const registerBussinessOwnerValidationSchema = z.object({
   }),
 });
 
+// register for reviewer
+
+const registerReviewValidationSchema = z.object({
+  body: z.object({
+    name: z.string({
+      required_error: 'Name is required',
+      invalid_type_error: 'Name must be string',
+    }),
+    email: z.string({ required_error: 'Email is required' }),
+    password: z.string({ required_error: 'Password is required' }),
+  }),
+});
+
 const loginValidationSchema = z.object({
   body: z.object({
     email: z.string({ required_error: 'Email is required' }),
@@ -83,6 +96,7 @@ const userValidations = {
   resendVerifyCodeSchema,
   changeUserStatus,
   deleteUserAccountValidationSchema,
+  registerReviewValidationSchema,
 };
 
 export default userValidations;

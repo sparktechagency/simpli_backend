@@ -15,6 +15,15 @@ const registerUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const registerReviewer = catchAsync(async (req, res) => {
+  const result = await userServices.registerReviewer(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Registration successful.Check email for verify your email',
+    data: result,
+  });
+});
 const verifyCode = catchAsync(async (req, res) => {
   const result = await userServices.verifyCode(
     req?.body?.email,
@@ -37,16 +46,6 @@ const resendVerifyCode = catchAsync(async (req, res) => {
   });
 });
 
-const getMyProfile = catchAsync(async (req, res) => {
-  const result = await userServices.getMyProfile(req.user);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Successfully retrieved your data',
-    data: result,
-  });
-});
 const changeUserStatus = catchAsync(async (req, res) => {
   const result = await userServices.changeUserStatus(
     req.params.id,
@@ -60,26 +59,12 @@ const changeUserStatus = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const deleteUserAccount = catchAsync(async (req, res) => {
-  const result = await userServices.deleteUserAccount(
-    req.user,
-    req.body.password,
-  );
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: `Your account deleted successfully`,
-    data: result,
-  });
-});
 
 const userController = {
   registerUser,
+  registerReviewer,
   verifyCode,
   resendVerifyCode,
-  getMyProfile,
   changeUserStatus,
-  deleteUserAccount,
 };
 export default userController;

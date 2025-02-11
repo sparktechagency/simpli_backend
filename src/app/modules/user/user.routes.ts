@@ -12,6 +12,11 @@ router.post(
   validateRequest(userValidations.registerBussinessOwnerValidationSchema),
   userControllers.registerUser,
 );
+router.post(
+  '/register-reviewer',
+  validateRequest(userValidations.registerReviewValidationSchema),
+  userControllers.registerReviewer,
+);
 
 router.post(
   '/verify-code',
@@ -25,23 +30,11 @@ router.post(
   userControllers.resendVerifyCode,
 );
 
-router.get(
-  '/get-my-profile',
-  auth(USER_ROLE.user, USER_ROLE.player, USER_ROLE.team, USER_ROLE.superAdmin),
-  userControllers.getMyProfile,
-);
-
 router.patch(
   '/change-status/:id',
   auth(USER_ROLE.superAdmin),
   validateRequest(userValidations.changeUserStatus),
   userControllers.changeUserStatus,
-);
-router.delete(
-  '/delete-account',
-  auth(USER_ROLE.user),
-  validateRequest(userValidations.deleteUserAccountValidationSchema),
-  userControllers.deleteUserAccount,
 );
 
 export const userRoutes = router;
