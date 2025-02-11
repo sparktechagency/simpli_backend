@@ -13,6 +13,7 @@ import { storeRoutes } from '../modules/store/store.routes';
 import { categoryRoutes } from '../modules/category/category.routes';
 import { campaignRoutes } from '../modules/campaign/campaign.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
+import { stripeRoutes } from '../modules/stripe/stripe.routes';
 
 const router = Router();
 
@@ -69,6 +70,10 @@ const moduleRoutes = [
   {
     path: '/transaction',
     router: transactionRoutes,
+  },
+  {
+    path: '/stripe',
+    router: stripeRoutes,
   },
 ];
 

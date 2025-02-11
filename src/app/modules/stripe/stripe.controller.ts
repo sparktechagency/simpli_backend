@@ -24,9 +24,9 @@ const updateOnboardingLink = catchAsync(async (req, res) => {
   });
 });
 
-const stripeController = {
+const StripeController = {
   createOnboardingLink,
   updateOnboardingLink,
 };
 
-export default stripeController;
+export default StripeController;
