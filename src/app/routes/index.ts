@@ -75,6 +75,10 @@ const moduleRoutes = [
     path: '/stripe',
     router: stripeRoutes,
   },
+  {
+    path: '/paypal',
+    router: stripeRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.router));

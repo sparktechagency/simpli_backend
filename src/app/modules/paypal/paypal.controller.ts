@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import PaypalService from './paypal.service';
+import config from '../../config';
 
 const createOnboardingLinkForPaypalPartner = catchAsync(async (req, res) => {
   const result = await PaypalService.createOnboardingLinkForPartnerAccount(
@@ -20,12 +21,11 @@ const savePaypalAccount = catchAsync(async (req, res) => {
     req.query.merchantId as string,
     req.query.userId as string,
   );
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Account connected succesfully for payment',
-    data: result,
-  });
+  if (!result) {
+    return res.redirect(`${config.paypal.paypal_onboarding_success}`);
+  }
+
+  return res.redirect(`${config.paypal.paypal_onboarding_failed}`);
 });
 
 const PaypalController = {
