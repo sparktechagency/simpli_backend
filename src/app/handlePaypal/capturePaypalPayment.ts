@@ -11,7 +11,7 @@ const capturePayPalPayment = async (req: Request, res: Response) => {
     captureRequest.requestBody({});
     const captureResponse = await paypalClient.execute(captureRequest);
     if (captureResponse.result.status !== 'COMPLETED') {
-      console.error('⛔ Payment Capture Failed:', captureResponse);
+      console.error('Payment Capture Failed:', captureResponse);
       return res.redirect(`${process.env.PAYPAL_CANCEL_URL}`);
     }
     const orderRequest = new paypal.orders.OrdersGetRequest(orderId as string);
@@ -24,13 +24,13 @@ const capturePayPalPayment = async (req: Request, res: Response) => {
     const transactionId = captureResponse.result.id;
     const amount = purchaseUnit.amount.value;
     console.log(
-      `✅ Transaction ID: ${transactionId}, Amount: ${amount}, Campaign ID: ${campaignId}, Payment Purpose: ${paymentPurpose}`,
+      `Transaction ID: ${transactionId}, Amount: ${amount}, Campaign ID: ${campaignId}, Payment Purpose: ${paymentPurpose}`,
     );
     return res.redirect(
       `${process.env.PAYPAL_SUCCESS_URL}?campaign_id=${campaignId}&transaction_id=${transactionId}&amount=${amount}`,
     );
   } catch (error) {
-    console.error('⛔ PayPal Capture Error:', error);
+    console.error('PayPal Capture Error:', error);
     return res.redirect(`${process.env.PAYPAL_CANCEL_URL}`);
   }
 };
