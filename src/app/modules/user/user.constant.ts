@@ -1,5 +1,5 @@
 export const USER_ROLE = {
-  sampler: 'sampler',
+  reviewer: 'reviewer',
   bussinessOwner: 'bussinessOwner',
   superAdmin: 'superAdmin',
 } as const;

@@ -25,4 +25,6 @@ export interface IBussiness {
   isBussinessDocumentProvided: boolean;
   isComplianceInfoProvided: boolean;
   isBussinessInfoProvided: boolean;
+  isStripeAccountConnected: boolean;
+  stripeConnectedAccountId: string;
 }

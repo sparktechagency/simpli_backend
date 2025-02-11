@@ -26,6 +26,8 @@ export default {
     stripe_campaign_run_payment_cancel_url:
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
     webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
+    onboarding_return_url: process.env.ONBOARDING_RETURN_URL,
+    onboarding_refresh_url: process.env.ONBOARDING_REFRESH_URL,
   },
   paypal: {
     client_id: process.env.PAYPAL_CLIENT_ID,

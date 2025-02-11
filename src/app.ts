@@ -14,6 +14,8 @@ import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import handleWebhook from './app/handleStripe/webhook';
 import handlePaypalWebhook from './app/handlePaypalEvents/handlePaypalWebhook';
 import capturePayPalPayment from './app/handlePaypalEvents/capturePaypalPayment';
+import stripe from './app/utilities/stripe';
+import config from './app/config';
 // parser
 app.post(
   '/simpli-webhook',
@@ -45,6 +47,27 @@ app.use('/uploads', express.static('uploads'));
 // application routers ----------------
 app.use('/', router);
 app.post('/contact-us', sendContactUsEmail);
+
+// onboarding refresh --------------
+router.get('/stripe/onboarding/refresh', async (req, res, next) => {
+  try {
+    const { accountId } = req.query;
+
+    if (!accountId) {
+      return res.status(400).send('Missing accountId');
+    }
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId as string,
+      refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${accountId}`,
+      return_url: config.stripe.onboarding_return_url,
+      type: 'account_onboarding',
+    });
+
+    res.redirect(accountLink.url);
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.get('/capture-payment', capturePayPalPayment);
 
