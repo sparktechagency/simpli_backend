@@ -73,8 +73,29 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
   }
 };
 
+// save paypal account
+const savePaypalAccount = async (merchantId: string, userId: string) => {
+  if (!merchantId || !userId) {
+    throw new AppError(
+      httpStatus.MISDIRECTED_REQUEST,
+      'Missing parametter , failed to connect partner account',
+    );
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const result = await User.findByIdAndUpdate(
+    userId,
+    { paypalMerchantId: merchantId, isPaypalConnected: true },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
 const PaypalService = {
   createOnboardingLinkForPartnerAccount,
+  savePaypalAccount,
 };
 
 export default PaypalService;
