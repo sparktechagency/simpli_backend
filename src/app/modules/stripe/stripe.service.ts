@@ -21,13 +21,17 @@ const createConnectedAccountAndOnboardingLink = async (
     email: userInfo.email,
     country: 'US',
     capabilities: {
+      // card_payments: { requested: true },
       transfers: { requested: true },
     },
-    tos_acceptance: {
-      service_agreement: 'recipient',
+    settings: {
+      payouts: {
+        schedule: {
+          interval: 'manual',
+        },
+      },
     },
   });
-
   const updateUserData = await User.findByIdAndUpdate(userData.id, {
     stripeConnectedAccountId: account?.id,
   });

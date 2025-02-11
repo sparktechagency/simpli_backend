@@ -11,7 +11,7 @@ router.post(
   StripeController.createOnboardingLink,
 );
 router.post(
-  '/update-onboarding-link',
+  '/update-connected-account',
   auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
   StripeController.updateOnboardingLink,
 );
