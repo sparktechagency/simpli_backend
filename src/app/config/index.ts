@@ -38,6 +38,7 @@ export default {
     paypal_campaign_run_payment_cancel_url:
       process.env.PAYPAL_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
     payment_capture_url: process.env.PAYPAL_PAYMENT_CAPTURE_URL,
+    base_url: process.env.PAYPAL_BASE_URL,
   },
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
