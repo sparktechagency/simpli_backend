@@ -14,7 +14,6 @@ const capturePayPalPayment = async (req: Request, res: Response) => {
       console.error('⛔ Payment Capture Failed:', captureResponse);
       return res.redirect(`${process.env.PAYPAL_CANCEL_URL}`);
     }
-
     const orderRequest = new paypal.orders.OrdersGetRequest(orderId as string);
     const orderResponse = await paypalClient.execute(orderRequest);
 
