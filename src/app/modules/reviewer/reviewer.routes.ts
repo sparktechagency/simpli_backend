@@ -51,4 +51,10 @@ router.patch(
   ReviewerController.updateReviewerIntoDB,
 );
 router.patch('/update-reviewer-profile', auth(USER_ROLE.reviewer));
+router.post(
+  '/make-skip',
+  auth(USER_ROLE.reviewer),
+  validateRequest(ReviewerValidations.makeSkipValidationSchema),
+  ReviewerController.makeSkip,
+);
 export const reviewRoutes = router;

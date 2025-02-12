@@ -60,6 +60,18 @@ const addSocailInfo = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const makeSkip = catchAsync(async (req, res) => {
+  const result = await ReviewerService.makeSkip(
+    req.user.profileId,
+    req.body.skipValue,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `${req.body.skipValue} is skipped successfully`,
+    data: result,
+  });
+});
 const updateReviewerIntoDB = catchAsync(async (req, res) => {
   const { files } = req;
   if (files && typeof files === 'object' && 'profile_image' in files) {
@@ -84,6 +96,7 @@ const ReviewerController = {
   addCurrentlyShareReview,
   addSocailInfo,
   updateReviewerIntoDB,
+  makeSkip,
 };
 
 export default ReviewerController;

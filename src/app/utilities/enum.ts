@@ -85,3 +85,11 @@ export const INTEREST_STATUS = {
   SKIPPED: 'Skipped',
   IN_PROGRESS: 'In-Progress',
 };
+
+export const ENUM_SKIP_VALUE = {
+  interestedCategoryStatus: 'interestedCategoryStatus',
+  shippingInformationStatus: 'shippingInformationStatus',
+  currentShareReviewStatus: 'currentShareReviewStatus',
+  profileDetailStatus: 'profileDetailStatus',
+  socailInfoStatus: 'socailInfoStatus',
+};

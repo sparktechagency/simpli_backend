@@ -72,6 +72,18 @@ const updateReviewerIntoDB = async (
   return result;
 };
 
+const makeSkip = async (reviewerId: string, skipValue: string) => {
+  const result = await Reviewer.findByIdAndUpdate(
+    reviewerId,
+    {
+      $set: { [skipValue]: INTEREST_STATUS.COMPLETED },
+    },
+    { new: true, runValidators: true },
+  );
+
+  return result;
+};
+
 const ReviewerService = {
   addAddress,
   addPersonalInfo,
@@ -79,6 +91,7 @@ const ReviewerService = {
   addCurrentlyShareReview,
   addSocailInfo,
   updateReviewerIntoDB,
+  makeSkip,
 };
 
 export default ReviewerService;

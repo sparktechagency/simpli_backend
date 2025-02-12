@@ -7,7 +7,7 @@ import {
   householdIncome,
   maritalStatus,
 } from './reviewer.constant';
-import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
+import { ENUM_SKIP_VALUE, GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
 const addAddressValidationSchema = z.object({
   body: z.object({
@@ -120,12 +120,19 @@ const updateReviewerValidationSchema = z.object({
   blog: z.string().optional(),
 });
 
+const makeSkipValidationSchema = z.object({
+  body: z.object({
+    skipValue: z.enum(Object.values(ENUM_SKIP_VALUE) as [string, ...string[]]),
+  }),
+});
+
 const ReviewerValidations = {
   addAddressValidationSchema,
   addPersonalInfoValidationSchema,
   addInterestedCategoryValidation,
   addCurrentlyShareReviewValidationSchema,
   updateReviewerValidationSchema,
+  makeSkipValidationSchema,
 };
 
 export default ReviewerValidations;
