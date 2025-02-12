@@ -12,9 +12,22 @@ const addAddress = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const addPersonalInfo = catchAsync(async (req, res) => {
+  const result = await ReviewerService.addPersonalInfo(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Personal info added successfully',
+    data: result,
+  });
+});
 
 const ReviewerController = {
   addAddress,
+  addPersonalInfo,
 };
 
 export default ReviewerController;

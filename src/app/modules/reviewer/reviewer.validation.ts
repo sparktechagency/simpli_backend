@@ -1,4 +1,12 @@
 import { z } from 'zod';
+import {
+  educationLevel,
+  employmentStatus,
+  ethnicity,
+  familyAndDependents,
+  householdIncome,
+  maritalStatus,
+} from './reviewer.constant';
 
 const addAddressValidationSchema = z.object({
   body: z.object({
@@ -19,8 +27,32 @@ const addAddressValidationSchema = z.object({
   }),
 });
 
+const addPersonalInfoValidationSchema = z.object({
+  body: z.object({
+    ethnicity: z
+      .enum(Object.values(ethnicity) as [string, ...string[]])
+      .optional(),
+    educationLevel: z
+      .enum(Object.values(educationLevel) as [string, ...string[]])
+      .optional(),
+    maritalStatus: z
+      .enum(Object.values(maritalStatus) as [string, ...string[]])
+      .optional(),
+    employmentStatus: z
+      .enum(Object.values(employmentStatus) as [string, ...string[]])
+      .optional(),
+    householdIncome: z
+      .enum(Object.values(householdIncome) as [string, ...string[]])
+      .optional(),
+    familyAndDependents: z
+      .enum(Object.values(familyAndDependents) as [string, ...string[]])
+      .optional(),
+  }),
+});
+
 const ReviewerValidations = {
   addAddressValidationSchema,
+  addPersonalInfoValidationSchema,
 };
 
 export default ReviewerValidations;

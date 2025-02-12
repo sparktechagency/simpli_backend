@@ -12,5 +12,11 @@ router.post(
   validateRequest(ReviewerValidations.addAddressValidationSchema),
   ReviewerController.addAddress,
 );
+router.post(
+  '/add-personal-info',
+  auth(USER_ROLE.reviewer),
+  validateRequest(ReviewerValidations.addAddressValidationSchema),
+  ReviewerController.addAddress,
+);
 
 export const reviewRoutes = router;
