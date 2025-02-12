@@ -7,6 +7,7 @@ import {
   householdIncome,
   maritalStatus,
 } from './reviewer.constant';
+import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
 const addAddressValidationSchema = z.object({
   body: z.object({
@@ -61,11 +62,67 @@ const addCurrentlyShareReviewValidationSchema = z.object({
   }),
 });
 
+const updateReviewerValidationSchema = z.object({
+  name: z.string().optional(),
+  username: z.string().optional(),
+  city: z.string().optional(),
+  zipcode: z.number().optional(),
+  gender: z.enum(Object.values(GENDER) as [string, ...string[]]),
+  age: z.number().min(18, 'Age must be at least 18').optional(),
+  ethnicity: z
+    .enum(Object.values(ethnicity) as [string, ...string[]])
+    .optional(),
+  educationLevel: z
+    .enum(Object.values(educationLevel) as [string, ...string[]])
+    .optional(),
+  maritalStatus: z
+    .enum(Object.values(maritalStatus) as [string, ...string[]])
+    .optional(),
+  employmentStatus: z
+    .enum(Object.values(employmentStatus) as [string, ...string[]])
+    .optional(),
+  householdIncome: z
+    .enum(Object.values(householdIncome) as [string, ...string[]])
+    .optional(),
+  familyAndDependents: z
+    .enum(Object.values(familyAndDependents) as [string, ...string[]])
+    .optional(),
+
+  interestedCategory: z
+    .array(z.string().min(24, 'Category ID must be a valid ObjectId'))
+    .optional(), // Array of valid ObjectId references
+  currentlyShareReview: z.array(z.string()).optional(),
+  interestedCategoryStatus: z
+    .enum(Object.values(INTEREST_STATUS) as [string, ...string[]])
+    .optional(),
+  currentShareReviewStatus: z
+    .enum(Object.values(INTEREST_STATUS) as [string, ...string[]])
+    .optional(),
+  shippingInformationStatus: z
+    .enum(Object.values(INTEREST_STATUS) as [string, ...string[]])
+    .optional(),
+  socailInfoStatus: z
+    .enum(Object.values(INTEREST_STATUS) as [string, ...string[]])
+    .optional(),
+  profileDetailStatus: z
+    .enum(Object.values(INTEREST_STATUS) as [string, ...string[]])
+    .optional(),
+  isPersonalInfoProvided: z.boolean().default(false),
+  isAddressProvided: z.boolean().default(false),
+  profile_image: z.string().default(''),
+  bio: z.string().optional(),
+  instagram: z.string().optional(),
+  youtube: z.string().optional(),
+  twitter: z.string().optional(),
+  tiktok: z.string().optional(),
+});
+
 const ReviewerValidations = {
   addAddressValidationSchema,
   addPersonalInfoValidationSchema,
   addInterestedCategoryValidation,
   addCurrentlyShareReviewValidationSchema,
+  updateReviewerValidationSchema,
 };
 
 export default ReviewerValidations;

@@ -47,11 +47,38 @@ const addCurrentlyShareReview = async (
   return result;
 };
 
+const addSocailInfo = async (
+  reviewerId: string,
+  payload: Partial<IReviewer>,
+) => {
+  payload.socailInfoStatus = INTEREST_STATUS.COMPLETED;
+  const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
+// update reviewer
+
+const updateReviewerIntoDB = async (
+  reviewerId: string,
+  payload: Partial<IReviewer>,
+) => {
+  const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 const ReviewerService = {
   addAddress,
   addPersonalInfo,
   addInterestedCategory,
   addCurrentlyShareReview,
+  addSocailInfo,
+  updateReviewerIntoDB,
 };
 
 export default ReviewerService;

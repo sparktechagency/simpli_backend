@@ -31,4 +31,16 @@ router.post(
   ReviewerController.addCurrentlyShareReview,
 );
 
+router.post(
+  '/add-social-info',
+  auth(USER_ROLE.reviewer),
+  ReviewerController.addSocailInfo,
+);
+
+router.patch(
+  '/update-reviewer-profile',
+  auth(USER_ROLE.reviewer),
+  ReviewerController.updateReviewerIntoDB,
+);
+router.patch('/update-reviewer-profile', auth(USER_ROLE.reviewer));
 export const reviewRoutes = router;

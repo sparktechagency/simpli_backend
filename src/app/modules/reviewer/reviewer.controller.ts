@@ -48,12 +48,42 @@ const addCurrentlyShareReview = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const addSocailInfo = catchAsync(async (req, res) => {
+  const result = await ReviewerService.addSocailInfo(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Socail info  added successfully',
+    data: result,
+  });
+});
+const updateReviewerIntoDB = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'profile_image' in files) {
+    req.body.profile_image = files['profile_image'][0].path;
+  }
+  const result = await ReviewerService.updateReviewerIntoDB(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile updated successfully',
+    data: result,
+  });
+});
 
 const ReviewerController = {
   addAddress,
   addPersonalInfo,
   addInterestedCategory,
   addCurrentlyShareReview,
+  addSocailInfo,
+  updateReviewerIntoDB,
 };
 
 export default ReviewerController;

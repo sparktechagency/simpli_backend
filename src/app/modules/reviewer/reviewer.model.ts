@@ -75,6 +75,17 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: Boolean,
       default: false,
     },
+    profile_image: {
+      type: String,
+      default: '',
+    },
+    bio: {
+      type: String,
+    },
+    instagram: String,
+    youtube: String,
+    twitter: String,
+    tiktok: String,
   },
   { timestamps: true },
 );

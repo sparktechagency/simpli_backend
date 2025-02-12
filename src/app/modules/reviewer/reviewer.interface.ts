@@ -30,6 +30,12 @@ export interface IReviewer {
   shippingInformationStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   socailInfoStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   profileDetailStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
+  profile_image: string;
+  bio: string;
   isPersonalInfoProvided: boolean;
   isAddressProvided: boolean;
+  instagram: string;
+  twitter: string;
+  youtube: string;
+  tiktok: string;
 }
