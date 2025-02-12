@@ -41,6 +41,7 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
         },
       ],
     },
+    currentlyShareReview: [String],
     interestedCategoryStatus: {
       type: String,
       enum: Object.values(INTEREST_STATUS),

@@ -24,5 +24,11 @@ router.post(
   validateRequest(ReviewerValidations.addInterestedCategoryValidation),
   ReviewerController.addInterestedCategory,
 );
+router.post(
+  '/add-currently-share-review',
+  auth(USER_ROLE.reviewer),
+  validateRequest(ReviewerValidations.addCurrentlyShareReviewValidationSchema),
+  ReviewerController.addCurrentlyShareReview,
+);
 
 export const reviewRoutes = router;

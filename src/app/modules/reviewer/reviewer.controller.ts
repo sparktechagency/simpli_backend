@@ -36,11 +36,24 @@ const addInterestedCategory = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const addCurrentlyShareReview = catchAsync(async (req, res) => {
+  const result = await ReviewerService.addCurrentlyShareReview(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Currently share review added successfully',
+    data: result,
+  });
+});
 
 const ReviewerController = {
   addAddress,
   addPersonalInfo,
   addInterestedCategory,
+  addCurrentlyShareReview,
 };
 
 export default ReviewerController;

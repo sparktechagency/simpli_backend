@@ -55,11 +55,17 @@ const addInterestedCategoryValidation = z.object({
     interestedCategory: z.array(z.string()),
   }),
 });
+const addCurrentlyShareReviewValidationSchema = z.object({
+  body: z.object({
+    currentlyShareReview: z.array(z.string()),
+  }),
+});
 
 const ReviewerValidations = {
   addAddressValidationSchema,
   addPersonalInfoValidationSchema,
   addInterestedCategoryValidation,
+  addCurrentlyShareReviewValidationSchema,
 };
 
 export default ReviewerValidations;

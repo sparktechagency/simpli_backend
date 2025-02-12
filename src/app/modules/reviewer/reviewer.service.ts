@@ -35,11 +35,23 @@ const addInterestedCategory = async (
   });
   return result;
 };
+const addCurrentlyShareReview = async (
+  reviewerId: string,
+  payload: Partial<IReviewer>,
+) => {
+  payload.interestedCategoryStatus = INTEREST_STATUS.COMPLETED;
+  const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
 
 const ReviewerService = {
   addAddress,
   addPersonalInfo,
   addInterestedCategory,
+  addCurrentlyShareReview,
 };
 
 export default ReviewerService;

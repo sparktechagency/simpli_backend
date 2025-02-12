@@ -24,6 +24,7 @@ export interface IReviewer {
   householdIncome: (typeof householdIncome)[keyof typeof householdIncome];
   familyAndDependents: (typeof familyAndDependents)[keyof typeof familyAndDependents];
   interestedCategory: [Types.ObjectId];
+  currentlyShareReview: string[];
   interestedCategoryStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   currentShareReviewStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   shippingInformationStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
