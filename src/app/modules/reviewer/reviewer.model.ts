@@ -86,6 +86,9 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     youtube: String,
     twitter: String,
     tiktok: String,
+    whatsapp: String,
+    facebook: String,
+    blog: String,
   },
   { timestamps: true },
 );

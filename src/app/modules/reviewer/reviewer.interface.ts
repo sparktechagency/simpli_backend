@@ -38,4 +38,7 @@ export interface IReviewer {
   twitter: string;
   youtube: string;
   tiktok: string;
+  whatsapp: string;
+  facebook: string;
+  blog: string;
 }

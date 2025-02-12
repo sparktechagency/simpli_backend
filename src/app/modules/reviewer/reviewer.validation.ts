@@ -115,6 +115,9 @@ const updateReviewerValidationSchema = z.object({
   youtube: z.string().optional(),
   twitter: z.string().optional(),
   tiktok: z.string().optional(),
+  whatsapp: z.string().optional(),
+  facebook: z.string().optional(),
+  blog: z.string().optional(),
 });
 
 const ReviewerValidations = {
