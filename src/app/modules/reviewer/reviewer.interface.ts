@@ -15,4 +15,5 @@ export interface IReviewer {
   socailInfoStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   profileDetailStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   isProfileInfoProvided: boolean;
+  isAddressProvided: boolean;
 }

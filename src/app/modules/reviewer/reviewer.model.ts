@@ -43,6 +43,10 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: Boolean,
       default: false,
     },
+    isAddressProvided: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

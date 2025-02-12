@@ -8,10 +8,10 @@ import ReviewerController from './reviewer.controller';
 const router = express.Router();
 
 router.post(
-  '/add-personal-info',
+  '/add-address',
   auth(USER_ROLE.reviewer),
-  validateRequest(ReviewerValidations.addPersonalInfoValidationSchema),
-  ReviewerController.addPersonalInfo,
+  validateRequest(ReviewerValidations.addAddressValidationSchema),
+  ReviewerController.addAddress,
 );
 
 export const reviewRoutes = router;

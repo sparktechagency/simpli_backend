@@ -1,10 +1,8 @@
 import { IReviewer } from './reviewer.interface';
 import Reviewer from './reviewer.model';
 
-const addPersonalInfo = async (
-  reviewerId: string,
-  payload: Partial<IReviewer>,
-) => {
+const addAddress = async (reviewerId: string, payload: Partial<IReviewer>) => {
+  payload.isAddressProvided = true;
   const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
     new: true,
     runValidators: true,
@@ -13,7 +11,7 @@ const addPersonalInfo = async (
 };
 
 const ReviewerService = {
-  addPersonalInfo,
+  addAddress,
 };
 
 export default ReviewerService;

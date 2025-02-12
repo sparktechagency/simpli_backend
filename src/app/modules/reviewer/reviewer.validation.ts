@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const addPersonalInfoValidationSchema = z.object({
+const addAddressValidationSchema = z.object({
   body: z.object({
     city: z
       .string()
@@ -20,7 +20,7 @@ const addPersonalInfoValidationSchema = z.object({
 });
 
 const ReviewerValidations = {
-  addPersonalInfoValidationSchema,
+  addAddressValidationSchema,
 };
 
 export default ReviewerValidations;
