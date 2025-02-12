@@ -1,6 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 import { IReviewer } from './reviewer.interface';
 import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
+import {
+  educationLevel,
+  employmentStatus,
+  ethnicity,
+  familyAndDependents,
+  householdIncome,
+  maritalStatus,
+} from './reviewer.constant';
 
 const ReviewerSchema: Schema = new Schema<IReviewer>(
   {
@@ -10,10 +18,20 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       required: true,
     },
     name: { type: String, required: true },
+    username: { type: String, required: true },
     city: { type: String },
     zipcode: { type: Number },
     gender: { type: String, enum: Object.values(GENDER) },
     age: { type: Number },
+    ethnicity: { type: String, enum: Object.values(ethnicity) },
+    educationLevel: { type: String, enum: Object.values(educationLevel) },
+    maritalStatus: { type: String, enum: Object.values(maritalStatus) },
+    employmentStatus: { type: String, enum: Object.values(employmentStatus) },
+    householdIncome: { type: String, enum: Object.values(householdIncome) },
+    familyAndDependents: {
+      type: String,
+      enum: Object.values(familyAndDependents),
+    },
     interestedProductStatus: {
       type: String,
       enum: Object.values(INTEREST_STATUS),
