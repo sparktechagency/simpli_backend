@@ -76,7 +76,7 @@ const makeSkip = async (reviewerId: string, skipValue: string) => {
   const result = await Reviewer.findByIdAndUpdate(
     reviewerId,
     {
-      $set: { [skipValue]: INTEREST_STATUS.COMPLETED },
+      $set: { [skipValue]: INTEREST_STATUS.SKIPPED },
     },
     { new: true, runValidators: true },
   );
