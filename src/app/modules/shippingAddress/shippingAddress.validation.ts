@@ -21,8 +21,22 @@ const shippingAddressValidationSchema = z.object({
     .string({ required_error: 'Alternative phone number is reqruired' })
     .min(1, 'Alternative phone number is required'),
 });
+const updateShippingAddressValidationSchema = z.object({
+  address: z.string({ required_error: 'Address is reqruied' }).optional(),
+  country: z.string({ required_error: 'Country is required' }).optional(),
+  zipCode: z.string({ required_error: 'Zip code is required' }).optional(),
+  city: z.string({ required_error: 'City is required' }).optional(),
+  state: z.string({ required_error: 'State is required' }).optional(),
+  phoneNumber: z
+    .string({ required_error: 'Phone number is required' })
+    .optional(),
+  alternativePhoneNumber: z
+    .string({ required_error: 'Alternative phone number is reqruired' })
+    .optional(),
+});
 
 const ShippingAddressValidations = {
   shippingAddressValidationSchema,
+  updateShippingAddressValidationSchema,
 };
 export default ShippingAddressValidations;
