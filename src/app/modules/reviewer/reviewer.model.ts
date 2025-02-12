@@ -39,7 +39,7 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       enum: Object.values(INTEREST_STATUS),
       default: INTEREST_STATUS.IN_PROGRESS,
     },
-    isProfileInfoProvided: {
+    isPersonalInfoProvided: {
       type: Boolean,
       default: false,
     },
