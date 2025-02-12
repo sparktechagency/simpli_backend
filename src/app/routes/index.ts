@@ -88,7 +88,7 @@ const moduleRoutes = [
     router: reviewRoutes,
   },
   {
-    path: '/shippingAddress',
+    path: '/shipping-address',
     router: shippingAddressRoutes,
   },
   {
