@@ -18,5 +18,11 @@ router.post(
   validateRequest(ReviewerValidations.addPersonalInfoValidationSchema),
   ReviewerController.addPersonalInfo,
 );
+router.post(
+  '/add-interested-category',
+  auth(USER_ROLE.reviewer),
+  validateRequest(ReviewerValidations.addInterestedCategoryValidation),
+  ReviewerController.addInterestedCategory,
+);
 
 export const reviewRoutes = router;

@@ -50,9 +50,16 @@ const addPersonalInfoValidationSchema = z.object({
   }),
 });
 
+const addInterestedCategoryValidation = z.object({
+  body: z.object({
+    interestedCategory: z.array(z.string()),
+  }),
+});
+
 const ReviewerValidations = {
   addAddressValidationSchema,
   addPersonalInfoValidationSchema,
+  addInterestedCategoryValidation,
 };
 
 export default ReviewerValidations;

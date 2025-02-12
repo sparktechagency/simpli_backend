@@ -23,7 +23,8 @@ export interface IReviewer {
   employmentStatus: (typeof employmentStatus)[keyof typeof employmentStatus];
   householdIncome: (typeof householdIncome)[keyof typeof householdIncome];
   familyAndDependents: (typeof familyAndDependents)[keyof typeof familyAndDependents];
-  interestedProductStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
+  interestedCategory: [Types.ObjectId];
+  interestedCategoryStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   currentShareReviewStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   shippingInformationStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   socailInfoStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];

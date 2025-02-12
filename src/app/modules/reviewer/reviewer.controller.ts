@@ -24,10 +24,23 @@ const addPersonalInfo = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const addInterestedCategory = catchAsync(async (req, res) => {
+  const result = await ReviewerService.addInterestedCategory(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Interested category info added successfully',
+    data: result,
+  });
+});
 
 const ReviewerController = {
   addAddress,
   addPersonalInfo,
+  addInterestedCategory,
 };
 
 export default ReviewerController;

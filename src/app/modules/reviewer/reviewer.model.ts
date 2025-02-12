@@ -32,7 +32,16 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: String,
       enum: Object.values(familyAndDependents),
     },
-    interestedProductStatus: {
+
+    interestedCategory: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Category',
+        },
+      ],
+    },
+    interestedCategoryStatus: {
       type: String,
       enum: Object.values(INTEREST_STATUS),
       default: INTEREST_STATUS.IN_PROGRESS,
