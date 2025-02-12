@@ -17,6 +17,7 @@ import { stripeRoutes } from '../modules/stripe/stripe.routes';
 import { paypalRoutes } from '../modules/paypal/paypal.routes';
 import { reviewRoutes } from '../modules/reviewer/reviewer.routes';
 import { shippingAddressRoutes } from '../modules/shippingAddress/shippingAddress.routes';
+import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
 
 const router = Router();
 
@@ -89,6 +90,10 @@ const moduleRoutes = [
   {
     path: '/shippingAddress',
     router: shippingAddressRoutes,
+  },
+  {
+    path: '/notificationSetting',
+    router: notificationSettingRoutes,
   },
 ];
 
