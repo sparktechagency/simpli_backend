@@ -1,6 +1,16 @@
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
 import { INTEREST_STATUS } from '../../utilities/enum';
 import { IReviewer } from './reviewer.interface';
 import Reviewer from './reviewer.model';
+
+const getReviewerProfile = async (profileId: string) => {
+  const result = await Reviewer.findById(profileId).populate({
+    path: 'interestedCategory',
+    select: 'name',
+  });
+  return result;
+};
 
 const addAddress = async (reviewerId: string, payload: Partial<IReviewer>) => {
   payload.isAddressProvided = true;
@@ -65,6 +75,12 @@ const updateReviewerIntoDB = async (
   reviewerId: string,
   payload: Partial<IReviewer>,
 ) => {
+  if (payload.username) {
+    const isExist = await Reviewer.findById({ username: payload.username });
+    if (isExist) {
+      throw new AppError(httpStatus.NOT_FOUND, 'This username not available');
+    }
+  }
   const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
     new: true,
     runValidators: true,
@@ -92,6 +108,7 @@ const ReviewerService = {
   addSocailInfo,
   updateReviewerIntoDB,
   makeSkip,
+  getReviewerProfile,
 };
 
 export default ReviewerService;

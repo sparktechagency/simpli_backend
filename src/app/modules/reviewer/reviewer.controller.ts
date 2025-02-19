@@ -3,6 +3,15 @@ import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ReviewerService from './reviewer.service';
 
+const getReviewerProfile = catchAsync(async (req, res) => {
+  const result = await ReviewerService.getReviewerProfile(req.user.profileId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile retrieved successfully',
+    data: result,
+  });
+});
 const addAddress = catchAsync(async (req, res) => {
   const result = await ReviewerService.addAddress(req.user.profileId, req.body);
   sendResponse(res, {
@@ -97,6 +106,7 @@ const ReviewerController = {
   addSocailInfo,
   updateReviewerIntoDB,
   makeSkip,
+  getReviewerProfile,
 };
 
 export default ReviewerController;

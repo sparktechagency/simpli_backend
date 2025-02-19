@@ -7,6 +7,11 @@ import ReviewerController from './reviewer.controller';
 import { uploadFile } from '../../helper/fileUploader';
 const router = express.Router();
 
+router.get(
+  '/get-profile',
+  auth(USER_ROLE.reviewer),
+  ReviewerController.getReviewerProfile,
+);
 router.post(
   '/add-address',
   auth(USER_ROLE.reviewer),
