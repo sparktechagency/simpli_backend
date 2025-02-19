@@ -14,6 +14,7 @@ export interface IReviewer {
   user: Types.ObjectId;
   name: string;
   username: string;
+  email: string;
   city: string;
   zipcode: number;
   gender: (typeof GENDER)[keyof typeof GENDER];

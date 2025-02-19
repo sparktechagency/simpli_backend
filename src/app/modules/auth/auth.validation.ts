@@ -65,6 +65,19 @@ const resendResetCodeValidationSchema = z.object({
   }),
 });
 
+const changeEmailValidationSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email is required' }),
+    password: z.string({ required_error: 'Password is reqruied' }),
+  }),
+});
+const verifyEmailCodeValidationSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email is required' }),
+    code: z.number({ required_error: 'Code is reqruied' }),
+  }),
+});
+
 const authValidations = {
   loginValidationSchema,
   changePasswordValidationSchema,
@@ -74,6 +87,8 @@ const authValidations = {
   verifyResetOtpValidationSchema,
   resendResetCodeValidationSchema,
   googleSignUpValidationSchema,
+  changeEmailValidationSchema,
+  verifyEmailCodeValidationSchema,
 };
 
 export default authValidations;

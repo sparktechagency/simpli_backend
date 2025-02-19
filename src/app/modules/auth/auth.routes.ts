@@ -20,13 +20,13 @@ router.post(
 );
 router.post(
   '/change-password',
-  auth(USER_ROLE.bussinessOwner, USER_ROLE.sampler, USER_ROLE.superAdmin),
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer, USER_ROLE.superAdmin),
   validateRequest(authValidations.changePasswordValidationSchema),
   authControllers.changePassword,
 );
 router.post(
   '/refresh-token',
-  auth(USER_ROLE.bussinessOwner, USER_ROLE.sampler, USER_ROLE.superAdmin),
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer, USER_ROLE.superAdmin),
   validateRequest(authValidations.refreshTokenValidationSchema),
   authControllers.refreshToken,
 );
@@ -58,5 +58,16 @@ router.post(
   validateRequest(authValidations.resendResetCodeValidationSchema),
   authControllers.resendResetCode,
 );
-
+router.post(
+  '/change-email',
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
+  validateRequest(authValidations.changeEmailValidationSchema),
+  authControllers.changeEmail,
+);
+router.post(
+  '/verify-email-code',
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
+  validateRequest(authValidations.verifyEmailCodeValidationSchema),
+  authControllers.verifyEmailCode,
+);
 export const authRoutes = router;

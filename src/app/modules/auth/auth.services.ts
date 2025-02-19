@@ -13,6 +13,9 @@ import sendEmail from '../../utilities/sendEmail';
 import mongoose from 'mongoose';
 import { USER_ROLE } from '../user/user.constant';
 import NormalUser from '../normalUser/normalUser.model';
+import changeEmailVerificationBody from '../../mailTemplate/changeEmailVerificationBody';
+import Bussiness from '../bussiness/bussiness.model';
+import Reviewer from '../reviewer/reviewer.model';
 
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
@@ -364,6 +367,7 @@ const resetPassword = async (payload: {
     },
     {
       password: newHashedPassword,
+      isResetVerified: false,
       passwordChangedAt: new Date(),
     },
   );
@@ -415,6 +419,8 @@ const resendResetCode = async (email: string) => {
 
   return null;
 };
+
+// resend verify code ----------------------
 const resendVerifyCode = async (email: string) => {
   const user = await User.findOne({ email: email });
   if (!user) {
@@ -445,6 +451,97 @@ const resendVerifyCode = async (email: string) => {
   return null;
 };
 
+const changeEmail = async (
+  userData: JwtPayload,
+  payload: { email: string; password: string },
+) => {
+  const user = await User.findById(userData.id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
+  }
+
+  const code = generateVerifyCode();
+  await User.findByIdAndUpdate(userData.id, {
+    emailChangeCode: code,
+    codeExpireIn: new Date(Date.now() + 2 * 60000),
+  });
+  sendEmail({
+    email: payload.email,
+    subject: 'Email Change Verification Code',
+    html: changeEmailVerificationBody('Dear', code),
+  });
+};
+
+const verifyEmailCode = async (
+  userData: JwtPayload,
+  payload: { email: string; code: number },
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findById(userData.id).session(session);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    if (user.emailChangeCode !== payload.code) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid verification code');
+    }
+    if (user.codeExpireIn < new Date(Date.now())) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Code is expire');
+    }
+
+    // Update user email
+    await User.findByIdAndUpdate(
+      userData.id,
+      { email: payload.email },
+      { session },
+    );
+
+    // Update related profile based on user role
+    if (userData.role === USER_ROLE.bussinessOwner) {
+      await Bussiness.findByIdAndUpdate(
+        userData.profileId,
+        { email: payload.email },
+        { session },
+      );
+    } else if (userData.role === USER_ROLE.reviewer) {
+      await Reviewer.findByIdAndUpdate(
+        userData.profileId,
+        { email: payload.email },
+        { session },
+      );
+    }
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return null;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    if (error instanceof mongoose.Error.ValidationError) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Validation Error: ${error.message}`,
+      );
+    } else if (error instanceof mongoose.Error.CastError) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid ID format');
+    } else {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'An error occurred while updating the email',
+      );
+    }
+  }
+};
+
 const authServices = {
   loginUserIntoDB,
   changePasswordIntoDB,
@@ -455,6 +552,8 @@ const authServices = {
   resendResetCode,
   loginWithGoogle,
   resendVerifyCode,
+  changeEmail,
+  verifyEmailCode,
 };
 
 export default authServices;

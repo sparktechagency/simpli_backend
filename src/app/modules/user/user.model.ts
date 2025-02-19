@@ -51,6 +51,13 @@ const userSchema = new Schema<TUser>(
     codeExpireIn: {
       type: Date,
     },
+    emailChangeCode: {
+      type: Number,
+    },
+    isEmailChangeVerified: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

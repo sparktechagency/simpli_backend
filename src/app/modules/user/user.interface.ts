@@ -21,6 +21,8 @@ export interface TUser {
   stripeConnectedAccountId: string;
   isPaypalConnected: boolean;
   paypalMerchantId: string;
+  emailChangeCode: number;
+  isEmailChangeVerified: boolean;
 }
 export interface TLoginUser {
   email: string;

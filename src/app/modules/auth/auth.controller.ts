@@ -102,6 +102,24 @@ const resendVerifyCode = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const changeEmail = catchAsync(async (req, res) => {
+  const result = await authServices.changeEmail(req.user, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Check you email for verify code for change email',
+    data: result,
+  });
+});
+const verifyEmailCode = catchAsync(async (req, res) => {
+  const result = await authServices.verifyEmailCode(req.user, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Email changed successfully',
+    data: result,
+  });
+});
 
 const authControllers = {
   loginUser,
@@ -112,7 +130,9 @@ const authControllers = {
   verifyResetOtp,
   resendResetCode,
   googleLogin,
-  resendVerifyCode
+  changeEmail,
+  resendVerifyCode,
+  verifyEmailCode,
 };
 
 export default authControllers;
