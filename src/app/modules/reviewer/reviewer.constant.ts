@@ -50,3 +50,10 @@ export const familyAndDependents = {
   three: '3',
   fourOrMore: '4+',
 } as const;
+
+export const receiveProductBy = {
+  weekly: 'Weekly',
+  bi_weekly: 'Bi-Weekly',
+  montly: 'Monthly',
+  quarterly: 'Quarterly',
+};

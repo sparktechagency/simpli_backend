@@ -8,6 +8,7 @@ import {
   familyAndDependents,
   householdIncome,
   maritalStatus,
+  receiveProductBy,
 } from './reviewer.constant';
 
 const ReviewerSchema: Schema = new Schema<IReviewer>(
@@ -66,6 +67,18 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: String,
       enum: Object.values(INTEREST_STATUS),
       default: INTEREST_STATUS.IN_PROGRESS,
+    },
+    receiveProductBy: {
+      type: String,
+      enum: Object.values(receiveProductBy),
+    },
+    minPriceForReview: {
+      type: Number,
+      default: null,
+    },
+    maxPriceForReview: {
+      type: Number,
+      default: null,
     },
     isPersonalInfoProvided: {
       type: Boolean,

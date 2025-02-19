@@ -7,6 +7,7 @@ import {
   familyAndDependents,
   householdIncome,
   maritalStatus,
+  receiveProductBy,
 } from './reviewer.constant';
 
 export interface IReviewer {
@@ -30,6 +31,9 @@ export interface IReviewer {
   shippingInformationStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   socailInfoStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
   profileDetailStatus: (typeof INTEREST_STATUS)[keyof typeof INTEREST_STATUS];
+  minPriceForReview: number | null;
+  maxPriceForReview: number | null;
+  receiveProductBy: (typeof receiveProductBy)[keyof typeof receiveProductBy];
   profile_image: string;
   bio: string;
   isPersonalInfoProvided: boolean;
