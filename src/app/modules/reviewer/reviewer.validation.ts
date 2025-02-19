@@ -6,6 +6,7 @@ import {
   familyAndDependents,
   householdIncome,
   maritalStatus,
+  receiveProductBy,
 } from './reviewer.constant';
 import { ENUM_SKIP_VALUE, GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
@@ -118,6 +119,11 @@ const updateReviewerValidationSchema = z.object({
   whatsapp: z.string().optional(),
   facebook: z.string().optional(),
   blog: z.string().optional(),
+  minPriceForReview: z.number().optional(),
+  maxPriceForReview: z.number().optional(),
+  receiveProductBy: z.enum(
+    Object.values(receiveProductBy) as [string, ...string[]],
+  ),
 });
 
 const makeSkipValidationSchema = z.object({
