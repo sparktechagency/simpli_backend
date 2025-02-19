@@ -15,6 +15,7 @@ import Bussiness from '../bussiness/bussiness.model';
 import { createToken } from './user.utils';
 import config from '../../config';
 import Reviewer from '../reviewer/reviewer.model';
+import { NotificationSetting } from '../notificationSetting/notificationSetting.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -98,7 +99,7 @@ const registerReviewer = async (payload: any) => {
       subject: 'Activate Your Account',
       html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
     });
-
+    await NotificationSetting.create({ user: result[0]._id });
     await session.commitTransaction();
     session.endSession();
 
