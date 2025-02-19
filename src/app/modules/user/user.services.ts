@@ -90,6 +90,7 @@ const registerReviewer = async (payload: any) => {
     const reviewerPayload = {
       email: payload.email,
       name: payload.name,
+      username: payload.username,
       user: user[0]._id,
     };
     const result = await Reviewer.create([reviewerPayload], { session });

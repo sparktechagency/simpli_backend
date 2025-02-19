@@ -18,7 +18,7 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       required: true,
     },
     name: { type: String, required: true },
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     city: { type: String },
     zipcode: { type: Number },
     gender: { type: String, enum: Object.values(GENDER) },

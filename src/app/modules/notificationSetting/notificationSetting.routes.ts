@@ -13,5 +13,9 @@ router.patch(
   validateRequest(NoficationSettingValidations.updateNotificationSettingSchema),
   NotificationSettingController.updateNotificationSetting,
 );
-
+router.get(
+  '/get-notification-setting',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  NotificationSettingController.getNotificationSetting,
+);
 export const notificationSettingRoutes = router;

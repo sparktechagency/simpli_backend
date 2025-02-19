@@ -92,7 +92,7 @@ const moduleRoutes = [
     router: shippingAddressRoutes,
   },
   {
-    path: '/notificationSetting',
+    path: '/notification-setting',
     router: notificationSettingRoutes,
   },
 ];

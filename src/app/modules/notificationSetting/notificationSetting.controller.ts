@@ -15,9 +15,21 @@ const updateNotificationSetting = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getNotificationSetting = catchAsync(async (req, res) => {
+  const result = await NotificationSettingService.getNotificationSetting(
+    req.user.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Notification setting retrieved successfully',
+    data: result,
+  });
+});
 
 const NotificationSettingController = {
   updateNotificationSetting,
+  getNotificationSetting,
 };
 
 export default NotificationSettingController;
