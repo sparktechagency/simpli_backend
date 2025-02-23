@@ -67,6 +67,7 @@ export const CAMPAIGN_STATUS = {
   COMPLETED: 'Completed',
   PAUSED: 'Paused',
   CANCELLED: 'Cancelled',
+  EXPIRED: 'Expired',
 };
 
 export const TRANSACTION_STATUS = {

@@ -77,61 +77,13 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
 
     return { url: session.url };
   }
-  // if (payload.paymentMethod === ENUM_PAYMENT_METHOD.PAYPAL) {
-  //   try {
-  //     const request = new orders.OrdersCreateRequest();
-  //     request.prefer('return=representation');
-  //     request.requestBody({
-  //       intent: 'CAPTURE',
-  //       purchase_units: [
-  //         {
-  //           amount: {
-  //             currency_code: 'USD',
-  //             value: totalAmount.toFixed(2),
-  //           },
-  //           description: `Payment for Campaign: ${result._id}`,
-  //           custom_id: result._id.toString(),
-  //         },
-  //       ],
-  //       application_context: {
-  //         brand_name: 'Your Business Name',
-  //         landing_page: 'LOGIN',
-  //         user_action: 'PAY_NOW',
-  //         return_url: `${config.paypal.paypal_campaign_run_payment_success_url}?order_id=${result._id}`,
-  //         cancel_url: `${config.paypal.paypal_campaign_run_payment_cancel_url}`,
-  //       },
-  //     });
-
-  //     const order = await paypalClient.execute(request);
-
-  //     const approvalUrl = order.result.links.find(
-  //       (link: any) => link.rel === 'approve',
-  //     )?.href;
-
-  //     if (!approvalUrl) {
-  //       throw new AppError(
-  //         httpStatus.INTERNAL_SERVER_ERROR,
-  //         'PayPal payment creation failed: No approval URL found',
-  //       );
-  //     }
-
-  //     return { url: approvalUrl };
-  //   } catch (error) {
-  //     console.error('PayPal Payment Error:', error);
-  //     throw new AppError(
-  //       httpStatus.INTERNAL_SERVER_ERROR,
-  //       'Failed to create PayPal order',
-  //     );
-  //   }
-  // }
 
   if (payload.paymentMethod === ENUM_PAYMENT_METHOD.PAYPAL) {
     try {
-      // ✅ FIX: Import `OrdersCreateRequest` properly
       const request = new paypal.orders.OrdersCreateRequest();
       request.prefer('return=representation');
       request.requestBody({
-        intent: 'CAPTURE', // ✅ Auto Capture Payment After Approval
+        intent: 'CAPTURE',
         purchase_units: [
           {
             amount: {
@@ -164,7 +116,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
         );
       }
 
-      return { url: approvalUrl }; // ✅ Redirect User to PayPal Checkout
+      return { url: approvalUrl };
     } catch (error) {
       console.error('PayPal Payment Error:', error);
       throw new AppError(
@@ -375,7 +327,15 @@ cron.schedule('0 0 * * *', async () => {
     { startDate: { $lte: currentDate }, status: { $ne: 'Active' } },
     { $set: { status: 'Active' } },
   );
-  console.log(`Campaigns updated: ${result.modifiedCount}`);
+  const result2 = await Campaign.updateMany(
+    {
+      endDate: { $lte: currentDate },
+    },
+    { $set: { status: CAMPAIGN_STATUS.EXPIRED } },
+  );
+
+  console.log(`Campaigns updated to active: ${result.modifiedCount}`);
+  console.log(`Campaigns updated to expired: ${result2.modifiedCount}`);
 });
 
 const CampaignService = {
