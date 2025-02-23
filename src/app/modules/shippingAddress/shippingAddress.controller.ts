@@ -29,9 +29,22 @@ const updateShippingAddress = catchAsync(async (req, res) => {
   });
 });
 
+const getShippingAddress = catchAsync(async (req, res) => {
+  const result = await ShippingAddressService.getShippingAddress(
+    req.user.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Shipping address retrieved successfully',
+    data: result,
+  });
+});
+
 const ShippingAddressController = {
   createShippingAddress,
   updateShippingAddress,
+  getShippingAddress,
 };
 
 export default ShippingAddressController;

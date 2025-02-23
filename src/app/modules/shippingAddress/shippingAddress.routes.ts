@@ -23,4 +23,10 @@ router.patch(
   ShippingAddressController.updateShippingAddress,
 );
 
+router.get(
+  '/get-shipping-address',
+  auth(USER_ROLE.reviewer),
+  ShippingAddressController.getShippingAddress,
+);
+
 export const shippingAddressRoutes = router;
