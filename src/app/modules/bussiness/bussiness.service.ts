@@ -79,10 +79,17 @@ const updateBussinessInfoIntoDB = async (
   }
   return result;
 };
+
+const getBussinessProfile = async (profileId: string) => {
+  const result = await Bussiness.findById(profileId);
+  return result;
+};
+
 const BussinessService = {
   addBussinessInformation,
   addBussinessDocumentIntoDB,
   updateBussinessInfoIntoDB,
+  getBussinessProfile,
 };
 
 export default BussinessService;

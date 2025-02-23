@@ -38,4 +38,11 @@ router.patch(
   },
   BussinessController.updateBussinessInfo,
 );
+
+router.get(
+  '/get-profile',
+  auth(USER_ROLE.bussinessOwner),
+  BussinessController.getBussinessProfile,
+);
+
 export const bussinessRoutes = router;

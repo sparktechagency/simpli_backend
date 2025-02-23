@@ -75,11 +75,22 @@ const updateBussinessInfo = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getBussinessProfile = catchAsync(async (req, res) => {
+  const result = await BussinessService.getBussinessProfile(req.user.profileId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Bussiness profile retrieved successfully',
+    data: result,
+  });
+});
 
 const BussinessController = {
   addBussinessInformation,
   addBussinessDocument,
   updateBussinessInfo,
+  getBussinessProfile,
 };
 
 export default BussinessController;
