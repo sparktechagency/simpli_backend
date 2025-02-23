@@ -15,6 +15,7 @@ import {
   CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
+  ENUM_PAYMENT_STATUS,
   ENUM_PRODUCT_STATUS,
 } from '../../utilities/enum';
 import config from '../../config';
@@ -226,7 +227,9 @@ const updateCampaignIntoDB = async (
 // get campaigns
 const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
   const campaignQuery = new QueryBuilder(
-    Campaign.find().populate('product'),
+    Campaign.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }).populate(
+      'product',
+    ),
     query,
   )
     .search([''])

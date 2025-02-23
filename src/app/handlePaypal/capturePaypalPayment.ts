@@ -1,6 +1,8 @@
 import paypal from '@paypal/checkout-server-sdk';
 import paypalClient from '../utilities/paypal';
 import { Request, Response } from 'express';
+import Campaign from '../modules/campaign/campaign.model';
+import { ENUM_PAYMENT_STATUS } from '../utilities/enum';
 
 const capturePayPalPayment = async (req: Request, res: Response) => {
   const orderId = req.query.token;
@@ -23,6 +25,9 @@ const capturePayPalPayment = async (req: Request, res: Response) => {
 
     const transactionId = captureResponse.result.id;
     const amount = purchaseUnit.amount.value;
+    await Campaign.findByIdAndUpdate(campaignId, {
+      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+    });
     console.log(
       `Transaction ID: ${transactionId}, Amount: ${amount}, Campaign ID: ${campaignId}, Payment Purpose: ${paymentPurpose}`,
     );
