@@ -256,6 +256,15 @@ const makeCampaignActive = async (
   if (!campaign) {
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
   }
+  if (new Date() > campaign?.endDate) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Your campaign end date is expired please update end date then make active',
+    );
+  }
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
   const result = await Campaign.findByIdAndUpdate(
     id,
     { status: status },
