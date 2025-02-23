@@ -9,6 +9,7 @@ import Category from '../category/category.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 
+// create product into db
 const createProductIntoDB = async (
   profileId: string,
   payload: IProduct,
