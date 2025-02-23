@@ -32,8 +32,14 @@ const updateShippingAddress = async (
   return result;
 };
 
+const getShippingAddress = async (profileId: string) => {
+  const result = await ShippingAddress.find({ reviewer: profileId });
+  return result;
+};
+
 const ShippingAddressService = {
   createShippingAddress,
   updateShippingAddress,
+  getShippingAddress,
 };
 export default ShippingAddressService;
