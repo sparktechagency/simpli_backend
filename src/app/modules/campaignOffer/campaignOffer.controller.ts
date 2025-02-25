@@ -15,9 +15,22 @@ const acceptCampaignOffer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getMyCampaignOffer = catchAsync(async (req, res) => {
+  const result = await CampaignOfferService.getMyCampaignOfferFromDB(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Campaign offer retrieved successfully`,
+    data: result,
+  });
+});
 
 const CampaignOfferController = {
   acceptCampaignOffer,
+  getMyCampaignOffer,
 };
 
 export default CampaignOfferController;

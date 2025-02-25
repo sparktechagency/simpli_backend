@@ -14,4 +14,9 @@ router.post(
   CampaignOfferController.acceptCampaignOffer,
 );
 
+router.get(
+  '/get-my-campaign-offer',
+  auth(USER_ROLE.reviewer),
+  CampaignOfferController.getMyCampaignOffer,
+);
 export const campaignOfferRoutes = router;

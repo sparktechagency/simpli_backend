@@ -34,7 +34,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
     // get the user if that here ---------
     const user = await User.findById(id);
-    console.log(user);
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
     }
