@@ -20,6 +20,7 @@ const addToCart = async ({
   productId,
   variantId,
 }: addToCartProps) => {
+  console.log('buss', bussinessId);
   let cart = await Cart.findOne({ reviewer: reviewerId });
 
   if (cart) {
@@ -41,8 +42,7 @@ const addToCart = async ({
   }
 
   const existingItem = cart.items.find(
-    (item) =>
-      item.product.toString() === productId && item.variant === variantId,
+    (item) => item.product.toString() == productId && item.variant == variantId,
   );
 
   if (existingItem) {
@@ -82,9 +82,12 @@ export const removeCartItem = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
   }
 
+  // cart.items = cart.items.filter(
+  //   (item) => item.product.toString() != productId && item.variant != variantId,
+  // );
   cart.items = cart.items.filter(
     (item) =>
-      item.product.toString() !== productId && item.variant !== variantId,
+      !(item.product.toString() == productId && item.variant == variantId),
   );
 
   await cart.save();
@@ -93,11 +96,10 @@ export const removeCartItem = async (
 
 // view cart
 
-const viewCart = async (costumerId: string) => {
-  const cart = await Cart.findOne({ customer: costumerId }).populate(
-    'items.product',
-    'name quantity price images',
-  );
+const viewCart = async (reviewerId: string) => {
+  const cart = await Cart.findOne({ reviewer: reviewerId })
+    .populate('items.product', 'name images')
+    .populate('items.variant');
 
   if (!cart) {
     throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
@@ -113,6 +115,7 @@ const increaseCartItemQuantity = async (
   productId: string,
   variantId: string | null,
 ) => {
+  console.log('profil', productId, variantId);
   const cart = await Cart.findOne({ reviewer: reviewerId });
 
   if (!cart) {
@@ -120,8 +123,7 @@ const increaseCartItemQuantity = async (
   }
 
   const item = cart.items.find(
-    (item) =>
-      item.product.toString() === productId && item.variant === variantId,
+    (item) => item.product.toString() == productId && item.variant == variantId,
   );
 
   if (!item) {
@@ -148,8 +150,7 @@ export const decreaseCartItemQuantity = async (
   }
 
   const item = cart.items.find(
-    (item) =>
-      item.product.toString() === productId && item.variant === variantId,
+    (item) => item.product.toString() == productId && item.variant == variantId,
   );
 
   if (!item) {

@@ -6,7 +6,7 @@ import cartServices from './cart.services';
 const addToCart = catchAsync(async (req, res) => {
   const result = await cartServices.addToCart({
     reviewerId: req?.user?.profileId,
-    bussinessId: req?.body?.shopId,
+    bussinessId: req?.body?.bussinessId,
     productId: req?.body?.productId,
     variantId: req?.body?.variantId || null,
     price: req?.body?.price,

@@ -18,6 +18,7 @@ import { paypalRoutes } from '../modules/paypal/paypal.routes';
 import { reviewRoutes } from '../modules/reviewer/reviewer.routes';
 import { shippingAddressRoutes } from '../modules/shippingAddress/shippingAddress.routes';
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
+import { cartRoutes } from '../modules/cart/cart.routes';
 
 const router = Router();
 
@@ -94,6 +95,10 @@ const moduleRoutes = [
   {
     path: '/notification-setting',
     router: notificationSettingRoutes,
+  },
+  {
+    path: '/cart',
+    router: cartRoutes,
   },
 ];
 
