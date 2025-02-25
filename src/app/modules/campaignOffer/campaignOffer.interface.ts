@@ -2,10 +2,10 @@ import { Types } from 'mongoose';
 import { CampaignOfferStatus } from './campaignOffer.constant';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 
-export interface ICampaignOffer {
+export interface ICampaignOffer extends Document {
   campaign: Types.ObjectId;
   product: Types.ObjectId;
-  bussiness: Types.ObjectId;
+  business: Types.ObjectId;
   reviewer: Types.ObjectId;
   shippingAddress: Types.ObjectId;
   status: (typeof CampaignOfferStatus)[keyof typeof CampaignOfferStatus];
