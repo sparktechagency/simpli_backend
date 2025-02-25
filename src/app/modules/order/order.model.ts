@@ -39,11 +39,13 @@ const OrderSchema: Schema = new Schema<IOrder>(
     paymentStatus: {
       type: String,
       enum: Object.values(ENUM_PAYMENT_STATUS) as string[],
+      default: ENUM_PAYMENT_STATUS.PENDING,
       required: true,
     },
     deliveryStatus: {
       type: String,
       enum: Object.values(ENUM_DELIVERY_STATUS) as string[],
+      default: ENUM_DELIVERY_STATUS.waiting,
       required: true,
     },
   },
