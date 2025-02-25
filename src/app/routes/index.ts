@@ -20,6 +20,7 @@ import { shippingAddressRoutes } from '../modules/shippingAddress/shippingAddres
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
 import { cartRoutes } from '../modules/cart/cart.routes';
 import { campaignOfferRoutes } from '../modules/campaignOffer/campaignOffer.routes';
+import { orderRoutes } from '../modules/order/order.routes';
 
 const router = Router();
 
@@ -104,6 +105,10 @@ const moduleRoutes = [
   {
     path: '/campaign-offer',
     router: campaignOfferRoutes,
+  },
+  {
+    path: '/campaign-offer',
+    router: orderRoutes,
   },
 ];
 
