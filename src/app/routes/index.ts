@@ -19,6 +19,7 @@ import { reviewRoutes } from '../modules/reviewer/reviewer.routes';
 import { shippingAddressRoutes } from '../modules/shippingAddress/shippingAddress.routes';
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
 import { cartRoutes } from '../modules/cart/cart.routes';
+import { campaignOfferRoutes } from '../modules/campaignOffer/campaignOffer.routes';
 
 const router = Router();
 
@@ -99,6 +100,10 @@ const moduleRoutes = [
   {
     path: '/cart',
     router: cartRoutes,
+  },
+  {
+    path: '/campaign-offer',
+    router: campaignOfferRoutes,
   },
 ];
 
