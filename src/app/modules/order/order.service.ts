@@ -3,8 +3,6 @@ import AppError from '../../error/appError';
 import Cart from '../cart/cart.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
-import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {

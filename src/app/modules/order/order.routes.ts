@@ -14,4 +14,10 @@ router.post(
   OrderController.createOrder,
 );
 
+router.get(
+  '/get-my-orders',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  OrderController.getMyOrders,
+);
+
 export const orderRoutes = router;
