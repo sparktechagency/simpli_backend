@@ -3,6 +3,9 @@ import AppError from '../../error/appError';
 import Cart from '../cart/cart.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
+import { JwtPayload } from 'jsonwebtoken';
+import { USER_ROLE } from '../user/user.constant';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
   const cart = await Cart.findOne({ reviewer: reviewerId });
@@ -24,8 +27,32 @@ const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
   return result;
 };
 
+const getMyOrders = async (
+  profileId: string,
+  query: Record<string, unknown>,
+) => {
+  const orderQuery = new QueryBuilder(
+    Order.find({ $or: [{ reviewer: profileId }, { bussiness: profileId }] }),
+    query,
+  )
+    .search([''])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const OrderService = {
   createOrder,
+  getMyOrders,
 };
 
 export default OrderService;
