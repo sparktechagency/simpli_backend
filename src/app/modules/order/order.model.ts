@@ -15,7 +15,7 @@ const OrderItemSchema: Schema = new Schema<IOrderItem>({
 
 const OrderSchema: Schema = new Schema<IOrder>(
   {
-    reviewer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    reviewer: { type: Schema.Types.ObjectId, ref: 'Reviewer', required: true },
     bussiness: {
       type: Schema.Types.ObjectId,
       ref: 'Bussiness',
