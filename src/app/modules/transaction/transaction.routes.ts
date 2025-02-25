@@ -12,7 +12,7 @@ router.get(
 );
 router.get(
   '/get-my-transaction',
-  auth(USER_ROLE.bussinessOwner, USER_ROLE.sampler),
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
   TransactionController.getMyTransaction,
 );
 
