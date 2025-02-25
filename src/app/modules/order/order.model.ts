@@ -21,6 +21,11 @@ const OrderSchema: Schema = new Schema<IOrder>(
       ref: 'Bussiness',
       required: true,
     },
+    shippingAddress: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'ShippingAddress',
+    },
     items: { type: [OrderItemSchema], required: true },
     totalQuantity: { type: Number, required: true, min: 1 },
     subTotal: { type: Number, required: true, min: 0 },

@@ -15,6 +15,7 @@ export interface IOrderItem {
 export interface IOrder extends Document {
   reviewer: Types.ObjectId;
   bussiness: Types.ObjectId;
+  shippingAddress: Types.ObjectId;
   items: IOrderItem[];
   totalQuantity: number;
   subTotal: number;
