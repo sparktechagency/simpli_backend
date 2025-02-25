@@ -94,3 +94,10 @@ export const ENUM_SKIP_VALUE = {
   profileDetailStatus: 'profileDetailStatus',
   socailInfoStatus: 'socailInfoStatus',
 };
+
+export const ENUM_DELIVERY_STATUS = {
+  shipped: 'Shipped',
+  waiting: 'Waiting to be shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
