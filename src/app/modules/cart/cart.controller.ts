@@ -22,6 +22,7 @@ const removeCartItem = catchAsync(async (req, res) => {
   const result = await cartServices.removeCartItem(
     req?.user?.profileId,
     req?.body?.productId,
+    req.body.variantId,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -44,6 +45,7 @@ const increaseItemQuantity = catchAsync(async (req, res) => {
   const result = await cartServices.increaseCartItemQuantity(
     req?.user?.profileId,
     req?.body?.productId,
+    req.body.variantId,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -56,6 +58,7 @@ const decreaseItemQuantity = catchAsync(async (req, res) => {
   const result = await cartServices.decreaseCartItemQuantity(
     req?.user?.profileId,
     req?.body?.productId,
+    req.body.variantId,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
