@@ -9,33 +9,33 @@ const router = express.Router();
 
 router.post(
   '/add-to-cart',
-  auth(USER_ROLE.customer),
+  auth(USER_ROLE.reviewer),
   validateRequest(cartValidations.addToCartValidationSchema),
   cartControllers.addToCart,
 );
 router.patch(
   '/remove-cart-item',
-  auth(USER_ROLE.customer),
+  auth(USER_ROLE.reviewer),
   validateRequest(cartValidations.removeCartItemValidationSchema),
   cartControllers.removeCartItem,
 );
-router.get('/view-cart', auth(USER_ROLE.customer), cartControllers.viewCart);
+router.get('/view-cart', auth(USER_ROLE.reviewer), cartControllers.viewCart);
 
 router.patch(
   '/increase-item-quantity',
-  auth(USER_ROLE.customer),
+  auth(USER_ROLE.reviewer),
   validateRequest(cartValidations.removeCartItemValidationSchema),
   cartControllers.increaseItemQuantity,
 );
 router.patch(
   '/decrease-item-quantity',
-  auth(USER_ROLE.customer),
+  auth(USER_ROLE.reviewer),
   validateRequest(cartValidations.removeCartItemValidationSchema),
   cartControllers.decreaseItemQuantity,
 );
 router.delete(
   '/delete-cart',
-  auth(USER_ROLE.customer),
+  auth(USER_ROLE.reviewer),
   cartControllers.clearCart,
 );
 
