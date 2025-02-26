@@ -45,9 +45,9 @@
 import paypal from '@paypal/checkout-server-sdk';
 import paypalClient from '../utilities/paypal';
 import { Request, Response } from 'express';
-import Campaign from '../modules/campaign/campaign.model';
-import { ENUM_PAYMENT_PURPOSE, ENUM_PAYMENT_STATUS } from '../utilities/enum';
+import { ENUM_PAYMENT_PURPOSE } from '../utilities/enum';
 import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
+import handleCampaignRunPaymentSuccess from './handleCampaignPaymentSuccess';
 
 const capturePayPalPayment = async (req: Request, res: Response) => {
   const orderId = req.query.token;
@@ -72,17 +72,15 @@ const capturePayPalPayment = async (req: Request, res: Response) => {
 
     if (paymentPurpose === ENUM_PAYMENT_PURPOSE.ORDER) {
       await handleOrderPaymentSuccess(req, res, id, transactionId, amount);
+    } else if (paymentPurpose === ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN) {
+      await handleCampaignRunPaymentSuccess(
+        req,
+        res,
+        id,
+        transactionId,
+        amount,
+      );
     }
-
-    // await Campaign.findByIdAndUpdate(campaignId, {
-    //   paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-    // });
-    // console.log(
-    //   `Transaction ID: ${transactionId}, Amount: ${amount}, Campaign ID: ${campaignId}, Payment Purpose: ${paymentPurpose}`,
-    // );
-    // return res.redirect(
-    //   `${process.env.PAYPAL_SUCCESS_URL}?campaign_id=${campaignId}&transaction_id=${transactionId}&amount=${amount}`,
-    // );
   } catch (error) {
     console.error('PayPal Capture Error:', error);
     return res.redirect(`${process.env.PAYPAL_CANCEL_URL}`);
