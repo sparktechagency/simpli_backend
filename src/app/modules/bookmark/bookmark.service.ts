@@ -1,32 +1,30 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import ProductBookmark from './bookmark.mode';
-import NormalUser from '../normalUser/normalUser.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import Product from '../product/product.model';
+import Bookmark from './bookmark.mode';
 
-const profileBookmarkAddDelete = async (
-  profileId: string,
-  bookmarkProfileId: string,
-) => {
+const bookmarkAddDelete = async (profileId: string, productId: string) => {
   // check if article exists
-  const profile = await NormalUser.findById(bookmarkProfileId);
-  if (!profile) {
+  const product = await Product.exists({ _id: productId });
+  if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Profile not found');
   }
-  const bookmark = await ProductBookmark.findOne({
-    user: profileId,
-    profile: bookmarkProfileId,
+  const bookmark = await Bookmark.exists({
+    reviewer: profileId,
+    product: productId,
   });
   if (bookmark) {
     await ProductBookmark.findOneAndDelete({
-      user: profileId,
-      profile: bookmarkProfileId,
+      reviewer: profileId,
+      product: productId,
     });
     return null;
   } else {
     const result = await ProductBookmark.create({
-      user: profileId,
-      profile: bookmarkProfileId,
+      reviewer: profileId,
+      product: productId,
     });
     return result;
   }
@@ -38,14 +36,13 @@ const getMyBookmarkFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const bookmarkQuery = new QueryBuilder(
-    ProductBookmark.find({ user: profileId }).populate({
-      path: 'profile',
-      select: 'name bio profile_image',
-      populate: { path: 'mainSkill', select: 'name' },
+    Bookmark.find({ user: profileId }).populate({
+      path: 'product',
+      select: 'name images',
     }),
     query,
   )
-    .search(['incidentType'])
+    .search([''])
     .fields()
     .filter()
     .paginate()
@@ -59,7 +56,7 @@ const getMyBookmarkFromDB = async (
 };
 
 const BookmarkService = {
-  profileBookmarkAddDelete,
+  bookmarkAddDelete,
   getMyBookmarkFromDB,
 };
 
