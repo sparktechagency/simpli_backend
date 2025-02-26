@@ -3,6 +3,8 @@ import AppError from '../../error/appError';
 import { ICampaignOffer } from './campaignOffer.interface';
 import { CampaignOffer } from './campaignOffer.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { JwtPayload } from 'jsonwebtoken';
+import { USER_ROLE } from '../user/user.constant';
 
 const acceptCampaignOffer = async (
   profileId: string,
@@ -26,10 +28,29 @@ const acceptCampaignOffer = async (
 
 // get my campaign offer
 const getMyCampaignOfferFromDB = async (
-  reviewerId: string,
+  userData: JwtPayload,
   query: Record<string, unknown>,
 ) => {
-  const campaignOfferQuery = new QueryBuilder(CampaignOffer.find(), query)
+  let filterQuery = {};
+  if (userData?.role === USER_ROLE.reviewer) {
+    filterQuery = {
+      reveviewer: userData.profileId,
+    };
+  } else if (userData?.role === USER_ROLE.bussinessOwner) {
+    filterQuery = {
+      bussiness: userData?.profileId,
+    };
+  }
+
+  const campaignOfferQuery = new QueryBuilder(
+    CampaignOffer.find(filterQuery)
+      .populate({
+        path: 'campaign',
+        select: 'name amountForEachReview endDate',
+      })
+      .populate({ path: 'product', select: 'name images' }),
+    query,
+  )
     .search([''])
     .filter()
     .sort()

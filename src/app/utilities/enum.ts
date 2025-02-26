@@ -59,6 +59,7 @@ export const ENUM_TRANSACTION_STATUS = {
 
 export const ENUM_PAYMENT_PURPOSE = {
   CAMPAIGN_RUN: 'Campaign Run',
+  ORDER: 'Order',
 };
 
 export const CAMPAIGN_STATUS = {

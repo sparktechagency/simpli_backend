@@ -25,6 +25,10 @@ export default {
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_SUCCESS_URL,
     stripe_campaign_run_payment_cancel_url:
       process.env.STRIPE_CAMPAIGN_RUN_PAYMENT_CANCEL_URL,
+    stripe_order_payment_success_url:
+      process.env.STRIPE_ORDER_PAYMENT_SUCCESS_URL,
+    stripe_order_payment_cancel_url:
+      process.env.STRIPE_ORDER_PAYMENT_CANCEL_URL,
     webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
     onboarding_return_url: process.env.ONBOARDING_RETURN_URL,
     onboarding_refresh_url: process.env.ONBOARDING_REFRESH_URL,
