@@ -4,7 +4,7 @@ import sendResponse from '../../utilities/sendResponse';
 import BookmarkService from './bookmark.service';
 
 const bookmarkAddDelete = catchAsync(async (req, res) => {
-  const result = await BookmarkService.profileBookmarkAddDelete(
+  const result = await BookmarkService.bookmarkAddDelete(
     req.user.profileId,
     req.params.id,
   );
@@ -12,8 +12,8 @@ const bookmarkAddDelete = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: result
-      ? 'Profile saved successfully'
-      : 'Profile unsaved successfully',
+      ? 'Product added to wishlist '
+      : 'Product deleted from wishlist',
     data: result,
   });
 });
@@ -27,7 +27,7 @@ const getMyBookmark = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Saved profile retrieved successfully',
+    message: 'Wishlist retrieved successfully',
     data: result,
   });
 });
