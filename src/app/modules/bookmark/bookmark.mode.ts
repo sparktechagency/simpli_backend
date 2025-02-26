@@ -3,15 +3,15 @@ import { IBookmark } from './bookmark.interface';
 
 const bookmarkSchema = new Schema<IBookmark>(
   {
-    profile: {
+    product: {
       type: Schema.Types.ObjectId,
       default: null,
-      ref: 'NormalUser',
+      ref: 'Product',
     },
-    user: {
+    reviewer: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'NormalUser',
+      ref: 'Reviewer',
     },
   },
   {
@@ -19,6 +19,6 @@ const bookmarkSchema = new Schema<IBookmark>(
   },
 );
 
-const Bookmark = model('ProductBookmark', bookmarkSchema);
+const Bookmark = model('Bookmark', bookmarkSchema);
 
 export default Bookmark;
