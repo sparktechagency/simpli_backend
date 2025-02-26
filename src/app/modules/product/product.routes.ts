@@ -66,7 +66,7 @@ router.patch(
 );
 router.get(
   '/get-all-product',
-  // auth(USER_ROLE.bussinessOwner),
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
   ProductController.getAllProduct,
 );
 router.get(

@@ -8,6 +8,7 @@ import unlinkFile from '../../helper/unLinkFile';
 import Category from '../category/category.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
+import Bookmark from '../bookmark/bookmark.mode';
 
 // create product into db
 const createProductIntoDB = async (
@@ -181,7 +182,10 @@ const changeProductStatus = async (profileId: string, id: string) => {
   return result;
 };
 
-const getAllProduct = async (query: Record<string, unknown>) => {
+const getAllProduct = async (
+  query: Record<string, unknown>,
+  reviewerId: string,
+) => {
   const productQuery = new QueryBuilder(Product.find(), query)
     .search([''])
     .filter()
@@ -192,9 +196,25 @@ const getAllProduct = async (query: Record<string, unknown>) => {
   const result = await productQuery.modelQuery;
   const meta = await productQuery.countTotal();
 
+  const productIds = result.map((product: any) => product._id);
+
+  const bookmarks = await Bookmark.find({
+    reviewer: reviewerId,
+    product: { $in: productIds },
+  }).select('product');
+
+  const bookmarkedProductIds = new Set(
+    bookmarks.map((bookmark) => bookmark.product.toString()),
+  );
+
+  const productsWithBookmarkStatus = result.map((product: any) => ({
+    ...product.toObject(),
+    isBookmark: bookmarkedProductIds.has(product._id.toString()),
+  }));
+
   return {
     meta,
-    result,
+    result: productsWithBookmarkStatus,
   };
 };
 

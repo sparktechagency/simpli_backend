@@ -21,6 +21,7 @@ import { notificationSettingRoutes } from '../modules/notificationSetting/notifi
 import { cartRoutes } from '../modules/cart/cart.routes';
 import { campaignOfferRoutes } from '../modules/campaignOffer/campaignOffer.routes';
 import { orderRoutes } from '../modules/order/order.routes';
+import { bookmarkRoutes } from '../modules/bookmark/bookmark.routes';
 
 const router = Router();
 
@@ -109,6 +110,10 @@ const moduleRoutes = [
   {
     path: '/campaign-offer',
     router: orderRoutes,
+  },
+  {
+    path: '/bookmark',
+    router: bookmarkRoutes,
   },
 ];
 

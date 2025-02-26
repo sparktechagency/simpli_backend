@@ -36,9 +36,9 @@ const getMyBookmarkFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const bookmarkQuery = new QueryBuilder(
-    Bookmark.find({ user: profileId }).populate({
+    Bookmark.find({ reviewer: profileId }).populate({
       path: 'product',
-      select: 'name images',
+      select: 'name images price',
     }),
     query,
   )
