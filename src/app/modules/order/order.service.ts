@@ -33,7 +33,6 @@ const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
 
   // for payment
   if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
-    // Handle Stripe Payment
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -48,7 +47,7 @@ const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
         },
       ],
       metadata: {
-        campaignId: result._id.toString(),
+        orderId: result._id.toString(),
         paymentPurpose: ENUM_PAYMENT_PURPOSE.ORDER,
       },
       success_url: config.stripe.stripe_order_payment_success_url,

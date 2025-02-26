@@ -10,6 +10,7 @@ import {
   ENUM_TRANSACTION_STATUS,
 } from '../utilities/enum';
 import Transaction from '../modules/transaction/transaction.model';
+import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
 
 const handlePaymentSuccess = async (
   metaData: any,
@@ -24,6 +25,8 @@ const handlePaymentSuccess = async (
       transactionId,
       amount,
     );
+  } else if (metaData.paymentPurpose == ENUM_PAYMENT_PURPOSE.ORDER) {
+    await handleOrderPaymentSuccess(metaData.orderId, transactionId, amount);
   }
 };
 
