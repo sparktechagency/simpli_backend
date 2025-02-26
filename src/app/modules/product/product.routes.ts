@@ -6,7 +6,6 @@ import validateRequest from '../../middlewares/validateRequest';
 import ProductValidations from './product.validation';
 import ProductController from './product.controller';
 import { uploadDynamicFile } from '../../helper/dynamicFileUploader';
-
 const router = express.Router();
 
 router.post(
