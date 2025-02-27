@@ -1,0 +1,14 @@
+import { Types } from 'mongoose';
+
+export interface IReview {
+  reviewer: Types.ObjectId;
+  product: Types.ObjectId;
+  category: Types.ObjectId;
+  campaign: Types.ObjectId;
+  price: number;
+  description: string;
+  video: string;
+  thumbnail: string;
+  liker: [Types.ObjectId];
+  comments: [Types.ObjectId];
+}
