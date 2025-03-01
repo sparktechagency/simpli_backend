@@ -12,4 +12,5 @@ export interface IReview {
   thumbnail: string;
   likers: [Types.ObjectId];
   comments: [Types.ObjectId];
+  rating: number;
 }

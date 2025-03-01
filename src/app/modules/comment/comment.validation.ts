@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 const ObjectIdSchema = (fieldName: string) =>
   z

@@ -17,6 +17,13 @@ const reviewValidationSchema = z.object({
     category: ObjectIdSchema('Category id'),
     amount: z.number().positive('Amount must be a positive number'),
     description: z.string({ required_error: 'Description is required' }),
+    rating: z
+      .number({
+        required_error: 'Rating is required',
+        invalid_type_error: 'Rating must be number',
+      })
+      .min(1, { message: 'Rating at list 1' })
+      .max(5, { message: 'Max rating will be 5' }),
   }),
 });
 
