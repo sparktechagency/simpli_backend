@@ -15,13 +15,14 @@ import { campaignRoutes } from '../modules/campaign/campaign.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { stripeRoutes } from '../modules/stripe/stripe.routes';
 import { paypalRoutes } from '../modules/paypal/paypal.routes';
-import { reviewRoutes } from '../modules/reviewer/reviewer.routes';
 import { shippingAddressRoutes } from '../modules/shippingAddress/shippingAddress.routes';
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
 import { cartRoutes } from '../modules/cart/cart.routes';
 import { campaignOfferRoutes } from '../modules/campaignOffer/campaignOffer.routes';
 import { orderRoutes } from '../modules/order/order.routes';
 import { bookmarkRoutes } from '../modules/bookmark/bookmark.routes';
+import { reviewerRoutes } from '../modules/reviewer/reviewer.routes';
+import { reviewRoutes } from '../modules/review/review.routes';
 
 const router = Router();
 
@@ -89,7 +90,7 @@ const moduleRoutes = [
   },
   {
     path: '/reviewer',
-    router: reviewRoutes,
+    router: reviewerRoutes,
   },
   {
     path: '/shipping-address',

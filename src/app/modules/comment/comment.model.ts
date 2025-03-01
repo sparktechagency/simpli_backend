@@ -3,7 +3,7 @@ import { IComment } from './comment.interface';
 
 const commentSchema = new mongoose.Schema<IComment>(
   {
-    postId: {
+    reviewId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Review',
       required: true,

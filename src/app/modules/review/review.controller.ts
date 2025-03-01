@@ -27,8 +27,23 @@ const createReview = catchAsync(async (req, res) => {
   });
 });
 
+// get all review
+const getAllReview = catchAsync(async (req, res) => {
+  const result = await ReviewService.getAllReviewFromDB(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review retrieved successfully',
+    data: result,
+  });
+});
+
 const ReviewController = {
   createReview,
+  getAllReview,
 };
 
 export default ReviewController;

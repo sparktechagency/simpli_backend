@@ -10,6 +10,6 @@ export interface IReview {
   images: string[];
   video: string;
   thumbnail: string;
-  liker: [Types.ObjectId];
+  likers: [Types.ObjectId];
   comments: [Types.ObjectId];
 }

@@ -62,4 +62,4 @@ router.post(
   validateRequest(ReviewerValidations.makeSkipValidationSchema),
   ReviewerController.makeSkip,
 );
-export const reviewRoutes = router;
+export const reviewerRoutes = router;

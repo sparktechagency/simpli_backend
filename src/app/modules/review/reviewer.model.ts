@@ -12,13 +12,16 @@ const ReviewSchema = new Schema<IReview>(
     images: { type: [String] },
     video: { type: String, required: true },
     thumbnail: { type: String, required: true },
-    liker: [{ type: Types.ObjectId, ref: 'User', default: [] }],
+    likers: [{ type: Types.ObjectId, ref: 'Reviewer', default: [] }],
     comments: [{ type: Types.ObjectId, ref: 'Comment', default: [] }],
   },
   {
     timestamps: true,
   },
 );
+
+ReviewSchema.index({ reviewer: 1, createdAt: -1 });
+ReviewSchema.index({ likers: 1 });
 
 const Review = mongoose.model<IReview>('Review', ReviewSchema);
 

@@ -22,4 +22,10 @@ router.patch(
   ReviewController.createReview,
 );
 
+router.get(
+  '/get-all-review',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  ReviewController.getAllReview,
+);
+
 export const reviewRoutes = router;
