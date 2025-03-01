@@ -41,9 +41,21 @@ const getAllReview = catchAsync(async (req, res) => {
   });
 });
 
+// get review liker
+const getReviewLikers = catchAsync(async (req, res) => {
+  const result = await ReviewService.getReviewLikers(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review likers retrieved successfully',
+    data: result,
+  });
+});
+
 const ReviewController = {
   createReview,
   getAllReview,
+  getReviewLikers,
 };
 
 export default ReviewController;

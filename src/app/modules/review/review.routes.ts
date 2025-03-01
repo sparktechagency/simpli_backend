@@ -27,5 +27,10 @@ router.get(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   ReviewController.getAllReview,
 );
+router.get(
+  '/get-review-liker/:id',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  ReviewController.getAllReview,
+);
 
 export const reviewRoutes = router;

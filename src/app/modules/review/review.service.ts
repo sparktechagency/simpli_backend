@@ -1,4 +1,6 @@
+import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
 import { IReview } from './review.interface';
 import Review from './reviewer.model';
 
@@ -27,9 +29,22 @@ const getAllReviewFromDB = async (
   };
 };
 
+// get all liker-----------
+const getReviewLikers = async (postId: string) => {
+  const likers = Review.findById(postId)
+    .populate({ path: 'likers', select: 'name profile_image' })
+    .select('likers')
+    .lean();
+  if (!likers) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+  return likers;
+};
+
 const ReviewService = {
   createReview,
   getAllReviewFromDB,
+  getReviewLikers,
 };
 
 export default ReviewService;
