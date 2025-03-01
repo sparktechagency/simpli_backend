@@ -24,6 +24,8 @@ const getCommentReplies = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+//
 const getCommentLikers = catchAsync(async (req, res) => {
   const result = await CommentService.getCommentLikers(
     req.params.id,
@@ -37,10 +39,32 @@ const getCommentLikers = catchAsync(async (req, res) => {
   });
 });
 
+// create comment
+const createComment = catchAsync(async (req, res) => {
+  const result = await CommentService.createComment(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comment added successfully',
+    data: result,
+  });
+});
+const createReply = catchAsync(async (req, res) => {
+  const result = await CommentService.createReply(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Replied added successfully',
+    data: result,
+  });
+});
+
 const CommentController = {
   getReviewComments,
   getCommentReplies,
   getCommentLikers,
+  createComment,
+  createReply,
 };
 
 export default CommentController;

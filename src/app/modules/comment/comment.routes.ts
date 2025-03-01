@@ -21,4 +21,15 @@ router.get(
   CommentController.getCommentLikers,
 );
 
+router.post(
+  '/create-comment',
+  auth(USER_ROLE.reviewer),
+  CommentController.createComment,
+);
+router.post(
+  '/create-reply',
+  auth(USER_ROLE.reviewer),
+  CommentController.createReply,
+);
+
 export const commentRoutes = router;
