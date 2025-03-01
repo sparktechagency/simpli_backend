@@ -7,7 +7,6 @@ export const uploadFile = () => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       let uploadPath = '';
-
       if (file.fieldname === 'profile_image') {
         uploadPath = 'uploads/images/profile';
       } else if (file.fieldname === 'category_image') {
@@ -128,9 +127,5 @@ export const uploadFile = () => {
     { name: 'thumbnail', maxCount: 1 },
     { name: 'comment_image', maxCount: 1 },
   ]);
-  // const upload = multer({
-  //   storage: storage,
-  //   fileFilter: fileFilter,
-  // }).any();
   return upload;
 };
