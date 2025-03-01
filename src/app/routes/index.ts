@@ -23,6 +23,7 @@ import { orderRoutes } from '../modules/order/order.routes';
 import { bookmarkRoutes } from '../modules/bookmark/bookmark.routes';
 import { reviewerRoutes } from '../modules/reviewer/reviewer.routes';
 import { reviewRoutes } from '../modules/review/review.routes';
+import { commentRoutes } from '../modules/comment/comment.routes';
 
 const router = Router();
 
@@ -119,6 +120,10 @@ const moduleRoutes = [
   {
     path: '/review',
     router: reviewRoutes,
+  },
+  {
+    path: '/comment',
+    router: commentRoutes,
   },
 ];
 
