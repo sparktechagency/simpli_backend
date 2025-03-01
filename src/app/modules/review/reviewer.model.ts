@@ -9,6 +9,7 @@ const ReviewSchema = new Schema<IReview>(
     campaign: { type: Schema.Types.ObjectId, ref: 'Campaign', required: true },
     price: { type: Number, required: true },
     description: { type: String, required: true },
+    images: { type: [String] },
     video: { type: String, required: true },
     thumbnail: { type: String, required: true },
     liker: [{ type: Types.ObjectId, ref: 'User', default: [] }],

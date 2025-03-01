@@ -7,6 +7,7 @@ export interface IReview {
   campaign: Types.ObjectId;
   price: number;
   description: string;
+  images: string[];
   video: string;
   thumbnail: string;
   liker: [Types.ObjectId];
