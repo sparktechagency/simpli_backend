@@ -18,6 +18,8 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/review_image';
       } else if (file.fieldname === 'review_video') {
         uploadPath = 'uploads/video/review_video';
+      } else if (file.fieldname === 'comment_image') {
+        uploadPath = 'uploads/images/comment_image';
       } else if (file.fieldname === 'thumbnail') {
         uploadPath = 'uploads/images/thumbnail';
       } else if (file.fieldname.startsWith('variant_image')) {
@@ -79,6 +81,7 @@ export const uploadFile = () => {
       'thumbnail',
       'review_video',
       'review_image',
+      'comment_image',
     ];
 
     if (file.fieldname === undefined) {
@@ -123,6 +126,7 @@ export const uploadFile = () => {
     { name: 'review_video', maxCount: 1 },
     { name: 'review_image', maxCount: 3 },
     { name: 'thumbnail', maxCount: 1 },
+    { name: 'comment_image', maxCount: 1 },
   ]);
   // const upload = multer({
   //   storage: storage,

@@ -5,6 +5,7 @@ import Comment from './comment.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { IComment } from './comment.interface';
 import Review from '../review/reviewer.model';
+import mongoose from 'mongoose';
 
 const getComments = async (
   reviewId: string,
@@ -168,12 +169,45 @@ const createReply = async (profileId: string, payload: IComment) => {
   return result;
 };
 
+// like unlike comment
+const likeUnlikeComment = async (commentId: string, userId: string) => {
+  try {
+    const comment = await Comment.findById(commentId).select('likers');
+    if (!comment) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const alreadyLiked = comment.likers.includes(userObjectId);
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      alreadyLiked
+        ? { $pull: { likers: userObjectId } }
+        : { $push: { likers: userObjectId } },
+      { new: true },
+    ).select('likers');
+
+    return {
+      commentId,
+      liked: !alreadyLiked,
+      totalLikes: updatedComment?.likers.length,
+    };
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong while toggling like.',
+    );
+  }
+};
+
 const CommentService = {
   getComments,
   getCommetReplies,
   getCommentLikers,
   createComment,
   createReply,
+  likeUnlikeComment,
 };
 
 export default CommentService;

@@ -41,6 +41,10 @@ const getCommentLikers = catchAsync(async (req, res) => {
 
 // create comment
 const createComment = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'comment_image' in files) {
+    req.body.image = files['comment_image'][0].path;
+  }
   const result = await CommentService.createComment(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -50,11 +54,27 @@ const createComment = catchAsync(async (req, res) => {
   });
 });
 const createReply = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'comment_image' in files) {
+    req.body.image = files['comment_image'][0].path;
+  }
   const result = await CommentService.createReply(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Replied added successfully',
+    data: result,
+  });
+});
+const likeUnlikeReview = catchAsync(async (req, res) => {
+  const result = await CommentService.likeUnlikeComment(
+    req.params.id,
+    req.user.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Liked added successfully',
     data: result,
   });
 });
@@ -65,6 +85,7 @@ const CommentController = {
   getCommentLikers,
   createComment,
   createReply,
+  likeUnlikeReview,
 };
 
 export default CommentController;
