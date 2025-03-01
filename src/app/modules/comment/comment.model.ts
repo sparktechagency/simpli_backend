@@ -14,15 +14,18 @@ const commentSchema = new mongoose.Schema<IComment>(
       required: true,
     },
     text: { type: String, required: true },
+    image: { type: String, default: '' },
     likers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
-    replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    parentCommentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null,
+    },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-commentSchema.index({ postId: 1, createdAt: -1 });
+commentSchema.index({ reviewId: 1, parentCommentId: 1, createdAt: -1 });
 commentSchema.index({ likers: 1 });
 
 const Comment = mongoose.model('Comment', commentSchema);

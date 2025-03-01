@@ -3,6 +3,8 @@ import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import Comment from './comment.model';
 import Reviewer from '../reviewer/reviewer.model';
+import { IComment } from './comment.interface';
+import Review from '../review/reviewer.model';
 
 const getComments = async (
   reviewId: string,
@@ -12,24 +14,29 @@ const getComments = async (
     const page = parseInt(query.page as string) || 1;
     const limit = parseInt(query.limit as string) || 5;
     const replyLimit = parseInt(query.replyLimit as string) || 2;
-
-    const comments: any = await Comment.find({ reviewId })
+    const comments: any = await Comment.find({
+      reviewId,
+      parentCommentId: null,
+    })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate('userId', 'name profilePic')
-      .select('text userId createdAt likers replies')
+      .populate('userId', 'name profile_image')
+      .select('text userId createdAt likers')
       .lean();
 
     for (const comment of comments) {
-      comment.replyCount = comment.replies.length;
+      comment.replyCount = await Comment.countDocuments({
+        parentCommentId: comment._id,
+      });
       comment.likersCount = comment.likers.length;
+
       comment.likers = await Reviewer.find({ _id: { $in: comment.likers } })
         .limit(3)
         .select('name profile_image')
         .lean();
 
-      comment.replies = await Comment.find({ _id: { $in: comment.replies } })
+      comment.replies = await Comment.find({ parentCommentId: comment._id })
         .sort({ createdAt: 1 })
         .limit(replyLimit)
         .populate('userId', 'name profile_image')
@@ -45,8 +52,16 @@ const getComments = async (
       }
     }
 
-    const totalComments = await Comment.countDocuments({ reviewId });
-    console.log('total commetns', totalComments);
+    const totalComments = await Comment.countDocuments({
+      reviewId,
+      parentCommentId: null,
+    });
+
+    return {
+      currentPage: page,
+      totalPages: Math.ceil(totalComments / limit),
+      comments,
+    };
   } catch (error: any) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, error.message);
   }
@@ -64,10 +79,10 @@ const getCommetReplies = async (
     if (!parentComment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
     }
-
-    const replies: any = await Comment.find({
-      _id: { $in: parentComment.replies },
-    })
+    const totalReplies = await Comment.countDocuments({
+      parentCommentId: commentId,
+    });
+    const replies: any = await Comment.find({ parentCommentId: commentId })
       .sort({ createdAt: 1 })
       .skip((page - 1) * limit)
       .limit(limit)
@@ -75,18 +90,19 @@ const getCommetReplies = async (
       .select('text userId createdAt likers')
       .lean();
 
-    // Fetch first 3 likers for each reply
     for (const reply of replies) {
       reply.likersCount = reply.likers.length;
       reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
         .limit(3)
-        .select('name profilePic')
+        .select('name profile_image')
         .lean();
     }
 
-    const totalReplies = parentComment.replies.length;
-
-    console.log('total replies', totalReplies);
+    return {
+      currentPage: page,
+      totalPages: Math.ceil(totalReplies / limit),
+      replies,
+    };
   } catch (error) {
     throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
   }
@@ -99,10 +115,13 @@ const getCommentLikers = async (
   try {
     const page = parseInt(query.page as string) || 1;
     const limit = parseInt(query.limit as string) || 10;
-    const comment = await Comment.findById(commentId);
+
+    const comment = await Comment.findById(commentId).select('likers').lean();
     if (!comment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
     }
+
+    const totalLikers = comment.likers.length;
 
     const likers = await Reviewer.find({ _id: { $in: comment.likers } })
       .skip((page - 1) * limit)
@@ -111,20 +130,50 @@ const getCommentLikers = async (
       .lean();
 
     return {
-      totalLikers: comment.likers.length,
+      totalLikers,
       currentPage: page,
-      totalPages: Math.ceil(comment.likers.length / limit),
+      totalPages: Math.ceil(totalLikers / limit),
       likers,
     };
   } catch (error) {
     throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
   }
 };
+const createComment = async (profileId: string, payload: IComment) => {
+  const review = await Review.exists({ _id: payload.reviewId });
+  if (!review) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+  const result = await Reviewer.create({
+    ...payload,
+    userId: profileId,
+    parentCommentId: null,
+  });
+
+  return result;
+};
+
+// create reply
+
+const createReply = async (profileId: string, payload: IComment) => {
+  const parentComment = await Comment.findById(payload.parentCommentId);
+  if (!parentComment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Parent comment not found.');
+  }
+  const result = await Comment.create({
+    ...payload,
+    reviewId: parentComment.reviewId,
+    userId: profileId,
+  });
+  return result;
+};
 
 const CommentService = {
   getComments,
   getCommetReplies,
   getCommentLikers,
+  createComment,
+  createReply,
 };
 
 export default CommentService;

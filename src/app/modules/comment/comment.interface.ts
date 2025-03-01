@@ -5,6 +5,7 @@ export interface IComment {
   reviewId: Types.ObjectId;
   userId: Types.ObjectId;
   text: string;
+  image: string;
   likers: Types.ObjectId[];
-  replies: Types.ObjectId[];
+  parentCommentId: Types.ObjectId;
 }
