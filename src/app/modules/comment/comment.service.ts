@@ -1,0 +1,97 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import Comment from './comment.model';
+import Reviewer from '../reviewer/reviewer.model';
+
+const getComments = async (postId: string, query: Record<string, unknown>) => {
+  try {
+    const page = parseInt(query.page as string) || 1;
+    const limit = parseInt(query.limit as string) || 5;
+    const replyLimit = parseInt(query.replyLimit as string) || 2;
+
+    const comments: any = await Comment.find({ postId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('userId', 'name profilePic')
+      .select('text userId createdAt likers replies')
+      .lean();
+
+    for (const comment of comments) {
+      comment.replyCount = comment.replies.length;
+      comment.likersCount = comment.likers.length;
+      comment.likers = await Reviewer.find({ _id: { $in: comment.likers } })
+        .limit(3)
+        .select('name profile_image')
+        .lean();
+
+      comment.replies = await Comment.find({ _id: { $in: comment.replies } })
+        .sort({ createdAt: 1 })
+        .limit(replyLimit)
+        .populate('userId', 'name profile_image')
+        .select('text userId createdAt likers')
+        .lean();
+
+      for (const reply of comment.replies) {
+        reply.likersCount = reply.likers.length;
+        reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
+          .limit(3)
+          .select('name profile_image')
+          .lean();
+      }
+    }
+
+    const totalComments = await Comment.countDocuments({ postId });
+    console.log('total commetns', totalComments);
+  } catch (error: any) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, error.message);
+  }
+};
+
+const getCommetReplies = async (
+  commentId: string,
+  query: Record<string, unknown>,
+) => {
+  try {
+    const page = parseInt(query.page as string) || 1;
+    const limit = parseInt(query.limit as string) || 5;
+
+    const parentComment = await Comment.findById(commentId);
+    if (!parentComment) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+    }
+
+    const replies: any = await Comment.find({
+      _id: { $in: parentComment.replies },
+    })
+      .sort({ createdAt: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('userId', 'name profile_image')
+      .select('text userId createdAt likers')
+      .lean();
+
+    // Fetch first 3 likers for each reply
+    for (const reply of replies) {
+      reply.likersCount = reply.likers.length;
+      reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
+        .limit(3)
+        .select('name profilePic')
+        .lean();
+    }
+
+    const totalReplies = parentComment.replies.length;
+
+    console.log('total replies', totalReplies);
+  } catch (error) {
+    throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
+  }
+};
+
+const CommentService = {
+  getComments,
+  getCommetReplies,
+};
+
+export default CommentService;
