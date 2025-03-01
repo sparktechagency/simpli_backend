@@ -15,7 +15,7 @@ const createReview = catchAsync(async (req, res) => {
     req.body.video = files['review_video'][0].path;
   }
   if (files && typeof files === 'object' && 'thumbnail' in files) {
-    req.body.video = files['thumbnail'][0].path;
+    req.body.thumbnail = files['thumbnail'][0].path;
   }
 
   const result = await ReviewService.createReview(req.user.profileId, req.body);
