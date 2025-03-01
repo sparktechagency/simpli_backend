@@ -115,6 +115,10 @@ const moduleRoutes = [
     path: '/bookmark',
     router: bookmarkRoutes,
   },
+  {
+    path: '/review',
+    router: reviewRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.router));

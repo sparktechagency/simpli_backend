@@ -7,7 +7,7 @@ const ReviewSchema = new Schema<IReview>(
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     campaign: { type: Schema.Types.ObjectId, ref: 'Campaign', required: true },
-    price: { type: Number, required: true },
+    amount: { type: Number, required: true },
     description: { type: String, required: true },
     images: { type: [String] },
     video: { type: String, required: true },

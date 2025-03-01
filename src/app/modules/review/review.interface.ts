@@ -5,7 +5,7 @@ export interface IReview {
   product: Types.ObjectId;
   category: Types.ObjectId;
   campaign: Types.ObjectId;
-  price: number;
+  amount: number;
   description: string;
   images: string[];
   video: string;
