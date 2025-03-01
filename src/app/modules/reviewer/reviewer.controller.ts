@@ -98,6 +98,20 @@ const updateReviewerIntoDB = catchAsync(async (req, res) => {
   });
 });
 
+// follow unfollow reviewer
+const followUnfollowReviewer = catchAsync(async (req, res) => {
+  const result = await ReviewerService.followUnfollowReviewer(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Follow unfollow successfull',
+    data: result,
+  });
+});
+
 const ReviewerController = {
   addAddress,
   addPersonalInfo,
@@ -107,6 +121,7 @@ const ReviewerController = {
   updateReviewerIntoDB,
   makeSkip,
   getReviewerProfile,
+  followUnfollowReviewer,
 };
 
 export default ReviewerController;

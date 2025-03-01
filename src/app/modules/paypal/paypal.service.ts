@@ -52,7 +52,7 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
       },
     );
 
-    console.log('PayPal Response:', response.data);
+    // console.log('PayPal Response:', response.data);
 
     const onboardingLink = response.data.links.find(
       (link: any) => link.rel === 'action_url',

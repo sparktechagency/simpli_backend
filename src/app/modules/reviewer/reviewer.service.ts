@@ -3,6 +3,7 @@ import AppError from '../../error/appError';
 import { INTEREST_STATUS } from '../../utilities/enum';
 import { IReviewer } from './reviewer.interface';
 import Reviewer from './reviewer.model';
+import mongoose from 'mongoose';
 
 const getReviewerProfile = async (profileId: string) => {
   const result = await Reviewer.findById(profileId).populate({
@@ -100,6 +101,66 @@ const makeSkip = async (reviewerId: string, skipValue: string) => {
   return result;
 };
 
+const followUnfollowReviewer = async (
+  followerId: string,
+  followingId: string,
+) => {
+  try {
+    if (
+      !mongoose.Types.ObjectId.isValid(followerId) ||
+      !mongoose.Types.ObjectId.isValid(followingId)
+    ) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user IDs');
+    }
+
+    if (followerId === followingId) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'You cannot follow yourself');
+    }
+
+    const followerObjectId = new mongoose.Types.ObjectId(followerId);
+    const followingObjectId = new mongoose.Types.ObjectId(followingId);
+
+    const followingUser =
+      await Reviewer.findById(followingId).select('followers');
+    if (!followingUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Reviewer not found');
+    }
+
+    const alreadyFollowing = followingUser.followers.includes(followerObjectId);
+
+    await Reviewer.findByIdAndUpdate(
+      followerId,
+      alreadyFollowing
+        ? { $pull: { following: followingObjectId } }
+        : { $addToSet: { following: followingObjectId } },
+      { new: true },
+    );
+
+    await Reviewer.findByIdAndUpdate(
+      followingId,
+      alreadyFollowing
+        ? { $pull: { followers: followerObjectId } }
+        : { $addToSet: { followers: followerObjectId } },
+      { new: true },
+    );
+
+    const totalFollowers =
+      await Reviewer.findById(followingId).select('followers');
+    const totalFollowersCount = totalFollowers?.followers.length;
+
+    return {
+      followingId,
+      following: !alreadyFollowing,
+      totalFollowers: totalFollowersCount,
+    };
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong while following/unfollowing user',
+    );
+  }
+};
+
 const ReviewerService = {
   addAddress,
   addPersonalInfo,
@@ -109,6 +170,7 @@ const ReviewerService = {
   updateReviewerIntoDB,
   makeSkip,
   getReviewerProfile,
+  followUnfollowReviewer,
 };
 
 export default ReviewerService;

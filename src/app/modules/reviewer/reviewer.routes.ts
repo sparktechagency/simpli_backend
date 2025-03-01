@@ -62,4 +62,10 @@ router.post(
   validateRequest(ReviewerValidations.makeSkipValidationSchema),
   ReviewerController.makeSkip,
 );
+
+router.post(
+  '/follow-unfollow-reviewer/:id',
+  auth(USER_ROLE.reviewer),
+  ReviewerController.followUnfollowReviewer,
+);
 export const reviewerRoutes = router;

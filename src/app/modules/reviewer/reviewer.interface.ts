@@ -46,4 +46,6 @@ export interface IReviewer {
   whatsapp: string;
   facebook: string;
   blog: string;
+  followers: [Types.ObjectId];
+  following: [Types.ObjectId];
 }

@@ -103,6 +103,8 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     whatsapp: String,
     facebook: String,
     blog: String,
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
   },
   { timestamps: true },
 );
