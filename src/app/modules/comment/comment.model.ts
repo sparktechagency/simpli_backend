@@ -5,12 +5,12 @@ const commentSchema = new mongoose.Schema<IComment>(
   {
     postId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
+      ref: 'Review',
       required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Reviewer',
       required: true,
     },
     text: { type: String, required: true },
