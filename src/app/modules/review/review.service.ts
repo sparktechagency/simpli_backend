@@ -3,6 +3,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { IReview } from './review.interface';
 import Review from './reviewer.model';
+import mongoose from 'mongoose';
 
 const createReview = async (reviewerId: string, payload: IReview) => {
   const result = await Review.create({ ...payload, reviewer: reviewerId });
@@ -41,10 +42,43 @@ const getReviewLikers = async (postId: string) => {
   return likers;
 };
 
+//
+const likeUnlikeReview = async (reviewId: string, userId: string) => {
+  try {
+    const review = await Review.findById(reviewId).select('likers');
+    if (!review) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const alreadyLiked = review.likers.includes(userObjectId);
+
+    const updatedReview = await Review.findByIdAndUpdate(
+      reviewId,
+      alreadyLiked
+        ? { $pull: { likers: userObjectId } }
+        : { $push: { likers: userObjectId } },
+      { new: true },
+    ).select('likers');
+
+    return {
+      reviewId,
+      liked: !alreadyLiked,
+      totalLikes: updatedReview?.likers.length,
+    };
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong while toggling like.',
+    );
+  }
+};
+
 const ReviewService = {
   createReview,
   getAllReviewFromDB,
   getReviewLikers,
+  likeUnlikeReview,
 };
 
 export default ReviewService;

@@ -33,4 +33,9 @@ router.get(
   ReviewController.getAllReview,
 );
 
+router.patch(
+  '/like-unlike/:id',
+  auth(USER_ROLE.reviewer),
+  ReviewController.likeUnlikeReview,
+);
 export const reviewRoutes = router;

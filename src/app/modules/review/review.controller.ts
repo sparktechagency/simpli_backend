@@ -51,11 +51,24 @@ const getReviewLikers = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const likeUnlikeReview = catchAsync(async (req, res) => {
+  const result = await ReviewService.likeUnlikeReview(
+    req.params.id,
+    req.user.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Liked added successfully',
+    data: result,
+  });
+});
 
 const ReviewController = {
   createReview,
   getAllReview,
   getReviewLikers,
+  likeUnlikeReview,
 };
 
 export default ReviewController;
