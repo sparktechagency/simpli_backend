@@ -3,6 +3,8 @@ import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import CommentController from './comment.controller';
 import { uploadFile } from '../../helper/fileUploader';
+import validateRequest from '../../middlewares/validateRequest';
+import CommentValidations from './comment.validation';
 
 const router = express.Router();
 
@@ -32,6 +34,7 @@ router.post(
     }
     next();
   },
+  validateRequest(CommentValidations.createCommentSchema),
   CommentController.createComment,
 );
 router.post(
@@ -44,6 +47,7 @@ router.post(
     }
     next();
   },
+  validateRequest(CommentValidations.createReplySchema),
   CommentController.createReply,
 );
 

@@ -1,28 +1,39 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-const objectIdSchema = z
-  .string()
-  .refine((val) => mongoose.Types.ObjectId.isValid(val), {
-    message: 'Invalid ObjectId format',
-  });
+const ObjectIdSchema = (fieldName: string) =>
+  z
+    .string({ required_error: `${fieldName} is required` })
+    .min(1, `${fieldName} cannot be empty`)
+    .refine((val) => Types.ObjectId.isValid(val), {
+      message: `${fieldName} must be a valid ObjectId`,
+    });
 
 const createCommentSchema = z.object({
   body: z.object({
-    reviewId: objectIdSchema,
-    userId: objectIdSchema,
+    reviewId: ObjectIdSchema('Review Id'),
     text: z
       .string()
       .trim()
       .min(1, { message: 'Text is required' })
       .max(500, { message: 'Text cannot exceed 500 characters' }),
-    image: z.string().url().optional().or(z.literal('')),
-    parentCommentId: objectIdSchema.nullish(),
+  }),
+});
+
+const createReplySchema = z.object({
+  body: z.object({
+    parentCommentId: ObjectIdSchema('Parent comment id'),
+    text: z
+      .string()
+      .trim()
+      .min(1, { message: 'Text is required' })
+      .max(500, { message: 'Text cannot exceed 500 characters' }),
   }),
 });
 
 const CommentValidations = {
   createCommentSchema,
+  createReplySchema,
 };
 
 export default CommentValidations;
