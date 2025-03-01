@@ -4,13 +4,16 @@ import AppError from '../../error/appError';
 import Comment from './comment.model';
 import Reviewer from '../reviewer/reviewer.model';
 
-const getComments = async (postId: string, query: Record<string, unknown>) => {
+const getComments = async (
+  reviewId: string,
+  query: Record<string, unknown>,
+) => {
   try {
     const page = parseInt(query.page as string) || 1;
     const limit = parseInt(query.limit as string) || 5;
     const replyLimit = parseInt(query.replyLimit as string) || 2;
 
-    const comments: any = await Comment.find({ postId })
+    const comments: any = await Comment.find({ reviewId })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
@@ -42,7 +45,7 @@ const getComments = async (postId: string, query: Record<string, unknown>) => {
       }
     }
 
-    const totalComments = await Comment.countDocuments({ postId });
+    const totalComments = await Comment.countDocuments({ reviewId });
     console.log('total commetns', totalComments);
   } catch (error: any) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, error.message);
@@ -89,9 +92,39 @@ const getCommetReplies = async (
   }
 };
 
+const getCommentLikers = async (
+  commentId: string,
+  query: Record<string, unknown>,
+) => {
+  try {
+    const page = parseInt(query.page as string) || 1;
+    const limit = parseInt(query.limit as string) || 10;
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+    }
+
+    const likers = await Reviewer.find({ _id: { $in: comment.likers } })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .select('name profile_image')
+      .lean();
+
+    return {
+      totalLikers: comment.likers.length,
+      currentPage: page,
+      totalPages: Math.ceil(comment.likers.length / limit),
+      likers,
+    };
+  } catch (error) {
+    throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
+  }
+};
+
 const CommentService = {
   getComments,
   getCommetReplies,
+  getCommentLikers,
 };
 
 export default CommentService;
