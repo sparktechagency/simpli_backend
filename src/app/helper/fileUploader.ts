@@ -14,11 +14,13 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/category';
       } else if (file.fieldname === 'product_image') {
         uploadPath = 'uploads/images/product_image';
-      }
-      // else if (file.fieldname === 'variant_image') {
-      //   uploadPath = 'uploads/images/variant_image';
-      // }
-      else if (file.fieldname.startsWith('variant_image')) {
+      } else if (file.fieldname === 'review_image') {
+        uploadPath = 'uploads/images/review_image';
+      } else if (file.fieldname === 'review_video') {
+        uploadPath = 'uploads/video/review_video';
+      } else if (file.fieldname === 'thumbnail') {
+        uploadPath = 'uploads/images/thumbnail';
+      } else if (file.fieldname.startsWith('variant_image')) {
         uploadPath = 'uploads/images/variant_image';
       } else if (file.fieldname === 'team_bg_image') {
         uploadPath = 'uploads/images/team_bg_image';
@@ -74,6 +76,9 @@ export const uploadFile = () => {
       'logo',
       'reward_image',
       'video',
+      'thumbnail',
+      'review_video',
+      'review_image',
     ];
 
     if (file.fieldname === undefined) {
@@ -115,7 +120,9 @@ export const uploadFile = () => {
     { name: 'player_bg_image', maxCount: 1 },
     { name: 'coverImage', maxCount: 1 },
     { name: 'logo', maxCount: 1 },
-    { name: 'video', maxCount: 1 },
+    { name: 'review_video', maxCount: 1 },
+    { name: 'review_image', maxCount: 3 },
+    { name: 'thumbnail', maxCount: 1 },
   ]);
   // const upload = multer({
   //   storage: storage,
