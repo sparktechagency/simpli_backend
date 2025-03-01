@@ -7,5 +7,4 @@ export interface IComment {
   text: string;
   likers: Types.ObjectId[];
   replies: Types.ObjectId[];
-  createdAt?: Date;
 }
