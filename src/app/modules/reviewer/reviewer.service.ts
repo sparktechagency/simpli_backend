@@ -4,6 +4,7 @@ import { INTEREST_STATUS } from '../../utilities/enum';
 import { IReviewer } from './reviewer.interface';
 import Reviewer from './reviewer.model';
 import mongoose from 'mongoose';
+import Bussiness from '../bussiness/bussiness.model';
 
 const getReviewerProfile = async (profileId: string) => {
   const result = await Reviewer.findById(profileId).populate({
@@ -161,6 +162,37 @@ const followUnfollowReviewer = async (
   }
 };
 
+const followUnfollowBussiness = async (
+  profileId: string,
+  bussinessId: string,
+) => {
+  const bussiness = await Bussiness.findById(bussinessId);
+  if (!bussiness) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Store not found');
+  }
+  const followerObjectId = new mongoose.Types.ObjectId(profileId);
+  const alreadyFollowing = bussiness.followers.includes(followerObjectId);
+  await Reviewer.findByIdAndUpdate(
+    profileId,
+    alreadyFollowing
+      ? { $pull: { following: bussinessId } }
+      : { $addToSet: { following: bussinessId } },
+    { new: true },
+  );
+
+  await Bussiness.findByIdAndUpdate(
+    bussinessId,
+    alreadyFollowing
+      ? { $pull: { followers: followerObjectId } }
+      : { $addToSet: { followers: followerObjectId } },
+    { new: true },
+  );
+
+  return {
+    following: !alreadyFollowing,
+  };
+};
+
 const ReviewerService = {
   addAddress,
   addPersonalInfo,
@@ -171,6 +203,7 @@ const ReviewerService = {
   makeSkip,
   getReviewerProfile,
   followUnfollowReviewer,
+  followUnfollowBussiness,
 };
 
 export default ReviewerService;

@@ -48,4 +48,5 @@ export interface IReviewer {
   blog: string;
   followers: [Types.ObjectId];
   following: [Types.ObjectId];
+  bussinessFollowing: [Types.ObjectId];
 }

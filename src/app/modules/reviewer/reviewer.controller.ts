@@ -113,6 +113,20 @@ const followUnfollowReviewer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const followUnfollowBussiness = catchAsync(async (req, res) => {
+  const result = await ReviewerService.followUnfollowBussiness(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.following
+      ? 'Successfully followed'
+      : 'Successfully Unfollowed',
+    data: result,
+  });
+});
 
 const ReviewerController = {
   addAddress,
@@ -124,6 +138,7 @@ const ReviewerController = {
   makeSkip,
   getReviewerProfile,
   followUnfollowReviewer,
+  followUnfollowBussiness,
 };
 
 export default ReviewerController;

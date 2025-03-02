@@ -25,4 +25,5 @@ export interface IBussiness {
   isBussinessDocumentProvided: boolean;
   isComplianceInfoProvided: boolean;
   isBussinessInfoProvided: boolean;
+  followers: [Types.ObjectId];
 }

@@ -84,6 +84,7 @@ const BussinessSchema = new Schema<IBussiness>(
       type: Boolean,
       default: false,
     },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
   },
   {
     timestamps: true,

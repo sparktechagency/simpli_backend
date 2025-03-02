@@ -68,4 +68,9 @@ router.post(
   auth(USER_ROLE.reviewer),
   ReviewerController.followUnfollowReviewer,
 );
+router.post(
+  '/follow-unfollow-bussiness/:id',
+  auth(USER_ROLE.reviewer),
+  ReviewerController.followUnfollowBussiness,
+);
 export const reviewerRoutes = router;
