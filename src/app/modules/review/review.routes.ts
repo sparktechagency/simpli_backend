@@ -8,7 +8,7 @@ import ReviewController from './review.controller';
 
 const router = express.Router();
 
-router.patch(
+router.post(
   '/create-review',
   auth(USER_ROLE.reviewer),
   uploadFile(),

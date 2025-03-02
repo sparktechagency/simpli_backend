@@ -1,12 +1,46 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
-import { IReview } from './review.interface';
 import Review from './reviewer.model';
 import mongoose from 'mongoose';
 
-const createReview = async (reviewerId: string, payload: IReview) => {
-  const result = await Review.create({ ...payload, reviewer: reviewerId });
+import { CAMPAIGN_STATUS } from '../../utilities/enum';
+import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
+
+const createReview = async (reviewerId: string, payload: any) => {
+  const campaignOffer = await CampaignOffer.findById(payload.campaignOfferId)
+    .populate<{
+      campaign: { status: string; _id: mongoose.Schema.Types.ObjectId };
+    }>({
+      path: 'campaign',
+      select: 'status',
+    })
+    .populate<{
+      product: {
+        _id: mongoose.Schema.Types.ObjectId;
+        category: mongoose.Schema.Types.ObjectId;
+      };
+    }>({ path: 'product', select: 'category' });
+  if (!campaignOffer) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
+  }
+  if (campaignOffer.campaign.status !== CAMPAIGN_STATUS.ACTIVE) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This campaign not active right now',
+    );
+  }
+  // TODO: when create review
+  const result = await Review.create({
+    ...payload,
+    reviewer: reviewerId,
+    campaign: campaignOffer.campaign._id,
+    product: campaignOffer.product._id,
+    category: campaignOffer.product.category,
+    bussiness: campaignOffer.business,
+    amount: campaignOffer.amount,
+  });
   return result;
 };
 

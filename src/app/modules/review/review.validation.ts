@@ -11,11 +11,10 @@ const ObjectIdSchema = (fieldName: string) =>
     });
 const reviewValidationSchema = z.object({
   body: z.object({
-    campaign: ObjectIdSchema('Campaign ID'),
-    product: ObjectIdSchema('Product ID'),
-    business: ObjectIdSchema('Business ID'),
-    category: ObjectIdSchema('Category id'),
-    amount: z.number().positive('Amount must be a positive number'),
+    campaignOfferId: ObjectIdSchema('Campaign Offer ID'),
+    // product: ObjectIdSchema('Product ID'),
+    // business: ObjectIdSchema('Business ID'),
+    // category: ObjectIdSchema('Category id'),
     description: z.string({ required_error: 'Description is required' }),
     rating: z
       .number({
