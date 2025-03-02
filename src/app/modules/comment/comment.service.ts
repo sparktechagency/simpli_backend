@@ -6,6 +6,7 @@ import Reviewer from '../reviewer/reviewer.model';
 import { IComment } from './comment.interface';
 import Review from '../review/reviewer.model';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const getComments = async (
   reviewId: string,
@@ -15,16 +16,34 @@ const getComments = async (
     const page = parseInt(query.page as string) || 1;
     const limit = parseInt(query.limit as string) || 5;
     const replyLimit = parseInt(query.replyLimit as string) || 2;
-    const comments: any = await Comment.find({
-      reviewId,
-      parentCommentId: null,
-    })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .populate('userId', 'name profile_image')
-      .select('text userId createdAt likers')
-      .lean();
+    // const comments: any = await Comment.find({
+    //   reviewId,
+    //   parentCommentId: null,
+    // })
+    //   .sort({ createdAt: -1 })
+    //   .skip((page - 1) * limit)
+    //   .limit(limit)
+    //   .populate('userId', 'name profile_image')
+    //   .select('text userId createdAt likers')
+    //   .lean();
+
+    const commentQuery = new QueryBuilder(
+      Comment.find({ reviewId, parentCommentId: null })
+        .populate({
+          path: 'userId',
+          select: 'name profile_image',
+        })
+        .lean(),
+      query,
+    )
+      .search(['name'])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+
+    const comments: any = await commentQuery.modelQuery;
+    console.log('comments', comments);
 
     for (const comment of comments) {
       comment.replyCount = await Comment.countDocuments({
@@ -145,7 +164,7 @@ const createComment = async (profileId: string, payload: IComment) => {
   if (!review) {
     throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
   }
-  const result = await Reviewer.create({
+  const result = await Comment.create({
     ...payload,
     userId: profileId,
     parentCommentId: null,

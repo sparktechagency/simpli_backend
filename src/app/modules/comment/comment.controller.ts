@@ -45,7 +45,10 @@ const createComment = catchAsync(async (req, res) => {
   if (files && typeof files === 'object' && 'comment_image' in files) {
     req.body.image = files['comment_image'][0].path;
   }
-  const result = await CommentService.createComment(req.params.id, req.body);
+  const result = await CommentService.createComment(
+    req.user.profileId,
+    req.body,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -58,7 +61,7 @@ const createReply = catchAsync(async (req, res) => {
   if (files && typeof files === 'object' && 'comment_image' in files) {
     req.body.image = files['comment_image'][0].path;
   }
-  const result = await CommentService.createReply(req.params.id, req.body);
+  const result = await CommentService.createReply(req.user.profileId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
