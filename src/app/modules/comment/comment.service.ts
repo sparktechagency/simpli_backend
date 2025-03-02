@@ -43,19 +43,16 @@ const getComments = async (
       .fields();
 
     const comments: any = await commentQuery.modelQuery;
-    console.log('comments', comments);
 
     for (const comment of comments) {
       comment.replyCount = await Comment.countDocuments({
         parentCommentId: comment._id,
       });
       comment.likersCount = comment.likers.length;
-
       comment.likers = await Reviewer.find({ _id: { $in: comment.likers } })
         .limit(3)
         .select('name profile_image')
         .lean();
-
       comment.replies = await Comment.find({ parentCommentId: comment._id })
         .sort({ createdAt: 1 })
         .limit(replyLimit)
@@ -87,36 +84,45 @@ const getCommetReplies = async (
   query: Record<string, unknown>,
 ) => {
   try {
-    const page = parseInt(query.page as string) || 1;
-    const limit = parseInt(query.limit as string) || 5;
-
+    const replyLimit = parseInt(query.replyLimit as string) || 2;
     const parentComment = await Comment.findById(commentId);
     if (!parentComment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
     }
-    const totalReplies = await Comment.countDocuments({
-      parentCommentId: commentId,
-    });
-    const replies: any = await Comment.find({ parentCommentId: commentId })
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .populate('userId', 'name profile_image')
-      .select('text userId createdAt likers')
-      .lean();
 
+    const replyQuery = new QueryBuilder(
+      Comment.find({ parentCommentId: commentId }).lean(),
+      query,
+    )
+      .search(['name'])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+
+    const replies: any = await replyQuery.modelQuery;
     for (const reply of replies) {
       reply.likersCount = reply.likers.length;
       reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
         .limit(3)
         .select('name profile_image')
         .lean();
+      reply.replies = await Comment.find({ parentCommentId: reply._id })
+        .sort({ createdAt: 1 })
+        .limit(replyLimit)
+        .populate('userId', 'name')
+        .select('text userId createdAt likers')
+        .lean();
+      reply.replyCount = await Comment.countDocuments({
+        parentCommentId: reply._id,
+      });
     }
 
+    const meta = await replyQuery.countTotal();
+
     return {
-      currentPage: page,
-      totalPages: Math.ceil(totalReplies / limit),
-      replies,
+      meta,
+      result: replies,
     };
   } catch (error) {
     throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
