@@ -38,7 +38,6 @@ export const uploadFile = () => {
       } else {
         uploadPath = 'uploads';
       }
-
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
       }

@@ -53,7 +53,8 @@ const getAllReviewFromDB = async (
   const reviewQuery = new QueryBuilder(
     Review.find()
       .populate({ path: 'product', select: 'name price' })
-      .populate({ path: 'category', select: 'name' }),
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'reviewer', select: 'name username profile_image' }),
     query,
   )
     .search(['description'])
