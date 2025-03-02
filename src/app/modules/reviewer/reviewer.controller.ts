@@ -107,7 +107,9 @@ const followUnfollowReviewer = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Follow unfollow successfull',
+    message: result.following
+      ? 'Successfully followed'
+      : 'Successfully Unfollowed',
     data: result,
   });
 });
