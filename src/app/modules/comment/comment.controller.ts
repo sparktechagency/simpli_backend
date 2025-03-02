@@ -4,7 +4,11 @@ import sendResponse from '../../utilities/sendResponse';
 import CommentService from './comment.service';
 
 const getReviewComments = catchAsync(async (req, res) => {
-  const result = await CommentService.getComments(req.params.id, req.query);
+  const result = await CommentService.getComments(
+    req.user.profileId,
+    req.params.id,
+    req.query,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -14,6 +18,7 @@ const getReviewComments = catchAsync(async (req, res) => {
 });
 const getCommentReplies = catchAsync(async (req, res) => {
   const result = await CommentService.getCommetReplies(
+    req.user.profileId,
     req.params.id,
     req.query,
   );

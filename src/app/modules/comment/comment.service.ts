@@ -5,10 +5,11 @@ import Comment from './comment.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { IComment } from './comment.interface';
 import Review from '../review/reviewer.model';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 const getComments = async (
+  profileId: string,
   reviewId: string,
   query: Record<string, unknown>,
 ) => {
@@ -48,6 +49,9 @@ const getComments = async (
       comment.replyCount = await Comment.countDocuments({
         parentCommentId: comment._id,
       });
+      comment.isLike = comment.likers.some((liker: Types.ObjectId) =>
+        liker.equals(profileId),
+      );
       comment.likersCount = comment.likers.length;
       comment.likers = await Reviewer.find({ _id: { $in: comment.likers } })
         .limit(3)
@@ -80,6 +84,7 @@ const getComments = async (
 };
 
 const getCommetReplies = async (
+  profileId: string,
   commentId: string,
   query: Record<string, unknown>,
 ) => {
@@ -103,6 +108,9 @@ const getCommetReplies = async (
     const replies: any = await replyQuery.modelQuery;
     for (const reply of replies) {
       reply.likersCount = reply.likers.length;
+      reply.isLike = reply.likers.some((liker: Types.ObjectId) =>
+        liker.equals(profileId),
+      );
       reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
         .limit(3)
         .select('name profile_image')
