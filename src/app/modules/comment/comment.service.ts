@@ -142,27 +142,32 @@ const getCommentLikers = async (
   query: Record<string, unknown>,
 ) => {
   try {
-    const page = parseInt(query.page as string) || 1;
-    const limit = parseInt(query.limit as string) || 10;
-
     const comment = await Comment.findById(commentId).select('likers').lean();
     if (!comment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
     }
 
-    const totalLikers = comment.likers.length;
+    // const totalLikers = comment.likers.length;
 
-    const likers = await Reviewer.find({ _id: { $in: comment.likers } })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .select('name profile_image')
-      .lean();
+    // const likers = await Reviewer.find({ _id: { $in: comment.likers } })
+    //   .skip((page - 1) * limit)
+    //   .limit(limit)
+    //   .select('name profile_image')
+    //   .lean();
+
+    const likerQuery = new QueryBuilder(
+      Reviewer.find({ _id: { $in: comment.likers } }).select(
+        'name profile_image',
+      ),
+      query,
+    );
+
+    const result = await likerQuery.modelQuery;
+    const meta = await likerQuery.countTotal();
 
     return {
-      totalLikers,
-      currentPage: page,
-      totalPages: Math.ceil(totalLikers / limit),
-      likers,
+      meta,
+      result,
     };
   } catch (error) {
     throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');

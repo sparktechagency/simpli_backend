@@ -28,9 +28,9 @@ router.get(
   ReviewController.getAllReview,
 );
 router.get(
-  '/get-review-liker/:id',
+  '/get-review-likers/:id',
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
-  ReviewController.getAllReview,
+  ReviewController.getReviewLikers,
 );
 
 router.patch(

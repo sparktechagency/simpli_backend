@@ -43,7 +43,7 @@ const getAllReview = catchAsync(async (req, res) => {
 
 // get review liker
 const getReviewLikers = catchAsync(async (req, res) => {
-  const result = await ReviewService.getReviewLikers(req.params.id);
+  const result = await ReviewService.getReviewLikers(req.params.id, req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -8,6 +8,7 @@ import mongoose, { Types } from 'mongoose';
 import { CAMPAIGN_STATUS } from '../../utilities/enum';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Comment from '../comment/comment.model';
+import Reviewer from '../reviewer/reviewer.model';
 
 const createReview = async (reviewerId: string, payload: any) => {
   const campaignOffer = await CampaignOffer.findById(payload.campaignOfferId)
@@ -86,15 +87,27 @@ const getAllReviewFromDB = async (
 };
 
 // get all liker-----------
-const getReviewLikers = async (postId: string) => {
-  const likers = Review.findById(postId)
-    .populate({ path: 'likers', select: 'name profile_image' })
-    .select('likers')
-    .lean();
-  if (!likers) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+const getReviewLikers = async (
+  reviewId: string,
+  query: Record<string, unknown>,
+) => {
+  const review = await Review.findById(reviewId).select('likers').lean();
+  if (!review) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
-  return likers;
+
+  const likerQuery = new QueryBuilder(
+    Reviewer.find({ _id: { $in: review.likers } }).select('name profile_image'),
+    query,
+  );
+
+  const result = await likerQuery.modelQuery;
+  const meta = await likerQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 //
