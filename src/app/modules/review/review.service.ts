@@ -3,10 +3,11 @@ import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import Review from './reviewer.model';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 import { CAMPAIGN_STATUS } from '../../utilities/enum';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
+import Comment from '../comment/comment.model';
 
 const createReview = async (reviewerId: string, payload: any) => {
   const campaignOffer = await CampaignOffer.findById(payload.campaignOfferId)
@@ -48,19 +49,39 @@ const getAllReviewFromDB = async (
   reviewerId: string,
   query: Record<string, unknown>,
 ) => {
-  const reviewQuery = new QueryBuilder(Review.find(), query)
+  const reviewQuery = new QueryBuilder(
+    Review.find()
+      .populate({ path: 'product', select: 'name price' })
+      .populate({ path: 'category', select: 'name' }),
+    query,
+  )
     .search(['description'])
     .filter()
     .sort()
     .paginate()
     .fields();
 
-  const result = await reviewQuery.modelQuery;
+  let reviews = await reviewQuery.modelQuery;
+  reviews = await Promise.all(
+    reviews.map(async (review: any) => {
+      const totalComments = await Comment.countDocuments({
+        reviewId: review._id,
+      });
+      const isLike = review.likers.some((liker: Types.ObjectId) =>
+        liker.equals(reviewerId),
+      );
+      return {
+        ...review.toObject(),
+        totalComments,
+        isLike,
+      };
+    }),
+  );
   const meta = await reviewQuery.countTotal();
 
   return {
     meta,
-    result,
+    result: reviews,
   };
 };
 
