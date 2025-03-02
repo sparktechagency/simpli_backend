@@ -127,7 +127,7 @@ const moduleRoutes = [
     router: commentRoutes,
   },
   {
-    path: '/review=report',
+    path: '/review-report',
     router: reviewReportRoutes,
   },
 ];
