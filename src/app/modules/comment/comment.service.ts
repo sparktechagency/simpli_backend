@@ -13,8 +13,8 @@ const getComments = async (
   query: Record<string, unknown>,
 ) => {
   try {
-    const page = parseInt(query.page as string) || 1;
-    const limit = parseInt(query.limit as string) || 5;
+    // const page = parseInt(query.page as string) || 1;
+    // const limit = parseInt(query.limit as string) || 5;
     const replyLimit = parseInt(query.replyLimit as string) || 2;
     // const comments: any = await Comment.find({
     //   reviewId,
@@ -72,15 +72,10 @@ const getComments = async (
       }
     }
 
-    const totalComments = await Comment.countDocuments({
-      reviewId,
-      parentCommentId: null,
-    });
-
+    const meta = await commentQuery.countTotal();
     return {
-      currentPage: page,
-      totalPages: Math.ceil(totalComments / limit),
-      comments,
+      meta,
+      result: comments,
     };
   } catch (error: any) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, error.message);

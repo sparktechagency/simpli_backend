@@ -14,7 +14,7 @@ router.get(
   CommentController.getReviewComments,
 );
 router.get(
-  '/get-comment-replies',
+  '/get-comment-replies/:id',
   auth(USER_ROLE.reviewer),
   CommentController.getCommentReplies,
 );
