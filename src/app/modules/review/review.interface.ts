@@ -13,4 +13,7 @@ export interface IReview {
   likers: [Types.ObjectId];
   comments: [Types.ObjectId];
   rating: number;
+  totalView: number;
+  totalReferralSales: number;
+  totalCommissions: number;
 }

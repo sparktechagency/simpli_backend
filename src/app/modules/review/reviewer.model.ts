@@ -15,6 +15,18 @@ const ReviewSchema = new Schema<IReview>(
     likers: [{ type: Types.ObjectId, ref: 'Reviewer', default: [] }],
     // comments: [{ type: Types.ObjectId, ref: 'Comment', default: [] }],
     rating: { type: Number, required: true },
+    totalView: {
+      type: Number,
+      default: 0,
+    },
+    totalCommissions: {
+      type: Number,
+      default: 0,
+    },
+    totalReferralSales: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

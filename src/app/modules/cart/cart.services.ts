@@ -12,6 +12,11 @@ interface addToCartProps {
   productId: any;
   variantId: Types.ObjectId | null;
   price: number;
+  referral?: {
+    reviewerId: Types.ObjectId;
+    reviewId: Types.ObjectId;
+    amount: Types.ObjectId;
+  } | null;
 }
 
 const addToCart = async ({
@@ -19,6 +24,7 @@ const addToCart = async ({
   bussinessId,
   productId,
   variantId,
+  referral,
 }: addToCartProps) => {
   console.log('buss', bussinessId);
   let cart = await Cart.findOne({ reviewer: reviewerId });
@@ -62,6 +68,7 @@ const addToCart = async ({
       variant: variantId,
       quantity: 1,
       price: price as number,
+      referral: referral ? referral : null,
     });
   }
 
