@@ -1,23 +1,23 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import { INotification } from './notification.interface';
-import {
-  ENUM_NOTIFICATION_TYPE,
-  ENUM_RECEIVER_TYPE,
-  ENUM_SENDER_TYPE,
-} from '../../utilities/enum';
+import { ENUM_NOTIFICATION_TYPE, ENUM_SENDER_TYPE } from '../../utilities/enum';
 
 const NotificationSchema = new Schema<INotification>(
   {
     receiver: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      refPath: 'userType',
-    },
-    receiverType: {
       type: String,
-      enum: Object.values(ENUM_RECEIVER_TYPE),
       required: true,
     },
+    // receiver: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    //   refPath: 'userType',
+    // },
+    // receiverType: {
+    //   type: String,
+    //   enum: Object.values(ENUM_RECEIVER_TYPE),
+    //   required: true,
+    // },
     sender: {
       type: Schema.Types.ObjectId,
       refPath: 'senderType',
