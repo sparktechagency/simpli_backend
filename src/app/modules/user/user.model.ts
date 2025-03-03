@@ -64,6 +64,18 @@ const userSchema = new Schema<TUser>(
     },
     isStripeAccountConnected: { type: Boolean, default: false },
     stripeConnectedAccountId: { type: String },
+    googleId: {
+      type: String,
+      default: '',
+    },
+    appleId: {
+      type: String,
+      default: '',
+    },
+    facebookId: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
