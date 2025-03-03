@@ -44,10 +44,28 @@ const oAuthLogin = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const oAuthLink = catchAsync(async (req, res) => {
+  const { provider, token } = req.body;
+  if (!['google', 'apple', 'facebook'].includes(provider)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid provider');
+  }
+  const result = await oAuthService.loginWithOAuth(
+    provider,
+    token,
+    req.user.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Social link successfully',
+    data: result,
+  });
+});
 
 const oAuthController = {
   loginWithGoogle,
   oAuthLogin,
+  oAuthLink,
 };
 
 export default oAuthController;

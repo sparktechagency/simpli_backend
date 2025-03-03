@@ -12,6 +12,8 @@ import { User } from '../user/user.model';
 import Bussiness from '../bussiness/bussiness.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
+import AppError from '../../error/appError';
+import httpStatus from 'http-status';
 
 dotenv.config();
 const loginWithGoogle = async (user: JwtPayload) => {
@@ -75,7 +77,7 @@ const loginWithOAuth = async (
     throw new Error('Invalid provider');
   }
 
-  let user = await User.findOne({ email });
+  let user = await User.findOne({ [`${provider}Id`]: id });
 
   if (!user) {
     user = new User({
@@ -120,9 +122,61 @@ const loginWithOAuth = async (
   return { accessToken, refreshToken };
 };
 
+const linkSocialAccount = async (
+  provider: string,
+  token: string,
+  userId: string,
+) => {
+  let id;
+
+  if (provider === 'google') {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload) throw new Error('Invalid Google token');
+
+    id = payload.sub;
+  } else if (provider === 'facebook') {
+    const response = await axios.get(
+      `https://graph.facebook.com/me?fields=id,email&access_token=${token}`,
+    );
+
+    id = response.data.id;
+  } else if (provider === 'apple') {
+    const appleUser = await appleSigninAuth.verifyIdToken(token, {
+      audience: process.env.APPLE_CLIENT_ID!,
+      ignoreExpiration: false,
+    });
+
+    id = appleUser.sub;
+  } else {
+    throw new Error('Invalid provider');
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const existingUser = await User.findOne({ [`${provider}Id`]: id });
+  if (existingUser && existingUser._id.toString() !== userId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'This social account is already linked to another user.'",
+    );
+  }
+
+  user[`${provider}Id`] = id;
+  await user.save();
+  return user;
+};
+
 const oAuthService = {
   loginWithOAuth,
   loginWithGoogle,
+  linkSocialAccount,
 };
 
 export default oAuthService;
