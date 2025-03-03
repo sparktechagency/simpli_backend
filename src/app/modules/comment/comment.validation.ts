@@ -19,6 +19,16 @@ const createCommentSchema = z.object({
       .max(500, { message: 'Text cannot exceed 500 characters' }),
   }),
 });
+const updateCommentValidationSchema = z.object({
+  body: z.object({
+    text: z
+      .string()
+      .trim()
+      .min(1, { message: 'Text is required' })
+      .max(500, { message: 'Text cannot exceed 500 characters' })
+      .optional(),
+  }),
+});
 
 const createReplySchema = z.object({
   body: z.object({
@@ -34,6 +44,7 @@ const createReplySchema = z.object({
 const CommentValidations = {
   createCommentSchema,
   createReplySchema,
+  updateCommentValidationSchema,
 };
 
 export default CommentValidations;

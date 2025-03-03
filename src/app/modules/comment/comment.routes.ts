@@ -51,6 +51,25 @@ router.post(
   CommentController.createReply,
 );
 
+router.delete(
+  '/delete-comment/:id',
+  auth(USER_ROLE.reviewer),
+  CommentController.deleteComment,
+);
+
+router.patch(
+  '/update-comment/:id',
+  auth(USER_ROLE.reviewer),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  validateRequest(CommentValidations.updateCommentValidationSchema),
+  CommentController.updateComment,
+);
 router.patch(
   '/like-unlike/:id',
   auth(USER_ROLE.reviewer),

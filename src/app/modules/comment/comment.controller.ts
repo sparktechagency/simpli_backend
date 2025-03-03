@@ -86,6 +86,35 @@ const likeUnlikeReview = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deleteComment = catchAsync(async (req, res) => {
+  const result = await CommentService.deleteComment(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comment deleted successfully',
+    data: result,
+  });
+});
+const updateComment = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'comment_image' in files) {
+    req.body.image = files['comment_image'][0].path;
+  }
+  const result = await CommentService.updateComment(
+    req.user.profileId,
+    req.params.id,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comment updated successfully',
+    data: result,
+  });
+});
 
 const CommentController = {
   getReviewComments,
@@ -94,6 +123,8 @@ const CommentController = {
   createComment,
   createReply,
   likeUnlikeReview,
+  deleteComment,
+  updateComment,
 };
 
 export default CommentController;

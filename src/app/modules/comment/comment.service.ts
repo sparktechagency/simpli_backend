@@ -234,6 +234,34 @@ const likeUnlikeComment = async (commentId: string, userId: string) => {
   }
 };
 
+const deleteComment = async (profileId: string, id: string) => {
+  const comment = await Comment.findOne({ userId: profileId, _id: id });
+  if (!comment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+  }
+
+  const result = await Comment.findByIdAndDelete(id);
+  return result;
+};
+
+// edit comment
+const updateComment = async (
+  profileId: string,
+  id: string,
+  payload: Partial<IComment>,
+) => {
+  const comment = await Comment.findOne({ userId: profileId, _id: id });
+  if (!comment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+  }
+
+  const result = await Comment.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 const CommentService = {
   getComments,
   getCommetReplies,
@@ -241,6 +269,8 @@ const CommentService = {
   createComment,
   createReply,
   likeUnlikeComment,
+  deleteComment,
+  updateComment,
 };
 
 export default CommentService;
