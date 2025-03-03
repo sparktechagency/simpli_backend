@@ -70,4 +70,5 @@ router.post(
   validateRequest(authValidations.verifyEmailCodeValidationSchema),
   authControllers.verifyEmailCode,
 );
+
 export const authRoutes = router;

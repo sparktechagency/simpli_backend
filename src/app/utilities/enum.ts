@@ -102,3 +102,27 @@ export const ENUM_DELIVERY_STATUS = {
   delivered: 'Delivered',
   cancelled: 'Cancelled',
 };
+
+export const ENUM_SENDER_TYPE = {
+  REVIEWER: 'Reviewer',
+  BUSSINESS_OWNER: 'BussinessOwner',
+  PLATFORM: 'Platform',
+};
+export const ENUM_RECEIVER_TYPE = {
+  REVIEWER: 'Reviewer',
+  BUSSINESS_OWNER: 'BussinessOwner',
+};
+
+export const ENUM_NOTIFICATION_TYPE = {
+  LIKE: 'Like',
+  COMMENT: 'Comment',
+  FOLLOW: 'Follow',
+  REPLY: 'Reply',
+  ORDER: 'Order',
+  REVIEW: 'Review',
+  PAYMENT: 'Payment',
+  SHIPPING: 'Shipping',
+  ANNOUNCEMENT: 'Announcement',
+  SYSTEM_UPDATE: 'System Update',
+  GENERAL: 'General',
+};
