@@ -26,8 +26,28 @@ const loginWithGoogle = catchAsync(async (req, res) => {
   });
 });
 
+const oAuthLogin = catchAsync(async (req, res) => {
+  const { provider, token, role } = req.body;
+  if (!['google', 'apple', 'facebook'].includes(provider)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid provider');
+  }
+  const result = await oAuthService.loginWithOAuth(provider, token, role);
+  res.cookie('refresh-token', result.refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+  });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User login successfully',
+    data: result,
+  });
+});
+
 const oAuthController = {
   loginWithGoogle,
+  oAuthLogin,
 };
 
 export default oAuthController;

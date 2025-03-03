@@ -16,5 +16,6 @@ router.get(
   passport.authenticate('google', { session: false }),
   oAuthController.loginWithGoogle,
 );
+router.post('/oauth-login', oAuthController.oAuthLogin);
 
 export default router;

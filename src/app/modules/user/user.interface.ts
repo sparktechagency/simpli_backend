@@ -23,6 +23,9 @@ export interface TUser {
   paypalMerchantId: string;
   emailChangeCode: number;
   isEmailChangeVerified: boolean;
+  googleId: string;
+  appleId: string;
+  facebookId: string;
 }
 export interface TLoginUser {
   email: string;
