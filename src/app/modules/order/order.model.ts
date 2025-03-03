@@ -11,6 +11,19 @@ const OrderItemSchema: Schema = new Schema<IOrderItem>({
   variant: { type: Schema.Types.ObjectId, ref: 'Variant', default: null },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true, min: 0 },
+  referral: {
+    reviewerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Reviewer',
+    },
+    reviewId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Review',
+    },
+    amount: {
+      type: Number,
+    },
+  },
 });
 
 const OrderSchema: Schema = new Schema<IOrder>(
@@ -47,6 +60,10 @@ const OrderSchema: Schema = new Schema<IOrder>(
       enum: Object.values(ENUM_DELIVERY_STATUS) as string[],
       default: ENUM_DELIVERY_STATUS.waiting,
       required: true,
+    },
+    isReferralAmountPaid: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

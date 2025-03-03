@@ -35,6 +35,19 @@ const CartSchema = new Schema<ICart>(
           type: Number,
           required: true,
         },
+        referral: {
+          reviewerId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Reviewer',
+          },
+          reviewId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Review',
+          },
+          amount: {
+            type: Number,
+          },
+        },
       },
     ],
     totalQuantity: {

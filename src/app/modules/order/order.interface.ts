@@ -10,6 +10,11 @@ export interface IOrderItem {
   variant: Types.ObjectId | null;
   quantity: number;
   price: number;
+  referral?: {
+    reviewerId: Types.ObjectId;
+    reviewId: Types.ObjectId;
+    amount: Types.ObjectId;
+  } | null;
 }
 
 export interface IOrder extends Document {
@@ -24,4 +29,5 @@ export interface IOrder extends Document {
   paymentMethod: (typeof ENUM_PAYMENT_METHOD)[keyof typeof ENUM_PAYMENT_METHOD];
   paymentStatus: (typeof ENUM_PAYMENT_STATUS)[keyof typeof ENUM_PAYMENT_STATUS];
   deliveryStatus: (typeof ENUM_DELIVERY_STATUS)[keyof typeof ENUM_DELIVERY_STATUS];
+  isReferralAmountPaid: boolean;
 }

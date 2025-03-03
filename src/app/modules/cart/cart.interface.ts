@@ -5,6 +5,11 @@ export interface ICartItem {
   variant: Types.ObjectId | null;
   quantity: number;
   price: number;
+  referral?: {
+    reviewerId: Types.ObjectId;
+    reviewId: Types.ObjectId;
+    amount: Types.ObjectId;
+  } | null;
 }
 
 export interface ICart extends Document {
