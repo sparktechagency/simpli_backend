@@ -51,7 +51,9 @@ const loginWithOAuth = async (
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    if (!payload) throw new Error('Invalid Google token');
+    if (!payload) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invlid token');
+    }
 
     email = payload.email!;
     id = payload.sub;
@@ -74,7 +76,10 @@ const loginWithOAuth = async (
     id = appleUser.sub;
     name = 'Apple User';
   } else {
-    throw new Error('Invalid provider');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid token, Please try again',
+    );
   }
 
   let user = await User.findOne({ [`${provider}Id`]: id });
@@ -135,7 +140,12 @@ const linkSocialAccount = async (
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    if (!payload) throw new Error('Invalid Google token');
+    if (!payload) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Invalid token, Please try again',
+      );
+    }
 
     id = payload.sub;
   } else if (provider === 'facebook') {
@@ -152,7 +162,10 @@ const linkSocialAccount = async (
 
     id = appleUser.sub;
   } else {
-    throw new Error('Invalid provider');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid token, Please try again',
+    );
   }
 
   const user = await User.findById(userId);
