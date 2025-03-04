@@ -1,6 +1,7 @@
+import { JwtPayload } from 'jsonwebtoken';
 import ReferralSales from './referralSales.model';
 
-const getReferralSales = async () => {
+const getReferralSales = async (userData: JwtPayload) => {
   const result = await ReferralSales.find().populate({
     path: 'product',
     select: 'name images',
