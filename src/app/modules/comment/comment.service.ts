@@ -88,55 +88,51 @@ const getCommetReplies = async (
   commentId: string,
   query: Record<string, unknown>,
 ) => {
-  try {
-    const replyLimit = parseInt(query.replyLimit as string) || 2;
-    const parentComment = await Comment.findById(commentId);
-    if (!parentComment) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
-    }
-
-    const replyQuery = new QueryBuilder(
-      Comment.find({ parentCommentId: commentId }).lean(),
-      query,
-    )
-      .search(['name'])
-      .filter()
-      .sort()
-      .paginate()
-      .fields();
-
-    const replies: any = await replyQuery.modelQuery;
-    for (const reply of replies) {
-      reply.likersCount = reply.likers.length;
-      reply.isLike = reply.likers.some((liker: Types.ObjectId) =>
-        liker.equals(profileId),
-      );
-      reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
-        .limit(3)
-        .select('name profile_image')
-        .lean();
-      reply.replies = await Comment.find({ parentCommentId: reply._id })
-        .sort({ createdAt: 1 })
-        .limit(replyLimit)
-        .populate('userId', 'name')
-        .select('text userId createdAt likers')
-        .lean();
-      reply.replyCount = await Comment.countDocuments({
-        parentCommentId: reply._id,
-      });
-    }
-
-    const meta = await replyQuery.countTotal();
-
-    return {
-      meta,
-      result: replies,
-    };
-  } catch (error) {
-    throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
+  const replyLimit = parseInt(query.replyLimit as string) || 2;
+  const parentComment = await Comment.findById(commentId);
+  if (!parentComment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
-};
 
+  const replyQuery = new QueryBuilder(
+    Comment.find({ parentCommentId: commentId }).lean(),
+    query,
+  )
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const replies: any = await replyQuery.modelQuery;
+
+  for (const reply of replies) {
+    reply.likersCount = reply.likers.length;
+    reply.isLike = reply.likers.some((liker: Types.ObjectId) =>
+      liker.equals(profileId),
+    );
+    reply.likers = await Reviewer.find({ _id: { $in: reply.likers } })
+      .limit(3)
+      .select('name profile_image')
+      .lean();
+    reply.replies = await Comment.find({ parentCommentId: reply._id })
+      .sort({ createdAt: 1 })
+      .limit(replyLimit)
+      .populate('userId', 'name')
+      .select('text userId createdAt likers')
+      .lean();
+    reply.replyCount = await Comment.countDocuments({
+      parentCommentId: reply._id,
+    });
+  }
+
+  const meta = await replyQuery.countTotal();
+
+  return {
+    meta,
+    result: replies,
+  };
+};
 const getCommentLikers = async (
   commentId: string,
   query: Record<string, unknown>,
@@ -146,14 +142,6 @@ const getCommentLikers = async (
     if (!comment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
     }
-
-    // const totalLikers = comment.likers.length;
-
-    // const likers = await Reviewer.find({ _id: { $in: comment.likers } })
-    //   .skip((page - 1) * limit)
-    //   .limit(limit)
-    //   .select('name profile_image')
-    //   .lean();
 
     const likerQuery = new QueryBuilder(
       Reviewer.find({ _id: { $in: comment.likers } }).select(
@@ -204,41 +192,35 @@ const createReply = async (profileId: string, payload: IComment) => {
 
 // like unlike comment
 const likeUnlikeComment = async (commentId: string, userId: string) => {
-  try {
-    const comment = await Comment.findById(commentId).select('likers');
-    if (!comment) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
-    }
-
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-    const alreadyLiked = comment.likers.includes(userObjectId);
-
-    const updatedComment = await Comment.findByIdAndUpdate(
-      commentId,
-      alreadyLiked
-        ? { $pull: { likers: userObjectId } }
-        : { $push: { likers: userObjectId } },
-      { new: true },
-    ).select('likers');
-
-    return {
-      commentId,
-      liked: !alreadyLiked,
-      totalLikes: updatedComment?.likers.length,
-    };
-  } catch (error) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      'Something went wrong while toggling like.',
-    );
+  const comment = await Comment.findById(commentId).select('likers');
+  if (!comment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
-};
 
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  const alreadyLiked = comment.likers.includes(userObjectId);
+
+  const updatedComment = await Comment.findByIdAndUpdate(
+    commentId,
+    alreadyLiked
+      ? { $pull: { likers: userObjectId } }
+      : { $push: { likers: userObjectId } },
+    { new: true },
+  ).select('likers');
+
+  return {
+    commentId,
+    liked: !alreadyLiked,
+    totalLikes: updatedComment?.likers.length,
+  };
+};
 const deleteComment = async (profileId: string, id: string) => {
   const comment = await Comment.findOne({ userId: profileId, _id: id });
   if (!comment) {
     throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
+
+  await Comment.deleteMany({ parentCommentId: comment._id });
 
   const result = await Comment.findByIdAndDelete(id);
   return result;
@@ -262,6 +244,60 @@ const updateComment = async (
   return result;
 };
 
+// get my comments
+const getMyComments = async (
+  reviewerId: string,
+  query: Record<string, unknown>,
+) => {
+  const commentQuery = new QueryBuilder(
+    Comment.find({
+      userId: reviewerId,
+      parentCommentId: null,
+    }).populate({
+      path: 'reviewId',
+      select: 'description images video thumbnail rating createdAt',
+      populate: [
+        { path: 'product', select: 'name price' },
+        { path: 'category', select: 'name' },
+        { path: 'reviewer', select: 'name profile_image' },
+      ],
+    }),
+    query,
+  );
+
+  const result = await commentQuery.modelQuery;
+  const meta = await commentQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
+};
+
+// get my likes
+const getMyLinkes = async (
+  profileId: string,
+  query: Record<string, unknown>,
+) => {
+  const likeQuery = new QueryBuilder(
+    Review.find({ likers: { $in: [profileId] } }).populate({
+      path: 'reviewId',
+      select: 'description images video thumbnail rating createdAt',
+      populate: [
+        { path: 'product', select: 'name price' },
+        { path: 'category', select: 'name' },
+        { path: 'reviewer', select: 'name profile_image' },
+      ],
+    }),
+    query,
+  );
+  const result = await likeQuery.modelQuery;
+  const meta = await likeQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
+};
+
 const CommentService = {
   getComments,
   getCommetReplies,
@@ -271,6 +307,8 @@ const CommentService = {
   likeUnlikeComment,
   deleteComment,
   updateComment,
+  getMyComments,
+  getMyLinkes,
 };
 
 export default CommentService;

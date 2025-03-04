@@ -116,6 +116,20 @@ const updateComment = catchAsync(async (req, res) => {
   });
 });
 
+// get my comments
+const getMyComments = catchAsync(async (req, res) => {
+  const result = await CommentService.getMyComments(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comment retrieved successfully',
+    data: result,
+  });
+});
+
 const CommentController = {
   getReviewComments,
   getCommentReplies,
@@ -125,6 +139,7 @@ const CommentController = {
   likeUnlikeReview,
   deleteComment,
   updateComment,
+  getMyComments,
 };
 
 export default CommentController;

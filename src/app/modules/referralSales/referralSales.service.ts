@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JwtPayload } from 'jsonwebtoken';
 import ReferralSales from './referralSales.model';
 

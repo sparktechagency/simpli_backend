@@ -76,4 +76,10 @@ router.patch(
   CommentController.likeUnlikeReview,
 );
 
+router.get(
+  '/get-my-comments',
+  auth(USER_ROLE.reviewer),
+  CommentController.getMyComments,
+);
+
 export const commentRoutes = router;
