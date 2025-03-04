@@ -79,6 +79,19 @@ const likeUnlikeReview = catchAsync(async (req, res) => {
     data: result,
   });
 });
+//
+const getSingleProductReview = catchAsync(async (req, res) => {
+  const result = await ReviewService.getSingleProductReview(
+    req.params.id,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Single product review retrieved successfully',
+    data: result,
+  });
+});
 
 const ReviewController = {
   createReview,
@@ -86,6 +99,7 @@ const ReviewController = {
   getReviewLikers,
   likeUnlikeReview,
   getMyReview,
+  getSingleProductReview,
 };
 
 export default ReviewController;

@@ -185,12 +185,40 @@ const likeUnlikeReview = async (reviewId: string, userId: string) => {
   }
 };
 
+// get single product review
+
+const getSingleProductReview = async (
+  productId: string,
+  query: Record<string, unknown>,
+) => {
+  const resultQuery = new QueryBuilder(
+    Review.find({ product: productId })
+      .select('reviewer createdAt rating description')
+      .populate({ path: 'reviewer', select: 'profile_image name' }),
+    query,
+  )
+    .search(['description'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await resultQuery.modelQuery;
+  const meta = await resultQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const ReviewService = {
   createReview,
   getAllReviewFromDB,
   getReviewLikers,
   likeUnlikeReview,
   getMyReviews,
+  getSingleProductReview,
 };
 
 export default ReviewService;

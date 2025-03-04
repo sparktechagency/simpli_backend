@@ -44,4 +44,11 @@ router.patch(
   auth(USER_ROLE.reviewer),
   ReviewController.likeUnlikeReview,
 );
+
+router.get(
+  '/get-single-product-review/:id',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  ReviewController.getSingleProductReview,
+);
+
 export const reviewRoutes = router;
