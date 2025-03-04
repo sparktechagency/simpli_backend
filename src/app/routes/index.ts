@@ -26,6 +26,7 @@ import { reviewRoutes } from '../modules/review/review.routes';
 import { commentRoutes } from '../modules/comment/comment.routes';
 import { reviewReportRoutes } from '../modules/reviewReport/reviewReport.routes';
 import { referralSalesRoutes } from '../modules/referralSales/referralSales.routes';
+import { metaRoutes } from '../modules/meta/meta.routes';
 
 const router = Router();
 
@@ -134,6 +135,10 @@ const moduleRoutes = [
   {
     path: '/referral-sales',
     router: referralSalesRoutes,
+  },
+  {
+    path: '/meta',
+    router: metaRoutes,
   },
 ];
 
