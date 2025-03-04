@@ -82,4 +82,10 @@ router.get(
   CommentController.getMyComments,
 );
 
+router.get(
+  '/get-my-likes',
+  auth(USER_ROLE.reviewer),
+  CommentController.getMyLikes,
+);
+
 export const commentRoutes = router;

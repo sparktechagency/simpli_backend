@@ -279,15 +279,10 @@ const getMyLinkes = async (
   query: Record<string, unknown>,
 ) => {
   const likeQuery = new QueryBuilder(
-    Review.find({ likers: { $in: [profileId] } }).populate({
-      path: 'reviewId',
-      select: 'description images video thumbnail rating createdAt',
-      populate: [
-        { path: 'product', select: 'name price' },
-        { path: 'category', select: 'name' },
-        { path: 'reviewer', select: 'name profile_image' },
-      ],
-    }),
+    Review.find({ likers: { $in: [profileId] } })
+      .populate({ path: 'product', select: 'name price' })
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'reviewer', select: 'name profile_image' }),
     query,
   );
   const result = await likeQuery.modelQuery;
