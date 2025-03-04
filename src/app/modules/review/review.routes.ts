@@ -27,6 +27,12 @@ router.get(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   ReviewController.getAllReview,
 );
+
+router.get(
+  '/get-my-reviews',
+  auth(USER_ROLE.reviewer),
+  ReviewController.getMyReview,
+);
 router.get(
   '/get-review-likers/:id',
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),

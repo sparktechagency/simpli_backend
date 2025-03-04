@@ -41,6 +41,20 @@ const getAllReview = catchAsync(async (req, res) => {
   });
 });
 
+// get my reviews
+const getMyReview = catchAsync(async (req, res) => {
+  const result = await ReviewService.getMyReviews(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review retrieved successfully',
+    data: result,
+  });
+});
+
 // get review liker
 const getReviewLikers = catchAsync(async (req, res) => {
   const result = await ReviewService.getReviewLikers(req.params.id, req.query);
@@ -71,6 +85,7 @@ const ReviewController = {
   getAllReview,
   getReviewLikers,
   likeUnlikeReview,
+  getMyReview,
 };
 
 export default ReviewController;

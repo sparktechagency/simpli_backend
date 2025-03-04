@@ -87,6 +87,48 @@ const getAllReviewFromDB = async (
   };
 };
 
+// get my revies
+const getMyReviews = async (
+  reviewerId: string,
+  query: Record<string, unknown>,
+) => {
+  const reviewQuery = new QueryBuilder(
+    Review.find({ reviewer: reviewerId })
+      .populate({ path: 'product', select: 'name price' })
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'reviewer', select: 'name username profile_image' }),
+    query,
+  )
+    .search(['description'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  let reviews = await reviewQuery.modelQuery;
+  reviews = await Promise.all(
+    reviews.map(async (review: any) => {
+      const totalComments = await Comment.countDocuments({
+        reviewId: review._id,
+      });
+      const isLike = review.likers.some((liker: Types.ObjectId) =>
+        liker.equals(reviewerId),
+      );
+      return {
+        ...review.toObject(),
+        totalComments,
+        isLike,
+      };
+    }),
+  );
+  const meta = await reviewQuery.countTotal();
+
+  return {
+    meta,
+    result: reviews,
+  };
+};
+
 // get all liker-----------
 const getReviewLikers = async (
   reviewId: string,
@@ -148,6 +190,7 @@ const ReviewService = {
   getAllReviewFromDB,
   getReviewLikers,
   likeUnlikeReview,
+  getMyReviews,
 };
 
 export default ReviewService;
