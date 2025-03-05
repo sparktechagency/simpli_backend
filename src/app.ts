@@ -15,6 +15,9 @@ import handleWebhook from './app/handleStripe/webhook';
 import handlePaypalWebhook from './app/handlePaypal/handlePaypalWebhook';
 import capturePayPalPayment from './app/handlePaypal/capturePaypalPayment';
 import onboardingRefresh from './app/handleStripe/onboardingRefresh';
+import auth from './app/middlewares/auth';
+import { USER_ROLE } from './app/modules/user/user.constant';
+import Bussiness from './app/modules/bussiness/bussiness.model';
 // parser
 app.post(
   '/simpli-webhook',
@@ -51,6 +54,16 @@ app.post('/contact-us', sendContactUsEmail);
 router.get('/stripe/onboarding/refresh', onboardingRefresh);
 
 app.get('/capture-payment', capturePayPalPayment);
+
+app.get(
+  '/nice',
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
+  async (req, res) => {
+    const totalIncome = 100;
+    const bussiness = await Bussiness.findById(req.user.profileId);
+    res.send({ message: 'okey', totalIncome, bussiness });
+  },
+);
 
 // global error handler
 app.use(globalErrorHandler);

@@ -50,8 +50,14 @@ const getAllReviewFromDB = async (
   reviewerId: string,
   query: Record<string, unknown>,
 ) => {
+  const reviewer = await Reviewer.findById(reviewerId).select('following');
+  let filterQuery = {};
+  if (query.following) {
+    filterQuery = { reviewer: { $in: reviewer?.following } };
+  }
+
   const reviewQuery = new QueryBuilder(
-    Review.find()
+    Review.find({ ...filterQuery })
       .populate({ path: 'product', select: 'name price' })
       .populate({ path: 'category', select: 'name' })
       .populate({ path: 'reviewer', select: 'name username profile_image' }),
@@ -205,12 +211,123 @@ const getSingleProductReview = async (
 
   const result = await resultQuery.modelQuery;
   const meta = await resultQuery.countTotal();
+  const avgRatingData = await Review.aggregate([
+    { $match: { product: new mongoose.Types.ObjectId(productId) } },
+    {
+      $group: {
+        _id: '$product',
+        averageRating: { $avg: '$rating' },
+      },
+    },
+  ]);
 
+  const averageRating =
+    avgRatingData.length > 0 ? avgRatingData[0].averageRating : 0;
   return {
     meta,
     result,
+    averageRating,
   };
 };
+
+// const getSingleProductReview = async (
+//   productId: string,
+//   query: Record<string, any>,
+// ) => {
+//   const productObjectId = new mongoose.Types.ObjectId(productId);
+
+//   const search = query.search ? query.search.toString() : null;
+//   const filter = query.filter ? JSON.parse(query.filter) : {};
+//   const sort = query.sort ? JSON.parse(query.sort) : { createdAt: -1 };
+//   const page = parseInt(query.page, 10) || 1;
+//   const limit = Math.min(parseInt(query.limit, 10) || 10, 50);
+//   const fields = query.fields
+//     ? query.fields.split(',').map((f: string) => f.trim())
+//     : [];
+
+//   const matchStage: Record<string, any> = { product: productObjectId };
+
+//   if (search) {
+//     matchStage['description'] = { $regex: search, $options: 'i' };
+//   }
+
+//   Object.assign(matchStage, filter);
+
+//   // Projection to select only required fields
+//   const projection: Record<string, number> = {
+//     reviewer: 1,
+//     createdAt: 1,
+//     rating: 1,
+//     description: 1,
+//   };
+
+//   if (fields.length > 0) {
+//     fields.forEach((field: string) => {
+//       projection[field] = 1;
+//     });
+//   }
+
+//   const pipeline = [
+//     { $match: matchStage },
+
+//     {
+//       $lookup: {
+//         from: 'reviewer',
+//         localField: 'reviewer',
+//         foreignField: '_id',
+//         pipeline: [
+//           {
+//             $project: {
+//               profile_image: 1,
+//               name: 1,
+//             },
+//           },
+//         ],
+//         as: 'reviewer',
+//       },
+//     },
+//     { $unwind: { path: '$reviewer', preserveNullAndEmptyArrays: true } },
+
+//     {
+//       $project: {
+//         'reviewer.profile_image': 1,
+//         'reviewer.name': 1,
+//         createdAt: 1,
+//         rating: 1,
+//         description: 1,
+//       },
+//     },
+
+//     { $sort: sort },
+
+//     { $skip: (page - 1) * limit },
+//     { $limit: limit },
+
+//     {
+//       $group: {
+//         _id: null,
+//         reviews: { $push: '$$ROOT' },
+//         total: { $sum: 1 },
+//         averageRating: { $avg: '$rating' },
+//       },
+//     },
+//     {
+//       $project: {
+//         result: '$reviews',
+//         meta: '$total',
+//         averageRating: { $ifNull: ['$averageRating', 0] },
+//       },
+//     },
+//   ];
+
+//   const [result] = await Review.aggregate(pipeline);
+
+//   return {
+//     meta: result?.meta || 0,
+//     result: result?.result || [],
+//     averageRating: result?.averageRating || 0,
+//   };
+// };
 
 const ReviewService = {
   createReview,

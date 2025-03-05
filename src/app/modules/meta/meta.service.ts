@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
+import Bussiness from '../bussiness/bussiness.model';
 import { Order } from '../order/order.model';
 import Review from '../review/reviewer.model';
 
@@ -165,7 +166,7 @@ const getReviewerMetaData = async (
       change: getPercentageChange(currentTotalReview, previousTotalReview),
     },
     itemInShipment: {
-      value: currentTotalOrderShipment,
+      value: currentTotalOrderShipment.toFixed,
       change: getPercentageChange(
         currentTotalOrderShipment,
         previousTotalOrderShipment,
@@ -174,7 +175,20 @@ const getReviewerMetaData = async (
   };
 };
 
+const getBussinessMetaData = async (
+  bussinessId: string,
+  query: Record<string, unknown>,
+) => {
+  const totalEarning = 100;
+  const bussiness = await Bussiness.findById(bussinessId);
+  return {
+    totalEarning,
+    bussiness,
+  };
+};
+
 const MetaService = {
   getReviewerMetaData,
+  getBussinessMetaData,
 };
 export default MetaService;

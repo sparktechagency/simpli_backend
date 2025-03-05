@@ -14,20 +14,7 @@ const getComments = async (
   query: Record<string, unknown>,
 ) => {
   try {
-    // const page = parseInt(query.page as string) || 1;
-    // const limit = parseInt(query.limit as string) || 5;
     const replyLimit = parseInt(query.replyLimit as string) || 2;
-    // const comments: any = await Comment.find({
-    //   reviewId,
-    //   parentCommentId: null,
-    // })
-    //   .sort({ createdAt: -1 })
-    //   .skip((page - 1) * limit)
-    //   .limit(limit)
-    //   .populate('userId', 'name profile_image')
-    //   .select('text userId createdAt likers')
-    //   .lean();
-
     const commentQuery = new QueryBuilder(
       Comment.find({ reviewId, parentCommentId: null })
         .populate({

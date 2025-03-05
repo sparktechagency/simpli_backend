@@ -11,4 +11,10 @@ router.get(
   MetaController.getReviewerMetaData,
 );
 
+router.get(
+  '/get-bussiness-meta-data',
+  auth(USER_ROLE.reviewer),
+  MetaController.getBussinessMetaData,
+);
+
 export const metaRoutes = router;
