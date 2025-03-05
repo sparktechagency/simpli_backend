@@ -124,29 +124,25 @@ const getCommentLikers = async (
   commentId: string,
   query: Record<string, unknown>,
 ) => {
-  try {
-    const comment = await Comment.findById(commentId).select('likers').lean();
-    if (!comment) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
-    }
-
-    const likerQuery = new QueryBuilder(
-      Reviewer.find({ _id: { $in: comment.likers } }).select(
-        'name profile_image',
-      ),
-      query,
-    );
-
-    const result = await likerQuery.modelQuery;
-    const meta = await likerQuery.countTotal();
-
-    return {
-      meta,
-      result,
-    };
-  } catch (error) {
-    throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Something went wrong');
+  const comment = await Comment.findById(commentId).select('likers').lean();
+  if (!comment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
+
+  const likerQuery = new QueryBuilder(
+    Reviewer.find({ _id: { $in: comment.likers } }).select(
+      'name profile_image',
+    ),
+    query,
+  );
+
+  const result = await likerQuery.modelQuery;
+  const meta = await likerQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 const createComment = async (profileId: string, payload: IComment) => {
   const review = await Review.exists({ _id: payload.reviewId });
@@ -242,7 +238,7 @@ const getMyComments = async (
       parentCommentId: null,
     }).populate({
       path: 'reviewId',
-      select: 'description images video thumbnail rating createdAt',
+      select: 'description images video thumbnail rating createdAt likers',
       populate: [
         { path: 'product', select: 'name price' },
         { path: 'category', select: 'name' },
@@ -272,7 +268,25 @@ const getMyLinkes = async (
       .populate({ path: 'reviewer', select: 'name profile_image' }),
     query,
   );
-  const result = await likeQuery.modelQuery;
+  // const result = await likeQuery.modelQuery;
+
+  let result = await likeQuery.modelQuery;
+  result = await Promise.all(
+    result.map(async (review: any) => {
+      const totalComments = await Comment.countDocuments({
+        reviewId: review._id,
+      });
+      const isLike = review.likers.some((liker: Types.ObjectId) =>
+        liker.equals(profileId),
+      );
+      return {
+        ...review.toObject(),
+        totalComments,
+        isLike,
+      };
+    }),
+  );
+
   const meta = await likeQuery.countTotal();
   return {
     meta,
