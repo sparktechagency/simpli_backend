@@ -152,7 +152,6 @@ const linkSocialAccount = async (
     const response = await axios.get(
       `https://graph.facebook.com/me?fields=id,email&access_token=${token}`,
     );
-
     id = response.data.id;
   } else if (provider === 'apple') {
     const appleUser = await appleSigninAuth.verifyIdToken(token, {
