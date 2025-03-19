@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable no-unused-vars */
 // import { NextFunction, Request, Response } from 'express';
 // import catchAsync from '../utilities/catchasync';
@@ -213,7 +214,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // Check if the profile data is cached
-    const cachedProfile = userCache.get(id);
+    const cachedProfile: any = userCache.get(id);
     if (cachedProfile) {
       // If data is in the cache, use it directly
       req.user = { ...decoded, profileId: cachedProfile._id };
