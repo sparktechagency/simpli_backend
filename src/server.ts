@@ -50,5 +50,4 @@ async function main() {
   }
 }
 
-// Run the main function and log errors
 main().catch((err) => errorLogger.error('Main function error:', err));
