@@ -24,7 +24,7 @@ const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
     );
   }
 
-  const result = await Order.create({
+  const result: any = await Order.create({
     ...payload,
     ...cart,
   });
@@ -70,7 +70,7 @@ const createOrder = async (reviewerId: string, payload: Partial<IOrder>) => {
               value: result.totalPrice.toFixed(2),
             },
             description: `Payment for Campaign: ${result._id}`,
-            custom_id: result._id.toString(),
+            custom_id: result?._id.toString(),
             reference_id: ENUM_PAYMENT_PURPOSE.ORDER,
           },
         ],
