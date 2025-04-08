@@ -12,4 +12,6 @@ export interface IStore {
   zipCode: number;
   city: string;
   state: string;
+  street1: string;
+  street2?: string;
 }

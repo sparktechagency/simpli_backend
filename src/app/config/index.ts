@@ -59,4 +59,7 @@ export default {
     smtp_pass: process.env.SMTP_PASS,
     name: process.env.SERVICE_NAME,
   },
+  shippo: {
+    api_key: process.env.SHIPPO_API_KEY,
+  },
 };

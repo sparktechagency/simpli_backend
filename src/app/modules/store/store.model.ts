@@ -18,6 +18,13 @@ const StoreSchema: Schema = new Schema<IStore>(
     zipCode: { type: Number, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
+    street1: {
+      type: String,
+      required: true,
+    },
+    street2: {
+      type: String,
+    },
   },
   { timestamps: true },
 );

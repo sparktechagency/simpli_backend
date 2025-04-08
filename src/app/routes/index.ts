@@ -27,6 +27,7 @@ import { commentRoutes } from '../modules/comment/comment.routes';
 import { reviewReportRoutes } from '../modules/reviewReport/reviewReport.routes';
 import { referralSalesRoutes } from '../modules/referralSales/referralSales.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
+import { shippoRoutes } from '../modules/shippo/shippo.routes';
 
 const router = Router();
 
@@ -139,6 +140,10 @@ const moduleRoutes = [
   {
     path: '/meta',
     router: metaRoutes,
+  },
+  {
+    path: '/shippo',
+    router: shippoRoutes,
   },
 ];
 
