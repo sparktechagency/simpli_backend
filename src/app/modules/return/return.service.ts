@@ -31,8 +31,12 @@ const getAllReturn = async (
   };
 };
 
-const issueRefund = async (profileId: string, returnId: string) => {
-  console.log('succssfully issue refund');
+const issueRefund = async (
+  profileId: string,
+  returnId: string,
+  amount: number,
+) => {
+  console.log('succssfully issue refund', amount);
   const returnData = await Return.findOne({
     bussiness: profileId,
     _id: returnId,

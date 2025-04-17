@@ -31,6 +31,7 @@ const issueRefund = catchAsync(async (req, res) => {
   const result = await ReturnService.issueRefund(
     req.user.profileId,
     req.params.id,
+    req.body.amount,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
