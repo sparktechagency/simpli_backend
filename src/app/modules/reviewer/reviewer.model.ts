@@ -108,6 +108,16 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     bussinessFollowing: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' },
     ],
+
+    //
+    totalEarning: {
+      type: Number,
+      default: 0,
+    },
+    currentBalance: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );

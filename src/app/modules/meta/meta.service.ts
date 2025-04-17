@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import Bussiness from '../bussiness/bussiness.model';

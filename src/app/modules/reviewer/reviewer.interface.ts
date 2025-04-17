@@ -49,4 +49,8 @@ export interface IReviewer {
   followers: [Types.ObjectId];
   following: [Types.ObjectId];
   bussinessFollowing: [Types.ObjectId];
+
+  //
+  totalEarning: number;
+  currentBalance: number;
 }
