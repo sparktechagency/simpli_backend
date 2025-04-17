@@ -2,6 +2,8 @@ import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { IShippingAddress } from './shippingAddress.interface';
 import ShippingAddress from './shippingAddress.model';
+
+// crate shipping address
 const createShippingAddress = async (
   reviewerId: string,
   payload: IShippingAddress,

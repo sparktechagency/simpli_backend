@@ -17,6 +17,7 @@ const addBussinessInformation = catchAsync(async (req, res) => {
   });
 });
 
+// add bussiness documents
 const addBussinessDocument = catchAsync(async (req, res) => {
   const { files } = req;
   if (files && typeof files === 'object' && 'bussinessLicense' in files) {
@@ -43,6 +44,7 @@ const addBussinessDocument = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const updateBussinessInfo = catchAsync(async (req, res) => {
   const { files } = req;
   if (files && typeof files === 'object' && 'bussinessLicense' in files) {

@@ -21,4 +21,10 @@ router.get(
   ReturnController.getAllReturn,
 );
 
+router.patch(
+  '/issue-refund/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ReturnController.issueRefund,
+);
+
 export const returnRoutes = router;

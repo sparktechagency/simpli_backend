@@ -3,6 +3,7 @@ import config from '../config';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+
 const isStripeAccountReady = async (accountId: string): Promise<boolean> => {
   try {
     const account = await stripe.accounts.retrieve(accountId);

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import config from '../config';
-import stripe from '../utilities/stripe';
-import AppError from '../error/appError';
 import httpStatus from 'http-status';
+import config from '../config';
+import AppError from '../error/appError';
+import stripe from '../utilities/stripe';
 
 const onboardingRefresh = async (req: Request, res: Response) => {
   try {

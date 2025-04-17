@@ -27,10 +27,23 @@ const getAllReturn = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const issueRefund = catchAsync(async (req, res) => {
+  const result = await ReturnService.issueRefund(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Refund issued successfully',
+    data: result,
+  });
+});
 
 const ReturnController = {
   createReturn,
   getAllReturn,
+  issueRefund,
 };
 
 export default ReturnController;

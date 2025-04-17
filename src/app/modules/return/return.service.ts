@@ -1,4 +1,6 @@
+import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
 import { IReturn } from './return.interface';
 import Return from './return.model';
 
@@ -29,9 +31,21 @@ const getAllReturn = async (
   };
 };
 
+const issueRefund = async (profileId: string, returnId: string) => {
+  console.log('succssfully issue refund');
+  const returnData = await Return.findOne({
+    bussiness: profileId,
+    _id: returnId,
+  });
+  if (!returnData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Return not found');
+  }
+};
+
 const ReturnService = {
   createReturn,
   getAllReturn,
+  issueRefund,
 };
 
 export default ReturnService;
