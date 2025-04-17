@@ -11,7 +11,7 @@ export const ENUM_NOTIFICATION_TYPE = {
   PAYMENT: 'Payment',
   SHIPPING: 'Shipping',
   ANNOUNCEMENT: 'Announcement',
-  SYSTEM_UPDATE: 'System Update',
+  SYSTEM_UPDATE: 'SYSTEM_UPDATE',
   GENERAL: 'General',
   PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
 };
