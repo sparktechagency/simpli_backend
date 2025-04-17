@@ -113,20 +113,6 @@ export const ENUM_RECEIVER_TYPE = {
   BUSSINESS_OWNER: 'BussinessOwner',
 };
 
-export const ENUM_NOTIFICATION_TYPE = {
-  LIKE: 'Like',
-  COMMENT: 'Comment',
-  FOLLOW: 'Follow',
-  REPLY: 'Reply',
-  ORDER: 'Order',
-  REVIEW: 'Review',
-  PAYMENT: 'Payment',
-  SHIPPING: 'Shipping',
-  ANNOUNCEMENT: 'Announcement',
-  SYSTEM_UPDATE: 'System Update',
-  GENERAL: 'General',
-};
-
 export const ENUM_REF_TYPE = {
   BUSSINESS: 'Bussiness',
   REVIEWER: 'Reviewer',

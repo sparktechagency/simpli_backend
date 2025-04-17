@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
-import { ENUM_NOTIFICATION_TYPE, ENUM_SENDER_TYPE } from '../../utilities/enum';
+import { ENUM_SENDER_TYPE } from '../../utilities/enum';
+import { ENUM_NOTIFICATION_TYPE } from './notification.enum';
 
 export interface INotification {
   receiver: string;

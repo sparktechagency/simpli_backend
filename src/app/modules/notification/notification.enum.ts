@@ -1,0 +1,17 @@
+export const ENUM_NOTIFICATION_TYPE = {
+  LIKE: 'Like',
+  COMMENT: 'Comment',
+  FOLLOW: 'Follow',
+  REPLY: 'Reply',
+  ORDER: 'Order',
+  ORDER_SHIPPED: 'ORDER_SHIPPED',
+  REVIEW: 'Review',
+  REVIEW_REQUEST: 'REVIEW_REQUEST',
+  REVIEW_PRODUCT_SHIPPED: 'REVIEW_PRODUCT_SHIPPED',
+  PAYMENT: 'Payment',
+  SHIPPING: 'Shipping',
+  ANNOUNCEMENT: 'Announcement',
+  SYSTEM_UPDATE: 'System Update',
+  GENERAL: 'General',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+};
