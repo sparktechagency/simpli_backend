@@ -15,9 +15,22 @@ const createReturn = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllReturn = catchAsync(async (req, res) => {
+  const result = await ReturnService.getAllReturn(
+    req?.user?.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Return retrieved successfully',
+    data: result,
+  });
+});
 
 const ReturnController = {
   createReturn,
+  getAllReturn,
 };
 
 export default ReturnController;

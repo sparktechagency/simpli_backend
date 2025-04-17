@@ -15,4 +15,10 @@ router.post(
   ReturnController.createReturn,
 );
 
+router.get(
+  '/all-return',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  ReturnController.getAllReturn,
+);
+
 export const returnRoutes = router;
