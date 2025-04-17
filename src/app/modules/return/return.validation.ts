@@ -23,9 +23,6 @@ const returnValidationSchema = z.object({
     business: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
       message: 'Invalid business ID format',
     }),
-    reviewer: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-      message: 'Invalid reviewer ID format',
-    }),
     items: z.array(OrderItemZodSchema).nonempty('Items array cannot be empty'),
     orderId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
       message: 'Invalid order ID format',
