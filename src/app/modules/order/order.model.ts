@@ -6,7 +6,7 @@ import {
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
 
-const OrderItemSchema: Schema = new Schema<IOrderItem>({
+export const OrderItemSchema: Schema = new Schema<IOrderItem>({
   product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
   variant: { type: Schema.Types.ObjectId, ref: 'Variant', default: null },
   quantity: { type: Number, required: true, min: 1 },

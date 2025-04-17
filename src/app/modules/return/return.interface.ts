@@ -8,7 +8,9 @@ export interface IReturn {
   items: IOrderItem[];
   orderId: Types.ObjectId;
   transactionId: string;
-  totalReturnAmount: number;
+  totalReturnAmount?: number;
   returnMethod: (typeof ENUM_RETURN_METHOD)[keyof typeof ENUM_RETURN_METHOD];
   status: (typeof ENUM_RETURN_STATUS)[keyof typeof ENUM_RETURN_STATUS];
+  refundTransactionId?: string;
+  refundData?: Date;
 }

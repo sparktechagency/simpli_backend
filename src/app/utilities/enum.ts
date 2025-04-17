@@ -126,3 +126,10 @@ export const ENUM_NOTIFICATION_TYPE = {
   SYSTEM_UPDATE: 'System Update',
   GENERAL: 'General',
 };
+
+export const ENUM_REF_TYPE = {
+  BUSSINESS: 'Bussiness',
+  REVIEWER: 'Reviewer',
+  ORDER: 'Order',
+  RETURN: 'Return',
+};
