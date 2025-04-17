@@ -5,9 +5,9 @@ import { ENUM_REF_TYPE } from '../../utilities/enum';
 import { OrderItemSchema } from '../order/order.model';
 
 // Define the schema for IReturn model
-const returnSchema: Schema = new Schema(
+const returnSchema: Schema = new Schema<IReturn>(
   {
-    business: {
+    bussiness: {
       type: mongoose.Schema.Types.ObjectId,
       ref: ENUM_REF_TYPE.BUSSINESS,
       required: true,
@@ -47,6 +47,9 @@ const returnSchema: Schema = new Schema(
     refundDate: {
       type: Date,
       default: null,
+    },
+    returnReason: {
+      type: String,
     },
   },
   {

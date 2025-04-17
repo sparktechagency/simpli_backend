@@ -12,5 +12,6 @@ export interface IReturn {
   returnMethod: (typeof ENUM_RETURN_METHOD)[keyof typeof ENUM_RETURN_METHOD];
   status: (typeof ENUM_RETURN_STATUS)[keyof typeof ENUM_RETURN_STATUS];
   refundTransactionId?: string;
-  refundData?: Date;
+  refundDate?: Date;
+  returnReason: string;
 }
