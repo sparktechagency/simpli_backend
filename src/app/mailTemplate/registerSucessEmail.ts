@@ -103,11 +103,6 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
           <p>Thank you for registering with Template. To activate your account, please use the following activation code:</p>
             <div class="activation-code">${activationCode || 'XXXXXX'}</div>
             <p>Enter this code on the activation page within the next 10 minutes. If you don't your account will be deleted from the database and you will need to register again.</p>
-            <div class="button-container">
-              <a href="https://yourwebsite.com/activate" class="button">
-                <span class="activate-btn">Activate Now</span>
-              </a>
-            </div>
             <p>If you didn't register, ignore this email.</p>
             /* TODO: set client email here  */
           <p>If you have any questions, feel free to contact us at <a href="maniksarker265@gmail.com">maniksarker265@gmail.com</a>.</p>
