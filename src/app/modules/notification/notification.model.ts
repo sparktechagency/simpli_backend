@@ -9,16 +9,6 @@ const NotificationSchema = new Schema<INotification>(
       type: String,
       required: true,
     },
-    // receiver: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   refPath: 'userType',
-    // },
-    // receiverType: {
-    //   type: String,
-    //   enum: Object.values(ENUM_RECEIVER_TYPE),
-    //   required: true,
-    // },
     sender: {
       type: Schema.Types.ObjectId,
       refPath: 'senderType',
