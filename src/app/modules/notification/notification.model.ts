@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import { INotification } from './notification.interface';
-import { ENUM_NOTIFICATION_TYPE, ENUM_SENDER_TYPE } from '../../utilities/enum';
+import { ENUM_SENDER_TYPE } from '../../utilities/enum';
+import { ENUM_NOTIFICATION_TYPE } from './notification.enum';
 
 const NotificationSchema = new Schema<INotification>(
   {
