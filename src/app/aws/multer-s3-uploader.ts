@@ -44,6 +44,15 @@ export const uploadFile = () => {
       'project_ducument',
       'project_image',
       'institution_cover',
+      'variant_image',
+      'bussinessLicense',
+      'incorparationCertificate',
+      'coverImage',
+      'logo',
+      'video',
+      'review_video',
+      'review_image',
+      'comment_image',
     ];
 
     if (file.fieldname === undefined) {
@@ -131,6 +140,26 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/institution_cover';
       } else if (file.fieldname === 'project_image') {
         uploadPath = 'uploads/images/project_image';
+      } else if (file.fieldname === 'product_image') {
+        uploadPath = 'uploads/images/product_image';
+      } else if (file.fieldname === 'review_image') {
+        uploadPath = 'uploads/images/review_image';
+      } else if (file.fieldname === 'review_video') {
+        uploadPath = 'uploads/video/review_video';
+      } else if (file.fieldname === 'comment_image') {
+        uploadPath = 'uploads/images/comment_image';
+      } else if (file.fieldname.startsWith('variant_image')) {
+        uploadPath = 'uploads/images/variant_image';
+      } else if (file.fieldname === 'player_image') {
+        uploadPath = 'uploads/images/player_image';
+      } else if (file.fieldname === 'bussinessLicense') {
+        uploadPath = 'uploads/document/bussiness';
+      } else if (file.fieldname === 'incorparationCertificate') {
+        uploadPath = 'uploads/document/bussiness';
+      } else if (file.fieldname === 'logo') {
+        uploadPath = 'uploads/images/bussiness_logo';
+      } else if (file.fieldname === 'coverImage') {
+        uploadPath = 'uploads/images/bussinessCover';
       } else {
         uploadPath = 'uploads';
       }
@@ -177,6 +206,16 @@ export const uploadFile = () => {
     { name: 'project_ducument', maxCount: 1 },
     { name: 'project_image', maxCount: 1 },
     { name: 'institution_cover', maxCount: 1 },
+    { name: 'product_image', maxCount: 5 },
+    { name: 'variant_image', maxCount: 5 },
+    { name: 'bussinessLicense', maxCount: 1 },
+    { name: 'incorparationCertificate', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'logo', maxCount: 1 },
+    { name: 'review_video', maxCount: 1 },
+    { name: 'review_image', maxCount: 3 },
+    { name: 'thumbnail', maxCount: 1 },
+    { name: 'comment_image', maxCount: 1 },
   ]);
 
   return upload;
