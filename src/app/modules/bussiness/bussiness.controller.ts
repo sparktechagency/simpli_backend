@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import BussinessService from './bussiness.service';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const addBussinessInformation = catchAsync(async (req, res) => {
   const result = await BussinessService.addBussinessInformation(
@@ -19,17 +21,16 @@ const addBussinessInformation = catchAsync(async (req, res) => {
 
 // add bussiness documents
 const addBussinessDocument = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'bussinessLicense' in files) {
-    req.body.bussinessLicense = files['bussinessLicense'][0].path;
+  const bussinessLicenseFile: any = req.files?.bussinessLicense;
+  if (req.files?.bussinessLicense) {
+    req.body.bussinessLicense = getCloudFrontUrl(bussinessLicenseFile[0].key);
   }
-  if (
-    files &&
-    typeof files === 'object' &&
-    'incorparationCertificate' in files
-  ) {
-    req.body.incorparationCertificate =
-      files['incorparationCertificate'][0].path;
+
+  const incorparationCertificateFile: any = req.files?.bussinessLicense;
+  if (req.files?.incorparationCertificate) {
+    req.body.incorparationCertificate = getCloudFrontUrl(
+      incorparationCertificateFile[0].key,
+    );
   }
 
   const result = await BussinessService.addBussinessDocumentIntoDB(
@@ -46,23 +47,24 @@ const addBussinessDocument = catchAsync(async (req, res) => {
 });
 
 const updateBussinessInfo = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'bussinessLicense' in files) {
-    req.body.bussinessLicense = files['bussinessLicense'][0].path;
+  const bussinessLicenseFile: any = req.files?.bussinessLicense;
+  if (req.files?.bussinessLicense) {
+    req.body.bussinessLicense = getCloudFrontUrl(bussinessLicenseFile[0].key);
   }
-  if (
-    files &&
-    typeof files === 'object' &&
-    'incorparationCertificate' in files
-  ) {
-    req.body.incorparationCertificate =
-      files['incorparationCertificate'][0].path;
+
+  const incorparationCertificateFile: any = req.files?.bussinessLicense;
+  if (req.files?.incorparationCertificate) {
+    req.body.incorparationCertificate = getCloudFrontUrl(
+      incorparationCertificateFile[0].key,
+    );
   }
-  if (files && typeof files === 'object' && 'coverImage' in files) {
-    req.body.coverImage = files['coverImage'][0].path;
+  const coverImageFile: any = req.files?.coverImage;
+  if (req.files?.coverImage) {
+    req.body.coverImage = getCloudFrontUrl(coverImageFile[0].key);
   }
-  if (files && typeof files === 'object' && 'logo' in files) {
-    req.body.logo = files['logo'][0].path;
+  const logo: any = req.files?.logo;
+  if (req.files?.logo) {
+    req.body.logo = getCloudFrontUrl(logo[0].key);
   }
 
   const result = await BussinessService.updateBussinessInfoIntoDB(
