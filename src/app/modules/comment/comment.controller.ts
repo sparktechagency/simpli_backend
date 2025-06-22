@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import CommentService from './comment.service';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const getReviewComments = catchAsync(async (req, res) => {
   const result = await CommentService.getComments(
@@ -46,9 +48,9 @@ const getCommentLikers = catchAsync(async (req, res) => {
 
 // create comment
 const createComment = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'comment_image' in files) {
-    req.body.image = files['comment_image'][0].path;
+  const file: any = req.files?.comment_image;
+  if (req.files?.comment_image) {
+    req.body.image = getCloudFrontUrl(file[0].key);
   }
   const result = await CommentService.createComment(
     req.user.profileId,
@@ -62,9 +64,9 @@ const createComment = catchAsync(async (req, res) => {
   });
 });
 const createReply = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'comment_image' in files) {
-    req.body.image = files['comment_image'][0].path;
+  const file: any = req.files?.comment_image;
+  if (req.files?.comment_image) {
+    req.body.image = getCloudFrontUrl(file[0].key);
   }
   const result = await CommentService.createReply(req.user.profileId, req.body);
   sendResponse(res, {
@@ -99,9 +101,9 @@ const deleteComment = catchAsync(async (req, res) => {
   });
 });
 const updateComment = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'comment_image' in files) {
-    req.body.image = files['comment_image'][0].path;
+  const file: any = req.files?.comment_image;
+  if (req.files?.comment_image) {
+    req.body.image = getCloudFrontUrl(file[0].key);
   }
   const result = await CommentService.updateComment(
     req.user.profileId,

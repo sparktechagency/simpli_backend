@@ -4,6 +4,7 @@ import { USER_ROLE } from '../user/user.constant';
 import CommentController from './comment.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import CommentValidations from './comment.validation';
+import { uploadFile } from '../../aws/multer-s3-uploader';
 
 const router = express.Router();
 
