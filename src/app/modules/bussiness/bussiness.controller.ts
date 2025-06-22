@@ -47,25 +47,39 @@ const addBussinessDocument = catchAsync(async (req, res) => {
 });
 
 const updateBussinessInfo = catchAsync(async (req, res) => {
-  const bussinessLicenseFile: any = req.files?.bussinessLicense;
-  if (req.files?.bussinessLicense) {
-    req.body.bussinessLicense = getCloudFrontUrl(bussinessLicenseFile[0].key);
-  }
+  // const bussinessLicenseFile: any = req.files?.bussinessLicense;
+  // if (req.files?.bussinessLicense) {
+  //   req.body.bussinessLicense = getCloudFrontUrl(bussinessLicenseFile[0].key);
+  // }
 
-  const incorparationCertificateFile: any = req.files?.bussinessLicense;
-  if (req.files?.incorparationCertificate) {
-    req.body.incorparationCertificate = getCloudFrontUrl(
-      incorparationCertificateFile[0].key,
-    );
-  }
-  const coverImageFile: any = req.files?.coverImage;
-  if (req.files?.coverImage) {
-    req.body.coverImage = getCloudFrontUrl(coverImageFile[0].key);
-  }
-  const logo: any = req.files?.logo;
-  if (req.files?.logo) {
-    req.body.logo = getCloudFrontUrl(logo[0].key);
-  }
+  // const incorparationCertificateFile: any = req.files?.bussinessLicense;
+  // if (req.files?.incorparationCertificate) {
+  //   req.body.incorparationCertificate = getCloudFrontUrl(
+  //     incorparationCertificateFile[0].key,
+  //   );
+  // }
+  // const coverImageFile: any = req.files?.coverImage;
+  // if (req.files?.coverImage) {
+  //   req.body.coverImage = getCloudFrontUrl(coverImageFile[0].key);
+  // }
+  // const logo: any = req.files?.logo;
+  // if (req.files?.logo) {
+  //   req.body.logo = getCloudFrontUrl(logo[0].key);
+  // }
+
+  const fileFields = [
+    'bussinessLicense',
+    'incorparationCertificate',
+    'coverImage',
+    'logo',
+  ] as const;
+
+  fileFields.forEach((field) => {
+    const files: any = req.files?.[field];
+    if (files && files.length > 0) {
+      req.body[field] = getCloudFrontUrl(files[0].key);
+    }
+  });
 
   const result = await BussinessService.updateBussinessInfoIntoDB(
     req.user.profileId,
