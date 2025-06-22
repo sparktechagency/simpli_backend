@@ -135,6 +135,7 @@ const verifyCode = async (email: string, verifyCode: number) => {
 
   const jwtPayload = {
     id: user?._id,
+    profileId: user.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };

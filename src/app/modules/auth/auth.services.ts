@@ -43,6 +43,7 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
   }
   const jwtPayload = {
     id: user?._id,
+    profileId: user.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };
@@ -77,6 +78,7 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     if (isExistUser) {
       const jwtPayload = {
         id: isExistUser._id,
+        profileId: isExistUser.profileId,
         email: isExistUser.email,
         role: isExistUser.role as TUserRole,
       };
@@ -120,6 +122,7 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     // Create JWT tokens
     const jwtPayload = {
       id: createUser[0]._id,
+      profileId: createUser[0].profileId,
       email: createUser[0].email,
       role: createUser[0].role as TUserRole,
     };
@@ -221,6 +224,7 @@ const refreshToken = async (token: string) => {
   // }
   const jwtPayload = {
     id: user?._id,
+    profileId: user?.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };
@@ -373,6 +377,7 @@ const resetPassword = async (payload: {
   );
   const jwtPayload = {
     id: user?._id,
+    profileId: user?.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };
