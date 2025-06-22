@@ -46,7 +46,11 @@ const registerBussinessOwner = async (email: string, password: string) => {
       user: user[0]._id,
     };
     const result = await Bussiness.create([bussinessOwnerPayload], { session });
-
+    await User.findByIdAndUpdate(
+      user[0]._id,
+      { profileId: result[0]._id },
+      { session },
+    );
     sendEmail({
       email: email,
       subject: 'Activate Your Account',

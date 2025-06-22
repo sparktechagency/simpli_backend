@@ -38,7 +38,11 @@ const seedSuperAdmin = async () => {
       user: user[0]._id,
     };
     const result = await SuperAdmin.create([superAdminPayload], { session });
-
+    await User.findByIdAndUpdate(
+      user[0]._id,
+      { profileId: result[0]._id },
+      { session },
+    );
     await session.commitTransaction();
     session.endSession();
     console.log('Super Admin Created Successfully');

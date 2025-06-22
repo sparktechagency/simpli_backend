@@ -5,6 +5,10 @@ const CategorySchema: Schema = new Schema<ICategory>(
   {
     name: { type: String, required: true, unique: true },
     category_image: { type: String, required: true },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

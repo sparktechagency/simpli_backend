@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import categoryValidation from './category.validation';
 import categoryController from './category.controller';
-import { uploadFile } from '../../helper/fileUploader';
+import { uploadFile } from '../../aws/multer-s3-uploader';
 
 const router = express.Router();
 

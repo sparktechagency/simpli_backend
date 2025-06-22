@@ -5,6 +5,10 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new Schema<TUser>(
   {
+    profileId: {
+      type: String,
+      default: null,
+    },
     email: {
       type: String,
       required: true,
@@ -25,10 +29,9 @@ const userSchema = new Schema<TUser>(
       enum: ['bussinessOwner', 'reviewer', 'superAdmin'],
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['in-progress', 'blocked'],
-      default: 'in-progress',
+    isBlocked: {
+      type: Boolean,
+      default: false,
     },
     isActive: {
       type: Boolean,

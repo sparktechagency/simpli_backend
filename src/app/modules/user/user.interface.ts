@@ -4,12 +4,13 @@ import { USER_ROLE } from './user.constant';
 
 export interface TUser {
   _id: string;
+  profileId: string;
   email: string;
   phone: string;
   password: string;
   passwordChangedAt?: Date;
   role: 'bussinessOwner' | 'reviewer' | 'superAdmin';
-  status: 'in-progress' | 'blocked';
+  isBlocked: boolean;
   verifyCode: number;
   resetCode: number;
   isVerified: boolean;

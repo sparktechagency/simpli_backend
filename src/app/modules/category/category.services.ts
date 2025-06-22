@@ -1,6 +1,5 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
-import mongoose from 'mongoose';
 import { ICategory } from './category.interface';
 import Category from './category.model';
 
@@ -9,6 +8,7 @@ const createCategoryIntoDB = async (payload: ICategory) => {
   const result = await Category.create(payload);
   return result;
 };
+
 const updateCategoryIntoDB = async (
   id: string,
   payload: Partial<ICategory>,
@@ -17,11 +17,14 @@ const updateCategoryIntoDB = async (
     new: true,
     runValidators: true,
   });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'category not found');
+  }
   return result;
 };
 
 const getAllCategories = async () => {
-  const result = await Category.find();
+  const result = await Category.find({ isDeleted: false });
   return result;
 };
 
@@ -39,31 +42,12 @@ const deleteCategoryFromDB = async (categoryId: string) => {
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
   }
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const deletedCategory = await Category.findByIdAndDelete(categoryId, {
-      session,
-    });
-
-    if (!deletedCategory) {
-      throw new AppError(
-        httpStatus.NOT_FOUND,
-        'Category not found or does not belong to this shop',
-      );
-    }
-
-    await session.commitTransaction();
-    session.endSession();
-    return deletedCategory;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-
-    if (error instanceof mongoose.Error) {
-      throw new AppError(500, `Mongoose Error: ${error.message}`);
-    }
-  }
+  const result = await Category.findByIdAndUpdate(
+    categoryId,
+    { isDeleted: true },
+    { new: true, runValidators: true },
+  );
+  return result;
 };
 
 const categoryService = {
