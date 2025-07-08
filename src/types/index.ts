@@ -29,6 +29,7 @@ declare namespace Express {
       coverImage?: File[];
       logo?: File[];
       comment_image?: File[];
+      pictures?: File[];
     };
   }
 }

@@ -1,13 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ProductService from './product.service';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createProduct = catchAsync(async (req, res) => {
-  const result = await ProductService.createProductIntoDB(
+  if (req.files?.product_image) {
+    req.body.images = req.files.product_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
+  }
+
+  const result = await ProductService.createProduct(
     req.user.profileId,
     req.body,
-    req.files,
   );
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -17,23 +24,24 @@ const createProduct = catchAsync(async (req, res) => {
   });
 });
 
-const saveProductAsDraft = catchAsync(async (req, res) => {
-  const result = await ProductService.saveProductAsDraftIntoDB(
-    req.user.profileId,
-    req.body,
-    req.files,
-  );
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Product save as draft successfully',
-    data: result,
-  });
-});
+// const saveProductAsDraft = catchAsync(async (req, res) => {
+//   const result = await ProductService.saveProductAsDraftIntoDB(
+//     req.user.profileId,
+//     req.body,
+//     req.files,
+//   );
+//   sendResponse(res, {
+//     statusCode: httpStatus.CREATED,
+//     success: true,
+//     message: 'Product save as draft successfully',
+//     data: result,
+//   });
+// });
 const publishProductFromDraft = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'product_image' in files) {
-    const newImages = files['product_image'].map((file) => file.path);
+  if (req.files?.product_image) {
+    const newImages = req.files.product_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
     req.body.images.push(...newImages);
   }
   const result = await ProductService.publishProductFromDraft(
@@ -113,9 +121,9 @@ const getSingleProduct = catchAsync(async (req, res) => {
   });
 });
 const updateProduct = catchAsync(async (req, res) => {
-  const { files } = req;
+  const { files }: any = req;
   if (files && typeof files === 'object' && 'product_image' in files) {
-    const newImages = files['product_image'].map((file) => file.path);
+    const newImages = files['product_image'].map((file: any) => file.path);
     req.body.images.push(...newImages);
   }
   const result = await ProductService.updateProductIntoDB(
@@ -133,7 +141,7 @@ const updateProduct = catchAsync(async (req, res) => {
 
 const ProductController = {
   createProduct,
-  saveProductAsDraft,
+  // saveProductAsDraft,
   publishProductFromDraft,
   deleteSingleProduct,
   softDeleteSingleProduct,

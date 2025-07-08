@@ -11,100 +11,109 @@ import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 import Bookmark from '../bookmark/bookmark.mode';
 
 // create product into db
-const createProductIntoDB = async (
-  profileId: string,
-  payload: IProduct,
-  files: any,
-) => {
-  const category = await Category.findById(payload.category);
-  if (!category) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
-  }
+// const createProductIntoDB = async (
+//   profileId: string,
+//   payload: IProduct,
+//   files: any,
+// ) => {
+//   const category = await Category.findById(payload.category);
+//   if (!category) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+//   }
 
-  let productImages: string[] = [];
-  if (Array.isArray(files)) {
-    productImages = files
-      .filter((file: any) => file.fieldname === 'product_image')
-      .map((file: any) => file.path);
-  }
-  // variant images
-  const variantImagesMap: { [key: string]: string[] } = {};
-  if (Array.isArray(files)) {
-    files.forEach((file: any) => {
-      if (file.fieldname.startsWith('variant_image_')) {
-        const sku = file.fieldname.replace('variant_image_', '');
-        if (!variantImagesMap[sku]) {
-          variantImagesMap[sku] = [];
-        }
-        variantImagesMap[sku].push(file.path);
-      }
-    });
-  }
-  const result = await Product.create({
-    ...payload,
-    bussiness: profileId,
-    images: productImages,
-  });
+//   let productImages: string[] = [];
+//   if (Array.isArray(files)) {
+//     productImages = files
+//       .filter((file: any) => file.fieldname === 'product_image')
+//       .map((file: any) => file.path);
+//   }
+//   // variant images
+//   const variantImagesMap: { [key: string]: string[] } = {};
+//   if (Array.isArray(files)) {
+//     files.forEach((file: any) => {
+//       if (file.fieldname.startsWith('variant_image_')) {
+//         const sku = file.fieldname.replace('variant_image_', '');
+//         if (!variantImagesMap[sku]) {
+//           variantImagesMap[sku] = [];
+//         }
+//         variantImagesMap[sku].push(file.path);
+//       }
+//     });
+//   }
+//   const result = await Product.create({
+//     ...payload,
+//     bussiness: profileId,
+//     images: productImages,
+//   });
 
-  const updatedVariants = payload.variants.map((variant) => ({
-    ...variant,
-    images: variantImagesMap[variant.sku] || [],
-    product: result._id,
-    bussiness: profileId,
-  }));
+//   const updatedVariants = payload.variants.map((variant) => ({
+//     ...variant,
+//     images: variantImagesMap[variant.sku] || [],
+//     product: result._id,
+//     bussiness: profileId,
+//   }));
 
-  await Variant.insertMany(updatedVariants);
+//   await Variant.insertMany(updatedVariants);
 
-  return result;
-};
+//   return result;
+// };
 
 // save as drafh -----------------
 
-const saveProductAsDraftIntoDB = async (
-  profileId: string,
-  payload: IProduct,
-  files: any,
-) => {
+// const saveProductAsDraftIntoDB = async (
+//   profileId: string,
+//   payload: IProduct,
+//   files: any,
+// ) => {
+//   const category = await Category.findById(payload.category);
+//   if (!category) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+//   }
+
+//   let productImages: string[] = [];
+//   if (Array.isArray(files)) {
+//     productImages = files
+//       .filter((file: any) => file.fieldname === 'product_image')
+//       .map((file: any) => file.path);
+//   }
+//   // variant images
+//   const variantImagesMap: { [key: string]: string[] } = {};
+//   if (Array.isArray(files)) {
+//     files.forEach((file: any) => {
+//       if (file.fieldname.startsWith('variant_image_')) {
+//         const sku = file.fieldname.replace('variant_image_', '');
+//         if (!variantImagesMap[sku]) {
+//           variantImagesMap[sku] = [];
+//         }
+//         variantImagesMap[sku].push(file.path);
+//       }
+//     });
+//   }
+//   const result = await Product.create({
+//     ...payload,
+//     bussiness: profileId,
+//     images: productImages,
+//     status: ENUM_PRODUCT_STATUS.DRAFT,
+//   });
+
+//   const updatedVariants = payload.variants.map((variant) => ({
+//     ...variant,
+//     images: variantImagesMap[variant.sku] || [],
+//     product: result._id,
+//     bussiness: profileId,
+//   }));
+
+//   await Variant.insertMany(updatedVariants);
+
+//   return result;
+// };
+
+const createProduct = async (bussinessId: string, payload: IProduct) => {
   const category = await Category.findById(payload.category);
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
   }
-
-  let productImages: string[] = [];
-  if (Array.isArray(files)) {
-    productImages = files
-      .filter((file: any) => file.fieldname === 'product_image')
-      .map((file: any) => file.path);
-  }
-  // variant images
-  const variantImagesMap: { [key: string]: string[] } = {};
-  if (Array.isArray(files)) {
-    files.forEach((file: any) => {
-      if (file.fieldname.startsWith('variant_image_')) {
-        const sku = file.fieldname.replace('variant_image_', '');
-        if (!variantImagesMap[sku]) {
-          variantImagesMap[sku] = [];
-        }
-        variantImagesMap[sku].push(file.path);
-      }
-    });
-  }
-  const result = await Product.create({
-    ...payload,
-    bussiness: profileId,
-    images: productImages,
-    status: ENUM_PRODUCT_STATUS.DRAFT,
-  });
-
-  const updatedVariants = payload.variants.map((variant) => ({
-    ...variant,
-    images: variantImagesMap[variant.sku] || [],
-    product: result._id,
-    bussiness: profileId,
-  }));
-
-  await Variant.insertMany(updatedVariants);
-
+  const result = await Product.create({ ...payload, bussiness: bussinessId });
   return result;
 };
 
@@ -249,8 +258,9 @@ const updateProductIntoDB = async (
 };
 
 const ProductService = {
-  createProductIntoDB,
-  saveProductAsDraftIntoDB,
+  createProduct,
+  // createProductIntoDB,
+  // saveProductAsDraftIntoDB,
   publishProductFromDraft,
   deleteSingleProduct,
   softDeleteSingleProduct,
