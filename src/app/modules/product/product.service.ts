@@ -237,6 +237,12 @@ const updateProductIntoDB = async (
   productId: string,
   payload: Partial<IProduct>,
 ) => {
+  if (payload.category) {
+    const category = await Category.exists({ _id: payload.category });
+    if (!category) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+    }
+  }
   const product: any = await Product.findOne({
     bussiness: bussinessId,
     _id: productId,
