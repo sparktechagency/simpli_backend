@@ -28,8 +28,10 @@ declare namespace Express {
       bussinessLicense?: File[];
       coverImage?: File[];
       logo?: File[];
-      comment_image?: File[];
-      pictures?: File[];
+      variant_image?: File[];
+      review_image?: File[];
+      review_video?: File[];
+      thumbnail?: File[];
     };
   }
 }

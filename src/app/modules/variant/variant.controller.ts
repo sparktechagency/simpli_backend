@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import VariantService from './variant.service';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createVariant = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'variant_image' in files) {
-    req.body.images = files['variant_image'].map((file) => file.path);
+  if (req.files?.variant_image) {
+    req.body.images = req.files.variant_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
   }
   const result = await VariantService.createVariantIntoDB(
     req.user.profileId,
@@ -22,10 +25,10 @@ const createVariant = catchAsync(async (req, res) => {
 
 // update variant
 const updateVariant = catchAsync(async (req, res) => {
-  const { files } = req;
-  if (files && typeof files === 'object' && 'variant_image' in files) {
-    const newImages = files['variant_image'].map((file) => file.path);
-    req.body.images.push(...newImages);
+  if (req.files?.variant_image) {
+    req.body.newImages = req.files.variant_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
   }
   const result = await VariantService.updateVariantIntoDB(
     req.user.profileId,

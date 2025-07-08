@@ -1,23 +1,28 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ReviewService from './review.service';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createReview = catchAsync(async (req, res) => {
-  // TOOD: need to upload in aws s3
-  const { files } = req;
-  if (files && typeof files === 'object' && 'review_image' in files) {
-    const newImages = files['review_image'].map((file) => file.path);
-    req.body.images = newImages;
+  if (req.files?.review_image) {
+    req.body.images = req.files.review_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
   }
 
-  if (files && typeof files === 'object' && 'review_video' in files) {
-    req.body.video = files['review_video'][0].path;
-  }
-  if (files && typeof files === 'object' && 'thumbnail' in files) {
-    req.body.thumbnail = files['thumbnail'][0].path;
+  const videoFile: any = req.files?.review_video;
+  if (req.files?.review_video) {
+    req.body.video = getCloudFrontUrl(videoFile[0].key);
   }
 
+  const thumnail: any = req.files?.thumbnail;
+  if (req.files?.thumbnail) {
+    req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
+  }
   const result = await ReviewService.createReview(req.user.profileId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

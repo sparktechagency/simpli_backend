@@ -10,4 +10,6 @@ export interface IVariant {
   price: number;
   stock: number;
   images?: string[];
+  newImages?: string[];
+  deletedImages?: string[];
 }
