@@ -26,11 +26,11 @@ export const createProductValidationSchema = z.object({
       .min(1, 'Category ID is required'),
     brand: z.string().optional(),
     status: ProductStatusSchema.default(ENUM_PRODUCT_STATUS.ACTIVE),
-    variants: z
-      .array(createVariantValidationSchema, {
-        required_error: 'At least one variant is required',
-      })
-      .min(1, 'At least one variant is required'),
+    // variants: z
+    //   .array(createVariantValidationSchema, {
+    //     required_error: 'At least one variant is required',
+    //   })
+    //   .min(1, 'At least one variant is required'),
     tags: z.array(z.string().min(1)).optional(),
   }),
 });

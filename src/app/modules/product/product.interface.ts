@@ -22,6 +22,9 @@ export interface IProduct {
   variants: IVariant[];
   images?: string[];
   tags?: string[];
+  isDeleted: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  newImages?: string[];
+  deletedImages?: string[];
 }

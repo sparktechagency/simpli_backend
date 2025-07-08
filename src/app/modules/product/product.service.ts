@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
-import Variant from '../variant/variant.model';
 import { IProduct } from './product.interface';
 import Product from './product.model';
-import unlinkFile from '../../helper/unLinkFile';
 import Category from '../category/category.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 import Bookmark from '../bookmark/bookmark.mode';
+import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 
 // create product into db
 // const createProductIntoDB = async (
@@ -130,13 +129,7 @@ const publishProductFromDraft = async (
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
-  const variant = await Variant.findOne({ product: product._id });
-  if (!variant) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You need to add minimum one variant for that product',
-    );
-  }
+
   payload.status = ENUM_PRODUCT_STATUS.ACTIVE;
   const result = await Product.findByIdAndUpdate(id, payload, {
     new: true,
@@ -146,35 +139,36 @@ const publishProductFromDraft = async (
   //TODO: if you want to uplaod images in cloud then need to change here
   if (product.images && product.images?.length > 0) {
     for (const imageUrl of product.images) {
-      if (!payload.images?.includes(imageUrl)) {
-        unlinkFile(imageUrl);
-      }
+      deleteFileFromS3(imageUrl);
     }
   }
   return result;
 };
 
 const deleteSingleProduct = async (profileId: string, id: string) => {
-  const product = await Product.findOne({ bussiness: profileId, _id: id });
+  const product = await Product.findOneAndUpdate(
+    { bussiness: profileId, _id: id },
+    { isDeleted: true },
+    { new: true, runValidators: true },
+  );
+
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
-  const result = await Product.findByIdAndDelete(id);
-  return result;
+  return product;
 };
 const softDeleteSingleProduct = async (profileId: string, id: string) => {
-  const product = await Product.findOne({ bussiness: profileId, _id: id });
-  if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  }
-
-  const result = await Product.findByIdAndUpdate(
-    id,
+  const product = await Product.findOneAndUpdate(
+    { bussiness: profileId, _id: id },
     { status: ENUM_PRODUCT_STATUS.ARCHIVED },
     { new: true, runValidators: true },
   );
-  return result;
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  return product;
 };
 // change product status -------------
 
@@ -243,17 +237,34 @@ const updateProductIntoDB = async (
   productId: string,
   payload: Partial<IProduct>,
 ) => {
-  const product = await Product.findOne({
+  const product: any = await Product.findOne({
     bussiness: bussinessId,
     _id: productId,
   });
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
+
+  if (payload.newImages) {
+    payload.images = [...payload.newImages, ...product.images];
+  } else {
+    payload.images = [...product.images];
+  }
+  if (payload?.deletedImages) {
+    payload.images = payload.images.filter(
+      (url) => !payload?.deletedImages?.includes(url),
+    );
+  }
+
   const result = await Product.findByIdAndUpdate(productId, payload, {
     new: true,
     runValidators: true,
   });
+
+  if (payload.deletedImages?.length) {
+    await Promise.all(payload.deletedImages.map(deleteFileFromS3));
+  }
+
   return result;
 };
 

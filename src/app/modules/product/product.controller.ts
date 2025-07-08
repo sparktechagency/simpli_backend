@@ -121,10 +121,10 @@ const getSingleProduct = catchAsync(async (req, res) => {
   });
 });
 const updateProduct = catchAsync(async (req, res) => {
-  const { files }: any = req;
-  if (files && typeof files === 'object' && 'product_image' in files) {
-    const newImages = files['product_image'].map((file: any) => file.path);
-    req.body.images.push(...newImages);
+  if (req.files?.product_image) {
+    req.body.newImages = req.files.product_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
   }
   const result = await ProductService.updateProductIntoDB(
     req.user.profileId,
