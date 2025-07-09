@@ -1,10 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
-import { uploadFile } from '../../helper/fileUploader';
 import validateRequest from '../../middlewares/validateRequest';
 import VariantValidations from './variant.validation';
 import VariantController from './variant.controller';
+import { uploadFile } from '../../aws/multer-s3-uploader';
 
 const router = express.Router();
 
