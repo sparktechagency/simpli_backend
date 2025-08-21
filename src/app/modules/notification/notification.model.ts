@@ -22,7 +22,7 @@ const NotificationSchema = new Schema<INotification>(
     type: {
       type: String,
       enum: Object.values(ENUM_NOTIFICATION_TYPE),
-      required: true,
+      required: true, 
     },
     message: { type: String, required: true },
     data: {
