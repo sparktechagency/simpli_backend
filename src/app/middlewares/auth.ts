@@ -1,24 +1,34 @@
 /* eslint-disable no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-import catchAsync from '../utilities/catchasync';
-import AppError from '../error/appError';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
+import AppError from '../error/appError';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
+import catchAsync from '../utilities/catchasync';
 
 // make costume interface
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check if the token is sent from client -----
+    // let token = req?.headers?.authorization;
+    // if (!token) {
+    //   throw new AppError(httpStatus.UNAUTHORIZED, 'Your are not authorized 1');
+    // }
+    // if (token.startsWith('Bearer ')) {
+    //   token = token.slice(7);
+    // }
     let token = req?.headers?.authorization;
+
     if (!token) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'Your are not authorized 1');
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
     }
+
+    // 2️⃣ Remove "Bearer " prefix if exists
     if (token.startsWith('Bearer ')) {
-      token = token.slice(7);
+      token = token.slice(7, token.length);
     }
     let decoded;
 

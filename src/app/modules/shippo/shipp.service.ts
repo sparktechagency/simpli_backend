@@ -108,6 +108,7 @@ const getShippingOptions = async (
   //     parcels: [parcel3],
   //     async: false,
   //   });
+
   const shipment = await shippo.shipments.create({
     addressFrom: addressFrom,
     addressTo: addressTo,

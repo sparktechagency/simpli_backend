@@ -32,6 +32,7 @@ declare namespace Express {
       review_image?: File[];
       review_video?: File[];
       thumbnail?: File[];
+      comment_image?: File[];
     };
   }
 }

@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { Types } from 'mongoose';
+import { z } from 'zod';
 
 // Helper function to validate MongoDB ObjectId
 const ObjectIdSchema = (fieldName: string) =>
@@ -9,12 +9,10 @@ const ObjectIdSchema = (fieldName: string) =>
     .refine((val) => Types.ObjectId.isValid(val), {
       message: `${fieldName} must be a valid ObjectId`,
     });
+
 const reviewValidationSchema = z.object({
   body: z.object({
     campaignOfferId: ObjectIdSchema('Campaign Offer ID'),
-    // product: ObjectIdSchema('Product ID'),
-    // business: ObjectIdSchema('Business ID'),
-    // category: ObjectIdSchema('Category id'),
     description: z.string({ required_error: 'Description is required' }),
     rating: z
       .number({

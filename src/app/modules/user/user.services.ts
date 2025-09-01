@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 
-import { User } from './user.model';
-import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
-import { TUser, TUserRole } from './user.interface';
-import { USER_ROLE } from './user.constant';
-import NormalUser from '../normalUser/normalUser.model';
-import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import cron from 'node-cron';
+import config from '../../config';
+import AppError from '../../error/appError';
+import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import sendEmail from '../../utilities/sendEmail';
 import Bussiness from '../bussiness/bussiness.model';
-import { createToken } from './user.utils';
-import config from '../../config';
-import Reviewer from '../reviewer/reviewer.model';
+import NormalUser from '../normalUser/normalUser.model';
 import { NotificationSetting } from '../notificationSetting/notificationSetting.model';
+import Reviewer from '../reviewer/reviewer.model';
+import { USER_ROLE } from './user.constant';
+import { TUser, TUserRole } from './user.interface';
+import { User } from './user.model';
+import { createToken } from './user.utils';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -98,6 +98,10 @@ const registerReviewer = async (payload: any) => {
       user: user[0]._id,
     };
     const result = await Reviewer.create([reviewerPayload], { session });
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to registered');
+    }
+    await User.findByIdAndUpdate(user[0]._id, { profileId: result[0]._id });
     // ! TODO: need to upgrade the email template
     sendEmail({
       email: payload.email,

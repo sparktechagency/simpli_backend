@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
-import Review from './reviewer.model';
-import mongoose, { Types } from 'mongoose';
-
 import { CAMPAIGN_STATUS } from '../../utilities/enum';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Comment from '../comment/comment.model';
 import Reviewer from '../reviewer/reviewer.model';
+import Review from './reviewer.model';
 
 const createReview = async (reviewerId: string, payload: any) => {
   const campaignOffer = await CampaignOffer.findById(payload.campaignOfferId)
@@ -33,7 +32,8 @@ const createReview = async (reviewerId: string, payload: any) => {
       'This campaign not active right now',
     );
   }
-  // TODO: when create review
+
+  // TODO: when create review---------------
   const result = await Review.create({
     ...payload,
     reviewer: reviewerId,
@@ -46,6 +46,7 @@ const createReview = async (reviewerId: string, payload: any) => {
   return result;
 };
 
+//----------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 const getAllReviewFromDB = async (
   reviewerId: string,
   query: Record<string, unknown>,
@@ -93,7 +94,7 @@ const getAllReviewFromDB = async (
   };
 };
 
-// get my revies
+// get my revies--------------------->>>>>
 const getMyReviews = async (
   reviewerId: string,
   query: Record<string, unknown>,
@@ -135,7 +136,7 @@ const getMyReviews = async (
   };
 };
 
-// get all liker-----------
+// get all liker--------------------->>>>>>>>>>
 const getReviewLikers = async (
   reviewId: string,
   query: Record<string, unknown>,
@@ -191,7 +192,7 @@ const likeUnlikeReview = async (reviewId: string, userId: string) => {
   }
 };
 
-// get single product review
+// get single product review-----
 
 const getSingleProductReview = async (
   productId: string,
@@ -229,105 +230,6 @@ const getSingleProductReview = async (
     averageRating,
   };
 };
-
-// const getSingleProductReview = async (
-//   productId: string,
-//   query: Record<string, any>,
-// ) => {
-//   const productObjectId = new mongoose.Types.ObjectId(productId);
-
-//   const search = query.search ? query.search.toString() : null;
-//   const filter = query.filter ? JSON.parse(query.filter) : {};
-//   const sort = query.sort ? JSON.parse(query.sort) : { createdAt: -1 };
-//   const page = parseInt(query.page, 10) || 1;
-//   const limit = Math.min(parseInt(query.limit, 10) || 10, 50);
-//   const fields = query.fields
-//     ? query.fields.split(',').map((f: string) => f.trim())
-//     : [];
-
-//   const matchStage: Record<string, any> = { product: productObjectId };
-
-//   if (search) {
-//     matchStage['description'] = { $regex: search, $options: 'i' };
-//   }
-
-//   Object.assign(matchStage, filter);
-
-//   // Projection to select only required fields
-//   const projection: Record<string, number> = {
-//     reviewer: 1,
-//     createdAt: 1,
-//     rating: 1,
-//     description: 1,
-//   };
-
-//   if (fields.length > 0) {
-//     fields.forEach((field: string) => {
-//       projection[field] = 1;
-//     });
-//   }
-
-//   const pipeline = [
-//     { $match: matchStage },
-
-//     {
-//       $lookup: {
-//         from: 'reviewer',
-//         localField: 'reviewer',
-//         foreignField: '_id',
-//         pipeline: [
-//           {
-//             $project: {
-//               profile_image: 1,
-//               name: 1,
-//             },
-//           },
-//         ],
-//         as: 'reviewer',
-//       },
-//     },
-//     { $unwind: { path: '$reviewer', preserveNullAndEmptyArrays: true } },
-
-//     {
-//       $project: {
-//         'reviewer.profile_image': 1,
-//         'reviewer.name': 1,
-//         createdAt: 1,
-//         rating: 1,
-//         description: 1,
-//       },
-//     },
-
-//     { $sort: sort },
-
-//     { $skip: (page - 1) * limit },
-//     { $limit: limit },
-
-//     {
-//       $group: {
-//         _id: null,
-//         reviews: { $push: '$$ROOT' },
-//         total: { $sum: 1 },
-//         averageRating: { $avg: '$rating' },
-//       },
-//     },
-//     {
-//       $project: {
-//         result: '$reviews',
-//         meta: '$total',
-//         averageRating: { $ifNull: ['$averageRating', 0] },
-//       },
-//     },
-//   ];
-
-//   const [result] = await Review.aggregate(pipeline);
-
-//   return {
-//     meta: result?.meta || 0,
-//     result: result?.result || [],
-//     averageRating: result?.averageRating || 0,
-//   };
-// };
 
 const ReviewService = {
   createReview,

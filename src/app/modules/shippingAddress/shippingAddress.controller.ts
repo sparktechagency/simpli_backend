@@ -4,6 +4,7 @@ import sendResponse from '../../utilities/sendResponse';
 import ShippingAddressService from './shippingAddress.service';
 
 const createShippingAddress = catchAsync(async (req, res) => {
+  console.log('user', req.user);
   const result = await ShippingAddressService.createShippingAddress(
     req.user.profileId,
     req.body,

@@ -15,6 +15,7 @@ const registerUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const registerReviewer = catchAsync(async (req, res) => {
   const result = await userServices.registerReviewer(req.body);
   sendResponse(res, {
@@ -24,6 +25,7 @@ const registerReviewer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const verifyCode = catchAsync(async (req, res) => {
   const result = await userServices.verifyCode(
     req?.body?.email,
@@ -36,6 +38,7 @@ const verifyCode = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const resendVerifyCode = catchAsync(async (req, res) => {
   const result = await userServices.resendVerifyCode(req?.body?.email);
   sendResponse(res, {

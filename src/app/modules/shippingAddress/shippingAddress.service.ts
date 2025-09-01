@@ -8,6 +8,7 @@ const createShippingAddress = async (
   reviewerId: string,
   payload: IShippingAddress,
 ) => {
+  console.log('ncie', reviewerId);
   const result = await ShippingAddress.create({
     ...payload,
     reviewer: reviewerId,
