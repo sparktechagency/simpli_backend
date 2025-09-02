@@ -1,11 +1,11 @@
-  import { Types } from 'mongoose';
+import { Types } from 'mongoose';
 
-  export interface IComment {
-    _id?: Types.ObjectId;
-    reviewId: Types.ObjectId;
-    userId: Types.ObjectId;
-    text: string;
-    image: string;
-    likers: Types.ObjectId[];
-    parentCommentId: Types.ObjectId;
-  }
+export interface IComment {
+  _id?: Types.ObjectId;
+  review: Types.ObjectId;
+  commentor: Types.ObjectId;
+  text: string;
+  image: string;
+  likers: Types.ObjectId[];
+  parent: Types.ObjectId;
+}

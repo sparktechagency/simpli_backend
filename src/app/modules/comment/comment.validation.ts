@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { Types } from 'mongoose';
+import { z } from 'zod';
 
 const ObjectIdSchema = (fieldName: string) =>
   z
@@ -11,7 +11,7 @@ const ObjectIdSchema = (fieldName: string) =>
 
 const createCommentSchema = z.object({
   body: z.object({
-    reviewId: ObjectIdSchema('Review Id'),
+    institutionConversation: ObjectIdSchema('Institution conversation  id'),
     text: z
       .string()
       .trim()
@@ -32,7 +32,7 @@ const updateCommentValidationSchema = z.object({
 
 const createReplySchema = z.object({
   body: z.object({
-    parentCommentId: ObjectIdSchema('Parent comment id'),
+    parent: ObjectIdSchema('Parent comment id'),
     text: z
       .string()
       .trim()

@@ -1,32 +1,16 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { uploadFile } from '../../helper/mutler-s3-uploader';
 import auth from '../../middlewares/auth';
-import { USER_ROLE } from '../user/user.constant';
-import CommentController from './comment.controller';
 import validateRequest from '../../middlewares/validateRequest';
-import CommentValidations from './comment.validation';
-import { uploadFile } from '../../aws/multer-s3-uploader';
+import { USER_ROLE } from '../user/user.constant';
+import commentController from './comment.controller';
+import commentValidations from './comment.validation';
 
 const router = express.Router();
 
-router.get(
-  '/get-review-comments/:id',
-  auth(USER_ROLE.reviewer),
-  CommentController.getReviewComments,
-);
-router.get(
-  '/get-comment-replies/:id',
-  auth(USER_ROLE.reviewer),
-  CommentController.getCommentReplies,
-);
-router.get(
-  '/get-comment-likers/:id',
-  auth(USER_ROLE.reviewer),
-  CommentController.getCommentLikers,
-);
-
 router.post(
-  '/create-comment',
-  auth(USER_ROLE.reviewer),
+  '/create',
+  auth(USER_ROLE.user),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -34,12 +18,12 @@ router.post(
     }
     next();
   },
-  validateRequest(CommentValidations.createCommentSchema),
-  CommentController.createComment,
+  validateRequest(commentValidations.createCommentSchema),
+  commentController.createComment,
 );
 router.post(
   '/create-reply',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.user),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -47,19 +31,12 @@ router.post(
     }
     next();
   },
-  validateRequest(CommentValidations.createReplySchema),
-  CommentController.createReply,
+  validateRequest(commentValidations.createReplySchema),
+  commentController.createReply,
 );
-
-router.delete(
-  '/delete-comment/:id',
-  auth(USER_ROLE.reviewer),
-  CommentController.deleteComment,
-);
-
 router.patch(
   '/update-comment/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.user),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -67,25 +44,37 @@ router.patch(
     }
     next();
   },
-  validateRequest(CommentValidations.updateCommentValidationSchema),
-  CommentController.updateComment,
+  validateRequest(commentValidations.updateCommentValidationSchema),
+  commentController.updateComment,
 );
-router.patch(
+router.delete(
+  '/delete-comment/:id',
+  auth(USER_ROLE.user),
+
+  commentController.deleteComment,
+);
+
+router.post(
   '/like-unlike/:id',
-  auth(USER_ROLE.reviewer),
-  CommentController.likeUnlikeReview,
+  auth(USER_ROLE.user),
+  commentController.likeUnlikeComment,
 );
 
 router.get(
-  '/get-my-comments',
-  auth(USER_ROLE.reviewer),
-  CommentController.getMyComments,
+  '/get-conversation-comments/:id',
+  auth(USER_ROLE.user),
+  commentController.getPodcastComments,
 );
 
 router.get(
-  '/get-my-likes',
-  auth(USER_ROLE.reviewer),
-  CommentController.getMyLikes,
+  '/get-replies/:id',
+  auth(USER_ROLE.user),
+  commentController.getReplies,
+);
+router.get(
+  '/get-likers/:id',
+  auth(USER_ROLE.user),
+  commentController.getAllLikersForComment,
 );
 
 export const commentRoutes = router;

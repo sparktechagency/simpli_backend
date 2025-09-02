@@ -3,20 +3,20 @@ import { IComment } from './comment.interface';
 
 const commentSchema = new mongoose.Schema<IComment>(
   {
-    reviewId: {
+    review: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Review',
       required: true,
     },
-    userId: {
+    commentor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Reviewer',
+      ref: 'NormalUser',
       required: true,
     },
     text: { type: String, required: true },
     image: { type: String, default: '' },
-    likers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
-    parentCommentId: {
+    likers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'NormalUser' }],
+    parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Comment',
       default: null,
