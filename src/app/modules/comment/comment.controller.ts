@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import commentServices from './comment.service';

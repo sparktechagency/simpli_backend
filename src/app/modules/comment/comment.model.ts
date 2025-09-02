@@ -10,7 +10,7 @@ const commentSchema = new mongoose.Schema<IComment>(
     },
     commentor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'NormalUser',
+      ref: 'Reviewer',
       required: true,
     },
     text: { type: String, required: true },

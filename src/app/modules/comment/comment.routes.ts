@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { uploadFile } from '../../helper/mutler-s3-uploader';
+import { uploadFile } from '../../aws/multer-s3-uploader';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   '/create',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -23,7 +23,7 @@ router.post(
 );
 router.post(
   '/create-reply',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -36,7 +36,7 @@ router.post(
 );
 router.patch(
   '/update-comment/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -49,31 +49,31 @@ router.patch(
 );
 router.delete(
   '/delete-comment/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
 
   commentController.deleteComment,
 );
 
 router.post(
   '/like-unlike/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   commentController.likeUnlikeComment,
 );
 
 router.get(
   '/get-conversation-comments/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   commentController.getPodcastComments,
 );
 
 router.get(
   '/get-replies/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   commentController.getReplies,
 );
 router.get(
   '/get-likers/:id',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.reviewer),
   commentController.getAllLikersForComment,
 );
 
