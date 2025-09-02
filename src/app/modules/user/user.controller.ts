@@ -48,17 +48,13 @@ const resendVerifyCode = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 const changeUserStatus = catchAsync(async (req, res) => {
-  const result = await userServices.changeUserStatus(
-    req.params.id,
-    req.body.status,
-  );
+  const result = await userServices.changeUserStatus(req.params.id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: `User is ${result?.status}`,
+    message: `User is ${result?.isBlocked ? 'Blocked' : 'Unblocked'}`,
     data: result,
   });
 });

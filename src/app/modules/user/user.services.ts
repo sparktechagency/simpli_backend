@@ -221,19 +221,19 @@ cron.schedule('*/2 * * * *', async () => {
   }
 });
 
-const changeUserStatus = async (id: string, status: string) => {
+const changeUserStatus = async (id: string) => {
   const user = await User.findById(id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
+
   const result = await User.findByIdAndUpdate(
     id,
-    { status: status },
+    { isBlocked: !user.isBlocked },
     { new: true, runValidators: true },
   );
   return result;
 };
-
 const userServices = {
   registerBussinessOwner,
   registerReviewer,
