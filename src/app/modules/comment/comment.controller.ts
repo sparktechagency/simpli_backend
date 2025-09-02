@@ -74,7 +74,7 @@ const likeUnlikeComment = catchAsync(async (req, res) => {
   });
 });
 const getPodcastComments = catchAsync(async (req, res) => {
-  const result = await commentServices.getInstitutionConversationComments(
+  const result = await commentServices.getReviewComments(
     req.user.profileId,
     req.params.id,
     req.query,
@@ -82,7 +82,7 @@ const getPodcastComments = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Podcast Comment retrieved  successfully',
+    message: 'Comment retrieved  successfully',
     data: result,
   });
 });

@@ -26,7 +26,7 @@ const createReply = async (user: JwtPayload, payload: IComment) => {
     ...payload,
     commentor: user.profileId,
     likers: [],
-    institutionConversation: comment.institutionConversation,
+    review: comment.review,
   };
   const result = await Comment.create(replyData);
   return result;
@@ -98,9 +98,9 @@ const likeUnlikeComment = async (commentId: string, user: JwtPayload) => {
   };
 };
 
-const getInstitutionConversationComments = async (
+const getReviewComments = async (
   profileId: string,
-  institutionConversation: string,
+  review: string,
   query: Record<string, any>,
 ) => {
   const page = parseInt(query.page as string) || 1;
@@ -110,9 +110,7 @@ const getInstitutionConversationComments = async (
   const comments = await Comment.aggregate([
     {
       $match: {
-        institutionConversation: new mongoose.Types.ObjectId(
-          institutionConversation,
-        ),
+        review: new mongoose.Types.ObjectId(review),
         parent: null,
       },
     },
@@ -302,7 +300,7 @@ const CommentServices = {
   updateComment,
   deleteComment,
   likeUnlikeComment,
-  getInstitutionConversationComments,
+  getReviewComments,
   getReplies,
   getAllLikersForComment,
 };
