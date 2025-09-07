@@ -4,7 +4,11 @@ import { IProduct } from './product.interface';
 
 const ProductSchema = new Schema<IProduct>(
   {
-    bussiness: { type: Schema.Types.ObjectId, ref: 'Business', required: true },
+    bussiness: {
+      type: Schema.Types.ObjectId,
+      ref: 'Bussiness',
+      required: true,
+    },
     name: { type: String, required: true },
     description: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },

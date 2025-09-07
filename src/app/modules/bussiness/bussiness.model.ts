@@ -9,8 +9,13 @@ const BussinessSchema = new Schema<IBussiness>(
       required: true,
       ref: 'User',
     },
+    bio: {
+      type: String,
+      default: '',
+    },
     bussinessName: {
       type: String,
+      default: '',
     },
     email: {
       type: String,
@@ -34,6 +39,7 @@ const BussinessSchema = new Schema<IBussiness>(
     },
     phoneNumber: {
       type: String,
+      default: '',
     },
     website: {
       type: String,
@@ -44,9 +50,11 @@ const BussinessSchema = new Schema<IBussiness>(
     },
     logo: {
       type: String,
+      default: '',
     },
     coverImage: {
       type: String,
+      default: '',
     },
     facebook: {
       type: String,

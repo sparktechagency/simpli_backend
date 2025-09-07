@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
 import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
@@ -221,15 +222,88 @@ const getAllProduct = async (
   };
 };
 
+// const getSingleProductFromDB = async (id: string) => {
+//   const result = await Product.findById(id)
+//     .populate({
+//       path: 'bussiness',
+//       select: 'bussinessName coverImage logo phoneNumber',
+//     })
+//     .populate({ path: 'category' });
+//   if (!result) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+//   }
+
+//   return result;
+// };
+
 const getSingleProductFromDB = async (id: string) => {
-  const result = await Product.findById(id);
-  if (!result) {
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  const result = await Product.aggregate([
+    { $match: { _id: objectId, isDeleted: false } },
+
+    // Lookup business (only selected fields)
+    {
+      $lookup: {
+        from: 'bussinesses',
+        localField: 'bussiness',
+        foreignField: '_id',
+        as: 'bussiness',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              bussinessName: 1,
+              coverImage: 1,
+              logo: 1,
+              phoneNumber: 1,
+            },
+          },
+        ],
+      },
+    },
+    { $unwind: { path: '$bussiness', preserveNullAndEmptyArrays: true } },
+
+    // Lookup category
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+
+    // Lookup reviews and calculate avg rating
+    {
+      $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'product',
+        as: 'reviews',
+      },
+    },
+    {
+      $addFields: {
+        avgRating: {
+          $ifNull: [{ $avg: '$reviews.rating' }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        reviews: 0, // exclude reviews array
+      },
+    },
+  ]);
+
+  if (!result.length) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
-  return result;
+  return result[0];
 };
-
 // update product
 
 const updateProductIntoDB = async (

@@ -4,6 +4,7 @@ import { bussinessType, industryType } from './bussiness.constant';
 export interface IBussiness {
   user: Types.ObjectId;
   bussinessName: string;
+  bio: string;
   email: string;
   tradeName: string;
   bussinessType: (typeof bussinessType)[keyof typeof bussinessType];
