@@ -7,6 +7,7 @@ export interface IVariant {
   color?: string;
   sizes?: string[];
   weight?: string;
+  height?: string;
   price: number;
   stock: number;
   images?: string[];
