@@ -1,9 +1,11 @@
 import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import ProductBookmark from './bookmark.mode';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
 import Product from '../product/product.model';
-import Bookmark from './bookmark.mode';
+import {
+  default as Bookmark,
+  default as ProductBookmark,
+} from './bookmark.mode';
 
 const bookmarkAddDelete = async (profileId: string, productId: string) => {
   // check if article exists

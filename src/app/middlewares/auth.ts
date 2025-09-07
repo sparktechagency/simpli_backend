@@ -51,7 +51,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       'isDeleted isBlocked isVerified passwordChangedAt',
     );
     if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
+      throw new AppError(httpStatus.NOT_FOUND, 'You are not authorized');
     }
     if (user.isDeleted) {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted');

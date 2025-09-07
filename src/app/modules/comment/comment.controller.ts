@@ -73,7 +73,7 @@ const likeUnlikeComment = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getPodcastComments = catchAsync(async (req, res) => {
+const getReviewComments = catchAsync(async (req, res) => {
   const result = await commentServices.getReviewComments(
     req.user.profileId,
     req.params.id,
@@ -114,7 +114,7 @@ const CommentController = {
   createReply,
   updateComment,
   deleteComment,
-  getPodcastComments,
+  getReviewComments,
   likeUnlikeComment,
   getReplies,
   getAllLikersForComment,

@@ -61,9 +61,9 @@ router.post(
 );
 
 router.get(
-  '/get-conversation-comments/:id',
+  '/get-review-comments/:id',
   auth(USER_ROLE.reviewer),
-  commentController.getPodcastComments,
+  commentController.getReviewComments,
 );
 
 router.get(

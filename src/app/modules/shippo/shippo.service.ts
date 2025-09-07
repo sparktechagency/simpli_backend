@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
 import {
   AddressCreateRequest,
   DistanceUnitEnum,
@@ -8,12 +9,11 @@ import {
   Shippo,
   WeightUnitEnum,
 } from 'shippo';
-import { IShippingAddress } from '../shippingAddress/shippingAddress.interface';
-import { Store } from '../store/store.model';
-import AppError from '../../error/appError';
-import httpStatus from 'http-status';
-import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import config from '../../config';
+import AppError from '../../error/appError';
+import { IShippingAddress } from '../shippingAddress/shippingAddress.interface';
+import ShippingAddress from '../shippingAddress/shippingAddress.model';
+import { Store } from '../store/store.model';
 
 const shippo = new Shippo({ apiKeyHeader: config.shippo.api_key as string });
 
@@ -33,48 +33,48 @@ const getShippingOptions = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
   }
 
+  // const addressFrom: AddressCreateRequest = {
+  //   name: store.name,
+  //   street1: store.street1,
+  //   street2: store.street2 || '',
+  //   city: store.city,
+  //   state: store.state,
+  //   zip: store.zipCode.toString(),
+  //   country: store.country,
+  //   phone: store?.phone,
+  //   email: store?.email,
+  // };
+
+  // const addressTo: AddressCreateRequest = {
+  //   name: shippingAddress.name,
+  //   street1: shippingAddress.street1,
+  //   street2: shippingAddress.street2 || '',
+  //   city: shippingAddress.city,
+  //   state: shippingAddress.state,
+  //   zip: shippingAddress.zipCode,
+  //   country: shippingAddress.country,
+  //   phone: shippingAddress?.phoneNumber,
+  //   email: shippingAddress?.email,
+  // };
+
+  // Create shipment with Shippo to get available rates
   const addressFrom: AddressCreateRequest = {
-    name: store.name,
-    street1: store.street1,
-    street2: store.street2 || '',
-    city: store.city,
-    state: store.state,
-    zip: store.zipCode.toString(),
-    country: store.country,
-    phone: store?.phone,
-    email: store?.email,
+    name: 'Shawn Ippotle',
+    street1: '215 Clayton St.',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94117',
+    country: 'US',
   };
 
   const addressTo: AddressCreateRequest = {
-    name: shippingAddress.name,
-    street1: shippingAddress.street1,
-    street2: shippingAddress.street2 || '',
-    city: shippingAddress.city,
-    state: shippingAddress.state,
-    zip: shippingAddress.zipCode,
-    country: shippingAddress.country,
-    phone: shippingAddress?.phoneNumber,
-    email: shippingAddress?.email,
+    name: 'Mr Hippo',
+    street1: 'Broadway 1',
+    city: 'New York',
+    state: 'NY',
+    zip: '10007',
+    country: 'US',
   };
-
-  // Create shipment with Shippo to get available rates
-  //   const addressFrom: AddressCreateRequest = {
-  //     name: 'Shawn Ippotle',
-  //     street1: '215 Clayton St.',
-  //     city: 'San Francisco',
-  //     state: 'CA',
-  //     zip: '94117',
-  //     country: 'US',
-  //   };
-
-  //   const addressTo: AddressCreateRequest = {
-  //     name: 'Mr Hippo',
-  //     street1: 'Broadway 1',
-  //     city: 'New York',
-  //     state: 'NY',
-  //     zip: '10007',
-  //     country: 'US',
-  //   };
 
   //   const parcel: ParcelCreateRequest = {
   //     length: '15',

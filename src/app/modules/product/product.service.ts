@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import { IProduct } from './product.interface';
-import Product from './product.model';
-import Category from '../category/category.model';
+import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 import Bookmark from '../bookmark/bookmark.mode';
-import { deleteFileFromS3 } from '../../aws/deleteFromS2';
+import Category from '../category/category.model';
+import { IProduct } from './product.interface';
+import Product from './product.model';
 
 // create product into db
 // const createProductIntoDB = async (
@@ -190,7 +190,7 @@ const getAllProduct = async (
   reviewerId: string,
 ) => {
   const productQuery = new QueryBuilder(Product.find(), query)
-    .search([''])
+    .search(['name', 'description'])
     .filter()
     .sort()
     .paginate()

@@ -1,5 +1,5 @@
 import express from 'express';
-import ShippoController from './shipp.controller';
+import ShippoController from './shippo.controller';
 
 const router = express.Router();
 

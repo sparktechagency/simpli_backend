@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ReviewerService from './reviewer.service';
-import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const getReviewerProfile = catchAsync(async (req, res) => {
   const result = await ReviewerService.getReviewerProfile(req.user.profileId);
@@ -85,7 +85,7 @@ const makeSkip = catchAsync(async (req, res) => {
 });
 const updateReviewerIntoDB = catchAsync(async (req, res) => {
   const file: any = req.files?.profile_image;
-  if (req.files?.comment_image) {
+  if (req.files?.profile_image) {
     req.body.profile_image = getCloudFrontUrl(file[0].key);
   }
   const result = await ReviewerService.updateReviewerIntoDB(

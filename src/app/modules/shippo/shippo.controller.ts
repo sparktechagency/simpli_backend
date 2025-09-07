@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
-import ShippoService from './shipp.service';
+import ShippoService from './shippo.service';
 
 const getShippingMethods = catchAsync(async (req, res) => {
   const result = await ShippoService.getShippingOptions(
