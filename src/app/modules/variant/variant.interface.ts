@@ -5,7 +5,7 @@ export interface IVariant {
   product: Types.ObjectId;
   sku: string;
   color?: string;
-  size?: string;
+  sizes?: string[];
   weight?: string;
   price: number;
   stock: number;

@@ -6,14 +6,17 @@ export interface IVariant {
   color?: string;
   size?: string;
   weight?: string;
+  height?: string;
   price: number;
   stock: number;
   images?: string[];
+  sizes?: string[];
 }
 
 export interface IProduct {
   bussiness: Types.ObjectId;
   name: string;
+  shortDescription: string;
   description: string;
   category: Types.ObjectId;
   price: number;
@@ -27,4 +30,6 @@ export interface IProduct {
   updatedAt?: Date;
   newImages?: string[];
   deletedImages?: string[];
+  colors?: string[];
+  sizes?: string[];
 }

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import Cart from './cart.model';
-import Product from '../product/product.model';
 import { Types } from 'mongoose';
+import AppError from '../../error/appError';
+import Product from '../product/product.model';
 import Variant from '../variant/variant.model';
+import Cart from './cart.model';
 
 interface addToCartProps {
   reviewerId: string;

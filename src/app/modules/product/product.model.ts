@@ -10,6 +10,7 @@ const ProductSchema = new Schema<IProduct>(
       required: true,
     },
     name: { type: String, required: true },
+    shortDescription: { type: String, default: '' },
     description: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     brand: { type: String, required: false },
@@ -24,6 +25,12 @@ const ProductSchema = new Schema<IProduct>(
     },
     images: { type: [String], required: false, default: [] },
     tags: { type: [String], required: false },
+    colors: {
+      type: [String],
+    },
+    sizes: {
+      type: [String],
+    },
     isDeleted: {
       type: Boolean,
       default: false,
