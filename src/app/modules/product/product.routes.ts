@@ -1,10 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
-import auth from '../../middlewares/auth';
-import { USER_ROLE } from '../user/user.constant';
-import validateRequest from '../../middlewares/validateRequest';
-import ProductValidations from './product.validation';
-import ProductController from './product.controller';
 import { uploadFile } from '../../aws/multer-s3-uploader';
+import auth from '../../middlewares/auth';
+import simpleAuth from '../../middlewares/simpleAuth';
+import validateRequest from '../../middlewares/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
+import ProductController from './product.controller';
+import ProductValidations from './product.validation';
 // import { uploadDynamicFile } from '../../helper/dynamicFileUploader';
 const router = express.Router();
 
@@ -72,7 +73,7 @@ router.get(
 );
 router.get(
   '/get-single-product/:id',
-  // auth(USER_ROLE.bussinessOwner),
+  simpleAuth,
   ProductController.getSingleProduct,
 );
 

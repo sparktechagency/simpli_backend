@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ProductService from './product.service';
-import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createProduct = catchAsync(async (req, res) => {
   if (req.files?.product_image) {
@@ -112,7 +112,10 @@ const getAllProduct = catchAsync(async (req, res) => {
   });
 });
 const getSingleProduct = catchAsync(async (req, res) => {
-  const result = await ProductService.getSingleProductFromDB(req.params.id);
+  const result = await ProductService.getSingleProductFromDB(
+    req.params.id,
+    req?.user?.profileId,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -236,20 +236,29 @@ const getAllProduct = async (
 //   return result;
 // };
 
-const getSingleProductFromDB = async (id: string) => {
+const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
+  // validate product id
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product id');
+  }
   const objectId = new mongoose.Types.ObjectId(id);
 
-  const result = await Product.aggregate([
+  // validate reviewer id (optional)
+  let reviewerObjectId: mongoose.Types.ObjectId | null = null;
+  if (reviewerId && mongoose.Types.ObjectId.isValid(reviewerId)) {
+    reviewerObjectId = new mongoose.Types.ObjectId(reviewerId);
+  }
+
+  const pipeline: any[] = [
     { $match: { _id: objectId, isDeleted: false } },
 
-    // Lookup business (only selected fields)
+    // Lookup business (selected fields)
     {
       $lookup: {
-        from: 'bussinesses',
-        localField: 'bussiness',
-        foreignField: '_id',
-        as: 'bussiness',
+        from: 'bussinesses', // make sure this matches your actual collection name
+        let: { bussinessId: '$bussiness' },
         pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$bussinessId'] } } },
           {
             $project: {
               _id: 1,
@@ -260,6 +269,7 @@ const getSingleProductFromDB = async (id: string) => {
             },
           },
         ],
+        as: 'bussiness',
       },
     },
     { $unwind: { path: '$bussiness', preserveNullAndEmptyArrays: true } },
@@ -268,8 +278,11 @@ const getSingleProductFromDB = async (id: string) => {
     {
       $lookup: {
         from: 'categories',
-        localField: 'category',
-        foreignField: '_id',
+        let: { categoryId: '$category' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$categoryId'] } } },
+          { $project: { _id: 1, name: 1 } }, // change fields as needed
+        ],
         as: 'category',
       },
     },
@@ -286,19 +299,66 @@ const getSingleProductFromDB = async (id: string) => {
     },
     {
       $addFields: {
-        avgRating: {
-          $ifNull: [{ $avg: '$reviews.rating' }, 0],
+        avgRating: { $ifNull: [{ $avg: '$reviews.rating' }, 0] },
+      },
+    },
+  ];
+
+  // If reviewer provided and valid -> lookup bookmark
+  if (reviewerObjectId) {
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'bookmarks', // ensure matches your bookmarks collection
+          let: { productId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$product', '$$productId'] },
+                    { $eq: ['$reviewer', reviewerObjectId] }, // compare to constant ObjectId
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: 'bookmark',
         },
       },
-    },
-    {
-      $project: {
-        reviews: 0, // exclude reviews array
+      {
+        $addFields: {
+          isBookmark: { $gt: [{ $size: '$bookmark' }, 0] },
+        },
       },
-    },
-  ]);
+      // cleanup
+      {
+        $project: {
+          reviews: 0,
+          bookmark: 0,
+        },
+      },
+    );
+  } else {
+    // no reviewer -> always false
+    pipeline.push(
+      {
+        $addFields: {
+          isBookmark: false,
+        },
+      },
+      {
+        $project: {
+          reviews: 0,
+        },
+      },
+    );
+  }
 
-  if (!result.length) {
+  const result = await Product.aggregate(pipeline);
+
+  if (!result || result.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 

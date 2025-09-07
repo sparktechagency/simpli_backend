@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 import { NextFunction, Request, Response } from 'express';
-import { USER_ROLE } from '../modules/user/user.constant';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import Bussiness from '../modules/bussiness/bussiness.model';
+import Reviewer from '../modules/reviewer/reviewer.model';
+import SuperAdmin from '../modules/superAdmin/superAdmin.model';
+import { USER_ROLE } from '../modules/user/user.constant';
 
 const simpleAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,6 +40,8 @@ const simpleAuth = async (req: Request, res: Response, next: NextFunction) => {
         profileData = await Bussiness.findOne({ user: id }).select('_id');
       } else if (role === USER_ROLE.superAdmin) {
         profileData = await SuperAdmin.findOne({ user: id }).select('_id');
+      } else if (role === USER_ROLE.reviewer) {
+        profileData = await Reviewer.findOne({ user: id }).select('_id');
       }
 
       if (profileData) {

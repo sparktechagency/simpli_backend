@@ -4,7 +4,6 @@ import sendResponse from '../../utilities/sendResponse';
 import BookmarkService from './bookmark.service';
 
 const bookmarkAddDelete = catchAsync(async (req, res) => {
-  console.log('sss', req.user);
   const result = await BookmarkService.bookmarkAddDelete(
     req.user.profileId,
     req.params.id,
