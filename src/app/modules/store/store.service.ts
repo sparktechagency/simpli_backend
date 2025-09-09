@@ -32,11 +32,26 @@ const createStore = async (profileId: string, payload: IStore) => {
 const updateStoreIntoDB = async (
   profileId: string,
   id: string,
-  payload: Partial<IStore>,
+  payload: IStore,
 ) => {
   const store = await Store.findOne({ bussiness: profileId, _id: id });
   if (!store) {
     throw new AppError(httpStatus.NOT_FOUND, 'Store not found');
+  }
+  const validatedAddress = await shippo.addresses.create({
+    ...payload,
+    validate: true,
+  });
+
+  if (
+    !validatedAddress.validationResults ||
+    validatedAddress.validationResults.isValid !== true
+  ) {
+    const messages = validatedAddress.validationResults?.messages || [];
+    const errorText =
+      messages.map((m) => m.text).join('; ') ||
+      'Invalid or undeliverable address provided.';
+    throw new AppError(httpStatus.BAD_REQUEST, errorText);
   }
   const result = await Store.findByIdAndUpdate(id, payload, {
     new: true,

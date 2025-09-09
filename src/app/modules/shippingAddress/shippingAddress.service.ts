@@ -17,8 +17,6 @@ const createShippingAddress = async (
     validate: true,
   });
 
-  console.log('validatee', validatedAddress.validationResults?.messages);
-
   // Ensure validation_results exists
   if (
     !validatedAddress.validationResults ||
@@ -41,7 +39,7 @@ const createShippingAddress = async (
 const updateShippingAddress = async (
   reviewerId: string,
   id: string,
-  payload: Partial<IShippingAddress>,
+  payload: IShippingAddress,
 ) => {
   const shippingAddress = await ShippingAddress.findOne({
     reviewer: reviewerId,
@@ -49,6 +47,23 @@ const updateShippingAddress = async (
   });
   if (!shippingAddress) {
     throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+  }
+
+  const validatedAddress = await shippo.addresses.create({
+    ...payload,
+    validate: true,
+  });
+
+  // Ensure validation_results exists
+  if (
+    !validatedAddress.validationResults ||
+    validatedAddress.validationResults.isValid !== true
+  ) {
+    const messages = validatedAddress.validationResults?.messages || [];
+    const errorText =
+      messages.map((m) => m.text).join('; ') ||
+      'Invalid or undeliverable address provided.';
+    throw new AppError(httpStatus.BAD_REQUEST, errorText);
   }
   const result = await ShippingAddress.findByIdAndUpdate(id, payload, {
     new: true,
