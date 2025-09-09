@@ -1,14 +1,36 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+
+import { Shippo } from 'shippo';
+import config from '../../config';
 import AppError from '../../error/appError';
 import { IShippingAddress } from './shippingAddress.interface';
 import ShippingAddress from './shippingAddress.model';
-
+const shippo = new Shippo({ apiKeyHeader: config.shippo.api_key as string });
 // crate shipping address
 const createShippingAddress = async (
   reviewerId: string,
   payload: IShippingAddress,
 ) => {
-  console.log('ncie', reviewerId);
+  const validatedAddress = await shippo.addresses.create({
+    ...payload,
+    validate: true,
+  });
+
+  console.log('validatee', validatedAddress.validationResults?.messages);
+
+  // Ensure validation_results exists
+  if (
+    !validatedAddress.validationResults ||
+    validatedAddress.validationResults.isValid !== true
+  ) {
+    const messages = validatedAddress.validationResults?.messages || [];
+    const errorText =
+      messages.map((m) => m.text).join('; ') ||
+      'Invalid or undeliverable address provided.';
+    throw new AppError(httpStatus.BAD_REQUEST, errorText);
+  }
+
   const result = await ShippingAddress.create({
     ...payload,
     reviewer: reviewerId,

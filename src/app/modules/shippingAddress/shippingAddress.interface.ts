@@ -3,14 +3,14 @@ import { Types } from 'mongoose';
 export interface IShippingAddress {
   reviewer: Types.ObjectId;
   name: string;
-  address: string;
-  country: string;
-  zipCode: string;
-  city: string;
-  state: string;
-  phoneNumber: string;
-  alternativePhoneNumber: string;
+  company: string;
   street1: string;
+  zip: string;
+  city: string;
+  country: string;
+  state: string;
+  phone: string;
+  alternativePhoneNumber: string;
   street2?: string;
   email: string;
 }

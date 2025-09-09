@@ -101,7 +101,12 @@ const registerReviewer = async (payload: any) => {
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to registered');
     }
-    await User.findByIdAndUpdate(user[0]._id, { profileId: result[0]._id });
+
+    await User.findByIdAndUpdate(
+      user[0]._id,
+      { profileId: result[0]._id },
+      { session },
+    );
     // ! TODO: need to upgrade the email template
     sendEmail({
       email: payload.email,
