@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
+import shippo from '../../utilities/shippo';
 import Bussiness from '../bussiness/bussiness.model';
 import { IStore } from './store.interface';
 import { Store } from './store.model';
@@ -8,6 +9,21 @@ const createStore = async (profileId: string, payload: IStore) => {
   const bussiness = await Bussiness.findById(profileId);
   if (!bussiness) {
     throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
+  }
+  const validatedAddress = await shippo.addresses.create({
+    ...payload,
+    validate: true,
+  });
+
+  if (
+    !validatedAddress.validationResults ||
+    validatedAddress.validationResults.isValid !== true
+  ) {
+    const messages = validatedAddress.validationResults?.messages || [];
+    const errorText =
+      messages.map((m) => m.text).join('; ') ||
+      'Invalid or undeliverable address provided.';
+    throw new AppError(httpStatus.BAD_REQUEST, errorText);
   }
   const result = await Store.create({ ...payload, bussiness: profileId });
   return result;
