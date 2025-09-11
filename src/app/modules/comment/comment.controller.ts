@@ -123,6 +123,19 @@ const getMyComments = catchAsync(async (req, res) => {
   });
 });
 
+const getMyLikes = catchAsync(async (req, res) => {
+  const result = await CommentServices.getMyLinkes(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Like retrieved successfully',
+    data: result,
+  });
+});
+
 const CommentController = {
   createComment,
   createReply,
@@ -133,5 +146,6 @@ const CommentController = {
   getReplies,
   getAllLikersForComment,
   getMyComments,
+  getMyLikes,
 };
 export default CommentController;

@@ -81,4 +81,10 @@ router.get(
   commentController.getAllLikersForComment,
 );
 
+router.get(
+  '/get-my-likes',
+  auth(USER_ROLE.reviewer),
+  commentController.getMyLikes,
+);
+
 export const commentRoutes = router;

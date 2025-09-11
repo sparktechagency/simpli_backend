@@ -4,6 +4,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
+import Review from '../review/reviewer.model';
 import { IComment } from './comment.interface';
 import Comment from './comment.model';
 
@@ -327,6 +328,44 @@ const getMyComments = async (
   };
 };
 
+// get my likes
+const getMyLinkes = async (
+  profileId: string,
+  query: Record<string, unknown>,
+) => {
+  const likeQuery = new QueryBuilder(
+    Review.find({ likers: { $in: [profileId] } })
+      .populate({ path: 'product', select: 'name price' })
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'reviewer', select: 'name profile_image' }),
+    query,
+  );
+  // const result = await likeQuery.modelQuery;
+
+  let result = await likeQuery.modelQuery;
+  result = await Promise.all(
+    result.map(async (review: any) => {
+      const totalComments = await Comment.countDocuments({
+        reviewId: review._id,
+      });
+      const isLike = review.likers.some((liker: mongoose.Types.ObjectId) =>
+        liker.equals(profileId),
+      );
+      return {
+        ...review.toObject(),
+        totalComments,
+        isLike,
+      };
+    }),
+  );
+
+  const meta = await likeQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
+};
+
 const CommentServices = {
   createComment,
   createReply,
@@ -337,5 +376,6 @@ const CommentServices = {
   getReplies,
   getAllLikersForComment,
   getMyComments,
+  getMyLinkes,
 };
 export default CommentServices;
