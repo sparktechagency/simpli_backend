@@ -6,7 +6,7 @@ import FollowController from './follow.controller';
 const router = express.Router();
 
 router.post(
-  '/follow-unfollow/:userId',
+  '/follow-unfollow/:id',
   auth(USER_ROLE.reviewer),
   FollowController.followUnfollowUser,
 );
