@@ -2,6 +2,7 @@
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { IComment } from './comment.interface';
 import Comment from './comment.model';
@@ -298,6 +299,34 @@ const getAllLikersForComment = async (commentId: string) => {
   return likers;
 };
 
+const getMyComments = async (
+  reviewerId: string,
+  query: Record<string, unknown>,
+) => {
+  const commentQuery = new QueryBuilder(
+    Comment.find({
+      userId: reviewerId,
+      parentCommentId: null,
+    }).populate({
+      path: 'reviewId',
+      select: 'description images video thumbnail rating createdAt likers',
+      populate: [
+        { path: 'product', select: 'name price' },
+        { path: 'category', select: 'name' },
+        { path: 'reviewer', select: 'name profile_image' },
+      ],
+    }),
+    query,
+  );
+
+  const result = await commentQuery.modelQuery;
+  const meta = await commentQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
+};
+
 const CommentServices = {
   createComment,
   createReply,
@@ -307,5 +336,6 @@ const CommentServices = {
   getReviewComments,
   getReplies,
   getAllLikersForComment,
+  getMyComments,
 };
 export default CommentServices;

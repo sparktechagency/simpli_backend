@@ -65,7 +65,11 @@ router.get(
   auth(USER_ROLE.reviewer),
   commentController.getReviewComments,
 );
-
+router.get(
+  '/get-my-comments',
+  auth(USER_ROLE.reviewer),
+  commentController.getMyComments,
+);
 router.get(
   '/get-replies/:id',
   auth(USER_ROLE.reviewer),
