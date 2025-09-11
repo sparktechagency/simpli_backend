@@ -32,4 +32,5 @@ export interface IProduct {
   deletedImages?: string[];
   colors?: string[];
   sizes?: string[];
+  stock: number;
 }

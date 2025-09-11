@@ -190,7 +190,10 @@ const getAllProduct = async (
   query: Record<string, unknown>,
   reviewerId: string,
 ) => {
-  const productQuery = new QueryBuilder(Product.find(), query)
+  const productQuery = new QueryBuilder(
+    Product.find({ isDeleted: false }),
+    query,
+  )
     .search(['name', 'description'])
     .filter()
     .sort()

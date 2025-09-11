@@ -31,6 +31,10 @@ const ProductSchema = new Schema<IProduct>(
     sizes: {
       type: [String],
     },
+    stock: {
+      type: Number,
+      required: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

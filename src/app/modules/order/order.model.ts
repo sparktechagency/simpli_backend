@@ -1,10 +1,10 @@
 import { model, Schema } from 'mongoose';
-import { IOrder, IOrderItem } from './order.interface';
 import {
   ENUM_DELIVERY_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { IOrder, IOrderItem } from './order.interface';
 
 export const OrderItemSchema: Schema = new Schema<IOrderItem>({
   product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -64,6 +64,17 @@ const OrderSchema: Schema = new Schema<IOrder>(
     isReferralAmountPaid: {
       type: Boolean,
       default: false,
+    },
+    shipping: {
+      rateId: { type: String, required: false },
+      provider: { type: String, required: false },
+      service: { type: String, required: false },
+      amount: { type: Number, required: false, default: 0 },
+      currency: { type: String, required: false },
+      shipmentId: { type: String, required: false },
+      status: { type: String, default: 'PENDING' }, // PENDING until shipped
+      trackingNumber: { type: String, default: null },
+      labelUrl: { type: String, default: '' },
     },
   },
   { timestamps: true },

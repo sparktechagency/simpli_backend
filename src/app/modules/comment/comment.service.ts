@@ -116,7 +116,7 @@ const getReviewComments = async (
     },
     {
       $lookup: {
-        from: 'normalusers',
+        from: 'reviewers',
         localField: 'commentor',
         foreignField: '_id',
         as: 'commentorDetails',
@@ -208,7 +208,7 @@ const getReplies = async (
     },
     {
       $lookup: {
-        from: 'normalusers',
+        from: 'reviewers',
         localField: 'commentor',
         foreignField: '_id',
         as: 'commentorDetails',
@@ -221,6 +221,9 @@ const getReplies = async (
           $eq: ['$commentor', new mongoose.Types.ObjectId(profileId)],
         },
         totalLike: { $size: '$likers' },
+        isMyLike: {
+          $in: [new mongoose.Types.ObjectId(profileId), '$likers'],
+        },
       },
     },
     { $unwind: '$commentorDetails' },
@@ -249,6 +252,7 @@ const getReplies = async (
         totalReplies: 1,
         isMyComment: 1,
         totalLike: 1,
+        isMyLike: 1,
       },
     },
     {

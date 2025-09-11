@@ -11,7 +11,7 @@ const ObjectIdSchema = (fieldName: string) =>
 
 const createCommentSchema = z.object({
   body: z.object({
-    review: ObjectIdSchema('Institution conversation  id'),
+    review: ObjectIdSchema('Review  id'),
     text: z
       .string()
       .trim()

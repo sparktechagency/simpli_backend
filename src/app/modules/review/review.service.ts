@@ -3,7 +3,6 @@ import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
-import { CAMPAIGN_STATUS } from '../../utilities/enum';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Comment from '../comment/comment.model';
 import Reviewer from '../reviewer/reviewer.model';
@@ -26,12 +25,12 @@ const createReview = async (reviewerId: string, payload: any) => {
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
-  if (campaignOffer.campaign.status !== CAMPAIGN_STATUS.ACTIVE) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'This campaign not active right now',
-    );
-  }
+  // if (campaignOffer.campaign.status !== CAMPAIGN_STATUS.ACTIVE) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     'This campaign not active right now',
+  //   );
+  // }
 
   // TODO: when create review---------------
   const result = await Review.create({
@@ -46,51 +45,239 @@ const createReview = async (reviewerId: string, payload: any) => {
   return result;
 };
 
-//----------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// //----------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// const getAllReviewFromDB = async (
+//   reviewerId: string,
+//   query: Record<string, unknown>,
+// ) => {
+//   const reviewer = await Reviewer.findById(reviewerId).select('following');
+//   let filterQuery = {};
+//   if (query.following) {
+//     filterQuery = { reviewer: { $in: reviewer?.following } };
+//   }
+
+//   const reviewQuery = new QueryBuilder(
+//     Review.find({ ...filterQuery })
+//       .populate({ path: 'product', select: 'name price' })
+//       .populate({ path: 'category', select: 'name' })
+//       .populate({ path: 'reviewer', select: 'name username profile_image' }),
+//     query,
+//   )
+//     .search(['description'])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   let reviews = await reviewQuery.modelQuery;
+//   reviews = await Promise.all(
+//     reviews.map(async (review: any) => {
+//       const totalComments = await Comment.countDocuments({
+//         reviewId: review._id,
+//       });
+//       const isLike = review.likers.some((liker: Types.ObjectId) =>
+//         liker.equals(reviewerId),
+//       );
+//       return {
+//         ...review.toObject(),
+//         totalComments,
+//         isLike,
+//       };
+//     }),
+//   );
+//   const meta = await reviewQuery.countTotal();
+
+//   return {
+//     meta,
+//     result: reviews,
+//   };
+// };
+
 const getAllReviewFromDB = async (
   reviewerId: string,
   query: Record<string, unknown>,
 ) => {
   const reviewer = await Reviewer.findById(reviewerId).select('following');
-  let filterQuery = {};
+
+  const matchStage: any = {};
   if (query.following) {
-    filterQuery = { reviewer: { $in: reviewer?.following } };
+    matchStage.reviewer = { $in: reviewer?.following || [] };
   }
 
-  const reviewQuery = new QueryBuilder(
-    Review.find({ ...filterQuery })
-      .populate({ path: 'product', select: 'name price' })
-      .populate({ path: 'category', select: 'name' })
-      .populate({ path: 'reviewer', select: 'name username profile_image' }),
-    query,
-  )
-    .search(['description'])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  if (query.category) {
+    matchStage.category = new mongoose.Types.ObjectId(query.category as string);
+  }
 
-  let reviews = await reviewQuery.modelQuery;
-  reviews = await Promise.all(
-    reviews.map(async (review: any) => {
-      const totalComments = await Comment.countDocuments({
-        reviewId: review._id,
-      });
-      const isLike = review.likers.some((liker: Types.ObjectId) =>
-        liker.equals(reviewerId),
-      );
-      return {
-        ...review.toObject(),
-        totalComments,
-        isLike,
-      };
-    }),
-  );
-  const meta = await reviewQuery.countTotal();
+  // Pagination
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Sorting
+  const sortStage =
+    query.sortBy && query.sortOrder
+      ? { [query.sortBy as string]: query.sortOrder === 'asc' ? 1 : -1 }
+      : { createdAt: -1 };
+
+  const pipeline: any[] = [
+    { $match: matchStage },
+
+    // Search
+    ...(query.search
+      ? [
+          {
+            $match: {
+              description: { $regex: query.search as string, $options: 'i' },
+            },
+          },
+        ]
+      : []),
+
+    {
+      $facet: {
+        meta: [
+          { $count: 'total' },
+          {
+            $addFields: {
+              page,
+              limit,
+              totalPage: {
+                $ceil: { $divide: ['$total', limit] },
+              },
+            },
+          },
+        ],
+        result: [
+          { $sort: sortStage },
+          { $skip: skip },
+          { $limit: limit },
+
+          // Lookup product
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'product',
+              foreignField: '_id',
+              as: 'product',
+            },
+          },
+          { $unwind: '$product' },
+
+          // Lookup category
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category',
+            },
+          },
+          { $unwind: '$category' },
+
+          // Lookup reviewer
+          {
+            $lookup: {
+              from: 'reviewers',
+              localField: 'reviewer',
+              foreignField: '_id',
+              as: 'reviewer',
+            },
+          },
+          { $unwind: '$reviewer' },
+
+          // Lookup comments to count
+          {
+            $lookup: {
+              from: 'comments',
+              localField: '_id',
+              foreignField: 'review',
+              as: 'comments',
+            },
+          },
+
+          {
+            $addFields: {
+              totalComments: { $size: '$comments' },
+              isLike: {
+                $in: [new Types.ObjectId(reviewerId), '$likers'],
+              },
+              isMyReview: {
+                $eq: ['$reviewer._id', new Types.ObjectId(reviewerId)],
+              },
+              totalLikers: { $size: '$likers' },
+            },
+          },
+          {
+            $lookup: {
+              from: 'reviewers', // or users collection
+              let: { likerIds: '$likers' },
+              pipeline: [
+                { $match: { $expr: { $in: ['$_id', '$$likerIds'] } } },
+                { $sample: { size: 6 } }, // randomly pick up to 6 likers
+                {
+                  $project: {
+                    _id: 1,
+                    name: 1,
+                    username: 1,
+                    profile_image: 1,
+                  },
+                },
+              ],
+              as: 'likers',
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              reviewer: {
+                _id: 1,
+                name: 1,
+                username: 1,
+                profile_image: 1,
+              },
+              product: {
+                _id: 1,
+                name: 1,
+                price: 1,
+              },
+              category: {
+                _id: 1,
+                name: 1,
+              },
+              campaign: 1,
+              amount: 1,
+              description: 1,
+              images: 1,
+              video: 1,
+              thumbnail: 1,
+              totalLikers: 1,
+              rating: 1,
+              totalView: 1,
+              totalCommissions: 1,
+              totalReferralSales: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              totalComments: 1,
+              isLike: 1,
+              isMyReview: 1,
+              likers: 1,
+            },
+          },
+        ],
+      },
+    },
+  ];
+
+  const result = await Review.aggregate(pipeline);
+
+  const meta = result[0]?.meta?.[0] || { page, limit, total: 0, totalPage: 0 };
+  const reviews = result[0]?.result || [];
 
   return {
-    meta,
-    result: reviews,
+    data: {
+      meta,
+      result: reviews,
+    },
   };
 };
 
@@ -147,7 +334,9 @@ const getReviewLikers = async (
   }
 
   const likerQuery = new QueryBuilder(
-    Reviewer.find({ _id: { $in: review.likers } }).select('name profile_image'),
+    Reviewer.find({ _id: { $in: review.likers } }).select(
+      'name profile_image username',
+    ),
     query,
   );
 

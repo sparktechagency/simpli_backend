@@ -22,7 +22,7 @@
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@types/winston": "^2.4.4",
     "apple-signin-auth": "^1.7.8",
-    "axios": "^1.8.1",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.1",
     "cookie-parser": "^1.4.7",

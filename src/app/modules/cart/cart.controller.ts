@@ -10,6 +10,7 @@ const addToCart = catchAsync(async (req, res) => {
     productId: req?.body?.productId,
     variantId: req?.body?.variantId || null,
     price: req?.body?.price,
+    referral: req.body.referral,
   });
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
