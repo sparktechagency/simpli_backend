@@ -1,5 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-import { IReviewer } from './reviewer.interface';
 import { GENDER, INTEREST_STATUS } from '../../utilities/enum';
 import {
   educationLevel,
@@ -10,6 +9,7 @@ import {
   maritalStatus,
   receiveProductBy,
 } from './reviewer.constant';
+import { IReviewer } from './reviewer.interface';
 
 const ReviewerSchema: Schema = new Schema<IReviewer>(
   {
@@ -96,12 +96,30 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     bio: {
       type: String,
     },
-    instagram: String,
-    youtube: String,
-    twitter: String,
-    tiktok: String,
-    whatsapp: String,
-    facebook: String,
+    instagram: {
+      type: String,
+      default: '',
+    },
+    youtube: {
+      type: String,
+      default: '',
+    },
+    twitter: {
+      type: String,
+      default: '',
+    },
+    tiktok: {
+      type: String,
+      default: '',
+    },
+    whatsapp: {
+      type: String,
+      default: '',
+    },
+    facebook: {
+      type: String,
+      default: '',
+    },
     blog: String,
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],

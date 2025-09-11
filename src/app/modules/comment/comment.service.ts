@@ -306,10 +306,10 @@ const getMyComments = async (
 ) => {
   const commentQuery = new QueryBuilder(
     Comment.find({
-      userId: reviewerId,
+      commentor: reviewerId,
       parentCommentId: null,
     }).populate({
-      path: 'reviewId',
+      path: 'review',
       select: 'description images video thumbnail rating createdAt likers',
       populate: [
         { path: 'product', select: 'name price' },
@@ -346,7 +346,7 @@ const getMyLinkes = async (
   result = await Promise.all(
     result.map(async (review: any) => {
       const totalComments = await Comment.countDocuments({
-        reviewId: review._id,
+        review: review._id,
       });
       const isLike = review.likers.some((liker: mongoose.Types.ObjectId) =>
         liker.equals(profileId),
