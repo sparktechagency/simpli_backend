@@ -1,10 +1,10 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
-import { USER_ROLE } from '../user/user.constant';
-import validateRequest from '../../middlewares/validateRequest';
-import CampaignValidations from './campaign.validation';
-import CampaignController from './campaign.controller';
 import simpleAuth from '../../middlewares/simpleAuth';
+import validateRequest from '../../middlewares/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
+import CampaignController from './campaign.controller';
+import CampaignValidations from './campaign.validation';
 
 const router = express.Router();
 
@@ -25,6 +25,11 @@ router.get(
   '/get-campaign',
   // auth(USER_ROLE.sampler, USER_ROLE.sampler),
   CampaignController.getAllCampaign,
+);
+router.get(
+  '/get-my-campaigns',
+  auth(USER_ROLE.bussinessOwner),
+  CampaignController.getMyCampaigns,
 );
 router.patch(
   '/change-status/:id',

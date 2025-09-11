@@ -1,16 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import Product from '../product/product.model';
-import { ICampaign } from './campaign.interface';
-import Campaign from './campaign.model';
-import stripe from '../../utilities/stripe';
 import paypal from '@paypal/checkout-server-sdk';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import cron from 'node-cron';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
-import paypalClient from '../../utilities/paypal';
+import config from '../../config';
+import { platformFeeForCampaignParcentage } from '../../constant';
+import AppError from '../../error/appError';
 import {
   CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
@@ -18,8 +14,12 @@ import {
   ENUM_PAYMENT_STATUS,
   ENUM_PRODUCT_STATUS,
 } from '../../utilities/enum';
-import config from '../../config';
-import { platformFeeForCampaignParcentage } from '../../constant';
+import paypalClient from '../../utilities/paypal';
+import stripe from '../../utilities/stripe';
+import Product from '../product/product.model';
+import { USER_ROLE } from '../user/user.constant';
+import { ICampaign } from './campaign.interface';
+import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
 
@@ -197,6 +197,30 @@ const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+const getMyCampaigns = async (
+  profileId: string,
+  query: Record<string, unknown>,
+) => {
+  const campaignQuery = new QueryBuilder(
+    Campaign.find({
+      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+      bussiness: profileId,
+    }).populate('product'),
+    query,
+  )
+    .search([''])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await campaignQuery.countTotal();
+  const result = await campaignQuery.modelQuery;
+  return {
+    meta,
+    result,
+  };
+};
 
 // get single campaign
 // TODO : need to work for bussiness owner for get campaign overview
@@ -353,6 +377,7 @@ const CampaignService = {
   changeCampaignStatus,
   getSingleCampaignFromDB,
   updateCampaignIntoDB,
+  getMyCampaigns,
 };
 
 export default CampaignService;

@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
+import { CAMPAIGN_STATUS } from '../../utilities/enum';
 import sendResponse from '../../utilities/sendResponse';
 import CampaignService from './campaign.service';
-import { CAMPAIGN_STATUS } from '../../utilities/enum';
 
 const createCampaign = catchAsync(async (req, res) => {
   const result = await CampaignService.createCampaign(
@@ -34,7 +34,19 @@ const getAllCampaign = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: `Campaign retreived successfully`,
+    message: `Campaign retrieved successfully`,
+    data: result,
+  });
+});
+const getMyCampaigns = catchAsync(async (req, res) => {
+  const result = await CampaignService.getMyCampaigns(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Campaign retrieved successfully`,
     data: result,
   });
 });
@@ -82,5 +94,6 @@ const CampaignController = {
   changeCampaignStatus,
   getSingleCampaign,
   updateCampaign,
+  getMyCampaigns,
 };
 export default CampaignController;

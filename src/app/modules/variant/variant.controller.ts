@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import VariantService from './variant.service';
-import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createVariant = catchAsync(async (req, res) => {
   if (req.files?.variant_image) {
@@ -38,7 +38,7 @@ const updateVariant = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Product variant created successfully',
+    message: 'Product variant updated successfully',
     data: result,
   });
 });

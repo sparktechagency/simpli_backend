@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
+import Product from '../product/product.model';
 import { IVariant } from './variant.interface';
 import Variant from './variant.model';
-import Product from '../product/product.model';
-import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 
 const createVariantIntoDB = async (profileId: string, payload: IVariant) => {
   const product = await Product.findById(payload.product);
@@ -28,32 +27,11 @@ const updateVariantIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Variant not found');
   }
 
-  const varient: any = await Variant.findOne({
-    _id: id,
-  });
-  if (!varient) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Varient not found');
-  }
-
-  if (payload.newImages) {
-    payload.images = [...payload.newImages, ...varient.images];
-  } else {
-    payload.images = [...varient.images];
-  }
-  if (payload?.deletedImages) {
-    payload.images = payload.images.filter(
-      (url) => !payload?.deletedImages?.includes(url),
-    );
-  }
-
-  const result = await Product.findByIdAndUpdate(id, payload, {
+  const result = await Variant.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   });
-
-  if (payload.deletedImages?.length) {
-    await Promise.all(payload.deletedImages.map(deleteFileFromS3));
-  }
+  console.log('result', result);
 
   return result;
 };
