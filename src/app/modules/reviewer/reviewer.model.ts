@@ -121,11 +121,6 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       default: '',
     },
     blog: String,
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
-    bussinessFollowing: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' },
-    ],
 
     //
     totalEarning: {

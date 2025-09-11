@@ -308,15 +308,17 @@ const getMyComments = async (
     Comment.find({
       commentor: reviewerId,
       parentCommentId: null,
-    }).populate({
-      path: 'review',
-      select: 'description images video thumbnail rating createdAt likers',
-      populate: [
-        { path: 'product', select: 'name price' },
-        { path: 'category', select: 'name' },
-        { path: 'reviewer', select: 'name profile_image' },
-      ],
-    }),
+    })
+      .populate({
+        path: 'review',
+        select: 'description images video thumbnail rating createdAt likers',
+        populate: [
+          { path: 'product', select: 'name price' },
+          { path: 'category', select: 'name' },
+          { path: 'reviewer', select: 'name profile_image' },
+        ],
+      })
+      .populate({ path: 'commentor', select: 'name username profile_image' }),
     query,
   );
 

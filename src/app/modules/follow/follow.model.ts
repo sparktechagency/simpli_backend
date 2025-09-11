@@ -5,12 +5,12 @@ const followSchema = new Schema<IFollow>(
   {
     follower: {
       type: Schema.Types.ObjectId,
-      ref: 'NormalUser',
+      ref: 'Reviewer',
       required: true,
     },
     following: {
       type: Schema.Types.ObjectId,
-      ref: 'NormalUser',
+      ref: 'Reviewer',
       required: true,
     },
   },
