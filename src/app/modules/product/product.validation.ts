@@ -35,6 +35,12 @@ export const createProductValidationSchema = z.object({
   }),
 });
 
+const changeProductStatusValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(Object.values(ENUM_PRODUCT_STATUS) as [string, ...string[]]),
+  }),
+});
+
 const saveAsDraftProductValidationSchema = z.object({
   body: z.object({
     name: z
@@ -59,6 +65,7 @@ const saveAsDraftProductValidationSchema = z.object({
 const ProductValidations = {
   createProductValidationSchema,
   saveAsDraftProductValidationSchema,
+  changeProductStatusValidationSchema,
 };
 
 export default ProductValidations;

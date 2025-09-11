@@ -90,6 +90,7 @@ const changeProductStatus = catchAsync(async (req, res) => {
   const result = await ProductService.changeProductStatus(
     req.user.profileId,
     req.params.id,
+    req.body.status,
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,

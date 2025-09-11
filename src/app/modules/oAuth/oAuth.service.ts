@@ -1,24 +1,25 @@
-import { JwtPayload } from 'jsonwebtoken';
-import { TUserRole } from '../user/user.interface';
-import { createToken } from '../user/user.utils';
-import config from '../../config';
-import { OAuth2Client } from 'google-auth-library';
-import axios from 'axios';
 import appleSigninAuth from 'apple-signin-auth';
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import axios from 'axios';
 import dotenv from 'dotenv';
-import { User } from '../user/user.model';
+import { OAuth2Client } from 'google-auth-library';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
+import config from '../../config';
+import AppError from '../../error/appError';
 import Bussiness from '../bussiness/bussiness.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
-import AppError from '../../error/appError';
-import httpStatus from 'http-status';
+import { TUserRole } from '../user/user.interface';
+import { User } from '../user/user.model';
+import { createToken } from '../user/user.utils';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 dotenv.config();
 const loginWithGoogle = async (user: JwtPayload) => {
   const jwtPayload = {
     id: user?._id,
+    profileId: user.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };
@@ -110,6 +111,7 @@ const loginWithOAuth = async (
 
   const jwtPayload = {
     id: user?._id,
+    profileId: user?.profileId,
     email: user?.email,
     role: user?.role as TUserRole,
   };

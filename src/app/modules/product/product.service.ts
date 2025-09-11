@@ -173,14 +173,18 @@ const softDeleteSingleProduct = async (profileId: string, id: string) => {
 };
 // change product status -------------
 
-const changeProductStatus = async (profileId: string, id: string) => {
+const changeProductStatus = async (
+  profileId: string,
+  id: string,
+  status: string,
+) => {
   const product = await Product.findOne({ bussiness: profileId, _id: id });
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
   const result = await Product.findByIdAndUpdate(
     id,
-    { status: !product.status },
+    { status: status },
     { new: true, runValidators: true },
   );
   return result;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import shippo from '../../utilities/shippo';
@@ -23,7 +24,7 @@ interface CartItem {
   width: number;
   height: number;
 }
-export const generateParcels = (cartItems: CartItem[]): Parcel[] => {
+export const generateParcels = (cartItems: CartItem[] | any): Parcel[] => {
   const parcels: Parcel[] = [];
   let currentParcel: Parcel = {
     length: 0,
@@ -33,7 +34,7 @@ export const generateParcels = (cartItems: CartItem[]): Parcel[] => {
     items: [],
   };
 
-  cartItems.forEach((item) => {
+  cartItems.forEach((item: any) => {
     for (let i = 0; i < item.quantity; i++) {
       const newWeight = currentParcel.weight + item.weight;
       const newLength = currentParcel.length + item.length;

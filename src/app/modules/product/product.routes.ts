@@ -64,6 +64,7 @@ router.delete(
 router.patch(
   '/change-status/:id',
   auth(USER_ROLE.bussinessOwner),
+  validateRequest(ProductValidations.changeProductStatusValidationSchema),
   ProductController.changeProductStatus,
 );
 router.get(
