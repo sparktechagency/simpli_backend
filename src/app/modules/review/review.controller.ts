@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import ReviewService from './review.service';
-import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const createReview = catchAsync(async (req, res) => {
   if (req.files?.review_image) {

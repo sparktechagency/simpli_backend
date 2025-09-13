@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import BussinessService from './bussiness.service';
-import { getCloudFrontUrl } from '../../aws/multer-s3-uploader';
 
 const addBussinessInformation = catchAsync(async (req, res) => {
   const result = await BussinessService.addBussinessInformation(
@@ -103,12 +103,23 @@ const getBussinessProfile = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getSingleBusinessById = catchAsync(async (req, res) => {
+  const result = await BussinessService.getSingleBusinessById(req.params.id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Bussiness profile retrieved successfully',
+    data: result,
+  });
+});
 
 const BussinessController = {
   addBussinessInformation,
   addBussinessDocument,
   updateBussinessInfo,
   getBussinessProfile,
+  getSingleBusinessById,
 };
 
 export default BussinessController;

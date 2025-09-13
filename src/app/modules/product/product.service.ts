@@ -195,7 +195,10 @@ const getAllProduct = async (
   reviewerId: string,
 ) => {
   const productQuery = new QueryBuilder(
-    Product.find({ isDeleted: false }),
+    Product.find({ isDeleted: false }).populate({
+      path: 'category',
+      select: 'name category_image',
+    }),
     query,
   )
     .search(['name', 'description'])

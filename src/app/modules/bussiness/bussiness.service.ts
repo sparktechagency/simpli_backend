@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
+import unlinkFile from '../../helper/unLinkFile';
 import { IBussiness } from './bussiness.interface';
 import Bussiness from './bussiness.model';
-import unlinkFile from '../../helper/unLinkFile';
 
 const addBussinessInformation = async (
   profileId: string,
@@ -85,11 +85,19 @@ const getBussinessProfile = async (profileId: string) => {
   return result;
 };
 
+const getSingleBusinessById = async (id: string) => {
+  const result = await Bussiness.findById(id).select(
+    'bussinessName logo bio phoneNumber email createdAt',
+  );
+  return result;
+};
+
 const BussinessService = {
   addBussinessInformation,
   addBussinessDocumentIntoDB,
   updateBussinessInfoIntoDB,
   getBussinessProfile,
+  getSingleBusinessById,
 };
 
 export default BussinessService;

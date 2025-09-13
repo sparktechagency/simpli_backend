@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose';
-import { ICampaign } from './campaign.interface';
 import {
   CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { ICampaign } from './campaign.interface';
 
 const CampaignSchema = new Schema<ICampaign>(
   {
@@ -56,7 +56,7 @@ const CampaignSchema = new Schema<ICampaign>(
     gender: {
       type: String,
       required: true,
-      enum: ['male', 'female', 'other'],
+      enum: ['male', 'female', 'other', 'both'],
     },
     location: {
       type: String,
