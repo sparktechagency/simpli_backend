@@ -16,7 +16,6 @@ const createShippingAddress = async (
     ...payload,
     validate: true,
   });
-
   // Ensure validation_results exists
   if (
     !validatedAddress.validationResults ||

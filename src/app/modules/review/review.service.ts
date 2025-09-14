@@ -566,6 +566,44 @@ const likeUnlikeReview = async (reviewId: string, userId: string) => {
 
 // get single product review-----
 
+// const getSingleProductReview = async (
+//   productId: string,
+//   query: Record<string, unknown>,
+// ) => {
+//   const resultQuery = new QueryBuilder(
+//     Review.find({ product: productId })
+//       .select('reviewer createdAt rating description')
+//       .populate({ path: 'product', select: 'name images' })
+//       .populate({ path: 'reviewer', select: 'profile_image name' }),
+//     query,
+//   )
+//     .search(['description'])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const result = await resultQuery.modelQuery;
+//   const meta = await resultQuery.countTotal();
+//   const avgRatingData = await Review.aggregate([
+//     { $match: { product: new mongoose.Types.ObjectId(productId) } },
+//     {
+//       $group: {
+//         _id: '$product',
+//         averageRating: { $avg: '$rating' },
+//       },
+//     },
+//   ]);
+
+//   const averageRating =
+//     avgRatingData.length > 0 ? avgRatingData[0].averageRating : 0;
+//   return {
+//     meta,
+//     result,
+//     averageRating,
+//   };
+// };
+
 const getSingleProductReview = async (
   productId: string,
   query: Record<string, unknown>,
@@ -585,22 +623,56 @@ const getSingleProductReview = async (
 
   const result = await resultQuery.modelQuery;
   const meta = await resultQuery.countTotal();
-  const avgRatingData = await Review.aggregate([
+
+  // Aggregation for average + star counts
+  const ratingStats = await Review.aggregate([
     { $match: { product: new mongoose.Types.ObjectId(productId) } },
     {
       $group: {
         _id: '$product',
         averageRating: { $avg: '$rating' },
+        oneStar: {
+          $sum: { $cond: [{ $eq: ['$rating', 1] }, 1, 0] },
+        },
+        twoStar: {
+          $sum: { $cond: [{ $eq: ['$rating', 2] }, 1, 0] },
+        },
+        threeStar: {
+          $sum: { $cond: [{ $eq: ['$rating', 3] }, 1, 0] },
+        },
+        fourStar: {
+          $sum: { $cond: [{ $eq: ['$rating', 4] }, 1, 0] },
+        },
+        fiveStar: {
+          $sum: { $cond: [{ $eq: ['$rating', 5] }, 1, 0] },
+        },
       },
     },
   ]);
 
-  const averageRating =
-    avgRatingData.length > 0 ? avgRatingData[0].averageRating : 0;
+  const stats =
+    ratingStats.length > 0
+      ? ratingStats[0]
+      : {
+          averageRating: 0,
+          oneStar: 0,
+          twoStar: 0,
+          threeStar: 0,
+          fourStar: 0,
+          fiveStar: 0,
+        };
+
   return {
     meta,
     result,
-    averageRating,
+    averageRating: stats.averageRating,
+    starCounts: {
+      oneStar: stats.oneStar,
+      twoStar: stats.twoStar,
+      threeStar: stats.threeStar,
+      fourStar: stats.fourStar,
+      fiveStar: stats.fiveStar,
+    },
   };
 };
 
