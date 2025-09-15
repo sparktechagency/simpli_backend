@@ -20,30 +20,14 @@ const simpleAuth = async (req: Request, res: Response, next: NextFunction) => {
         config.jwt_access_secret as string,
       ) as JwtPayload;
     } catch (err: any) {
-      // If token expired, decode without verifying
       if (err.name === 'TokenExpiredError') {
         decoded = jwt.decode(token) as JwtPayload | null;
       } else {
-        return next(); // Ignore other errors
+        return next();
       }
     }
 
     if (decoded) {
-      // const { id, role } = decoded;
-
-      // let profileData;
-      // if (role === USER_ROLE.bussinessOwner) {
-      //   profileData = await Bussiness.findOne({ user: id }).select('_id');
-      // } else if (role === USER_ROLE.superAdmin) {
-      //   profileData = await SuperAdmin.findOne({ user: id }).select('_id');
-      // } else if (role === USER_ROLE.reviewer) {
-      //   profileData = await Reviewer.findOne({ user: id }).select('_id');
-      // }
-
-      // if (profileData) {
-      //   decoded.profileId = profileData._id;
-      // }
-
       req.user = decoded;
     }
 
