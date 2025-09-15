@@ -22,8 +22,7 @@ import { Order } from './order.model';
 
 const createOrder = async (
   reviewerId: string,
-  payload: Partial<IOrder>,
-  selectedRateId?: string,
+  payload: Partial<IOrder> & { selectedRateId: string },
 ) => {
   const cart = await Cart.findOne({ reviewer: reviewerId });
   if (!cart || cart.items.length === 0) {
@@ -33,7 +32,7 @@ const createOrder = async (
   let deliveryCharge = 0;
   let shippingInfo: any = null;
 
-  if (selectedRateId) {
+  if (payload.selectedRateId) {
     // User selected a shipping rate
     const shippingAddress = await ShippingAddress.findOne({
       _id: payload.shippingAddress,
@@ -81,7 +80,7 @@ const createOrder = async (
     });
 
     const selectedRate = shipment.rates.find(
-      (r: any) => r.objectId === selectedRateId,
+      (r: any) => r.objectId === payload.selectedRateId,
     );
     if (!selectedRate)
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid shipping rate');

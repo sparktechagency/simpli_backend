@@ -12,6 +12,7 @@ const createOrderValidationSchema = z.object({
     paymentMethod: z.enum(
       Object.values(ENUM_PAYMENT_METHOD) as [string, ...string[]],
     ),
+    selectedRateId: z.string({ required_error: 'Selected rated id required' }),
   }),
 });
 
