@@ -12,6 +12,9 @@ const updateNotificationSettingSchema = z.object({
     trendingPost: z.boolean().optional(),
     newPost: z.boolean().optional(),
     postFromFollower: z.boolean().optional(),
+    general: z.boolean().optional(),
+    customerNotification: z.boolean().optional(),
+    orderNotification: z.boolean().optional(),
   }),
 });
 

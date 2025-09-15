@@ -1,8 +1,8 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import NotificationSettingController from './notificationSetting.controller';
-import validateRequest from '../../middlewares/validateRequest';
 import NoficationSettingValidations from './notificationSetting.validation';
 
 const router = express.Router();
