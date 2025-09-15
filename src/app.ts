@@ -3,24 +3,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express, { Application } from 'express';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import router from './app/routes';
-import notFound from './app/middlewares/notFound';
-const app: Application = express();
-import sendContactUsEmail from './app/helper/sendContactUsEmail';
-import handleWebhook from './app/handleStripe/webhook';
-import handlePaypalWebhook from './app/handlePaypal/handlePaypalWebhook';
+import cors from 'cors';
+import express, { Application } from 'express';
 import capturePayPalPayment from './app/handlePaypal/capturePaypalPayment';
+import handlePaypalWebhook from './app/handlePaypal/handlePaypalWebhook';
 import onboardingRefresh from './app/handleStripe/onboardingRefresh';
+import handleWebhook from './app/handleStripe/webhook';
+import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import auth from './app/middlewares/auth';
-import { USER_ROLE } from './app/modules/user/user.constant';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 import Bussiness from './app/modules/bussiness/bussiness.model';
+import { USER_ROLE } from './app/modules/user/user.constant';
+import router from './app/routes';
+const app: Application = express();
 // parser
 app.post(
-  '/simpli-webhook',
+  '/sampli-webhook',
   express.raw({ type: 'application/json' }),
   handleWebhook,
 );

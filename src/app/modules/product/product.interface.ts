@@ -33,4 +33,8 @@ export interface IProduct {
   colors?: string[];
   sizes?: string[];
   stock: number;
+  weight: number; // lbs
+  length: number; // inches
+  width: number;
+  height: number;
 }

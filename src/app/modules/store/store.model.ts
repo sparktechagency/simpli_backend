@@ -9,7 +9,7 @@ const StoreSchema: Schema = new Schema<IStore>(
       required: true,
     },
     name: { type: String, required: true },
-    company: { type: String, required: true },
+    company: { type: String },
     street1: { type: String, required: true },
     street2: { type: String },
     city: { type: String, required: true },

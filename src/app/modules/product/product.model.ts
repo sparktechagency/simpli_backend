@@ -39,6 +39,19 @@ const ProductSchema = new Schema<IProduct>(
       type: Boolean,
       default: false,
     },
+    // for shipping
+    height: {
+      type: Number,
+    },
+    weight: {
+      type: Number,
+    },
+    width: {
+      type: Number,
+    },
+    length: {
+      type: Number,
+    },
   },
   { timestamps: true },
 );
