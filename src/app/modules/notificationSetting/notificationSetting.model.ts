@@ -19,6 +19,18 @@ const NotificationSettingSchema = new Schema<INotificationSetting>(
     trendingPost: { type: Boolean, default: true },
     newPost: { type: Boolean, default: true },
     postFromFollower: { type: Boolean, default: true },
+    general: {
+      type: Boolean,
+      default: true,
+    },
+    customerNotification: {
+      type: Boolean,
+      default: true,
+    },
+    orderNotification: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );

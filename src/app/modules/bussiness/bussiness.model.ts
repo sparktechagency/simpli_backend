@@ -61,12 +61,19 @@ const BussinessSchema = new Schema<IBussiness>(
     },
     twiter: {
       type: String,
+      default: '',
     },
     linkedin: {
       type: String,
+      default: '',
     },
     instagram: {
       type: String,
+      default: '',
+    },
+    tiktok: {
+      type: String,
+      default: '',
     },
     taxtIndentificationNumber: {
       type: Number,

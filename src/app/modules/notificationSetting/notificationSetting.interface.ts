@@ -12,4 +12,7 @@ export interface INotificationSetting {
   trendingPost: boolean;
   newPost: boolean;
   postFromFollower: boolean;
+  general: boolean;
+  customerNotification: boolean;
+  orderNotification: boolean;
 }
