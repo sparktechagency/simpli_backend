@@ -23,7 +23,7 @@ router.patch(
 
 router.get(
   '/get-campaign',
-  // auth(USER_ROLE.sampler, USER_ROLE.sampler),
+  auth(USER_ROLE.reviewer),
   CampaignController.getAllCampaign,
 );
 router.get(

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import paypal from '@paypal/checkout-server-sdk';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
@@ -264,6 +264,9 @@ const getMyOrders = async (
     Order.find({
       $or: [{ reviewer: profileId }, { bussiness: profileId }],
     })
+      .select(
+        '-shipping -shippingAddress -paymentStatus -isReferralAmountPaid ',
+      )
       .populate({
         path: 'items.product',
         select: 'name images',
@@ -271,7 +274,8 @@ const getMyOrders = async (
       .populate({
         path: 'items.variant',
         select: 'name price',
-      }),
+      })
+      .populate({ path: 'reviewer', select: 'name profile_image' }),
     query,
   )
     .search([''])
@@ -289,7 +293,47 @@ const getMyOrders = async (
   };
 };
 
+// const getSingleOrder = async (profileId: string, orderId: string) => {
+//   const order = await Order.findOne({
+//     $or: [{ reviewer: profileId }, { bussiness: profileId }],
+//     _id: orderId,
+//   });
+
+//   if (!order) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+//   }
+//   console.log('order shipping', order.shipping);
+//   if (!order.shipping?.provider || !order.shipping?.trackingNumber) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       'Shipping provider or tracking number missing',
+//     );
+//   }
+//   const response = await axios.post(
+//     'https://api.goshippo.com/v1/tracks/',
+//     new URLSearchParams({
+//       carrier: order.shipping.provider,
+//       tracking_number: order.shipping.trackingNumber,
+//       metadata: `Order : ${order._id}`,
+//     }),
+//     {
+//       headers: {
+//         Authorization: `ShippoToken ${process.env.SHIPPO_API_KEY}`,
+//         'Content-Type': 'application/x-www-form-urlencoded',
+//       },
+//     },
+//   );
+
+//   console.log('res', response);
+
+//   const trackingData = response.data;
+//   return {
+//     order,
+//     trackingData,
+//   };
+// };
 const getSingleOrder = async (profileId: string, orderId: string) => {
+  // 1️⃣ Find order
   const order = await Order.findOne({
     $or: [{ reviewer: profileId }, { bussiness: profileId }],
     _id: orderId,
@@ -298,28 +342,69 @@ const getSingleOrder = async (profileId: string, orderId: string) => {
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
   }
-  const response = await axios.post(
-    'https://api.goshippo.com/tracks/',
-    new URLSearchParams({
-      carrier: order.shipping?.provider as string,
-      tracking_number: order.shipping?.trackingNumber as string,
-      metadata: `Order : ${order._id}`,
-    }),
-    {
-      headers: {
-        Authorization: `ShippoToken ${process.env.SHIPPO_API_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+
+  if (!order.shipping?.provider || !order.shipping?.trackingNumber) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Shipping provider or tracking number missing',
+    );
+  }
+
+  const carrier =
+    process.env.NODE_ENV === 'development'
+      ? 'shippo' // Shippo test mode
+      : order.shipping.provider.toLowerCase();
+
+  const tracking_number =
+    process.env.NODE_ENV === 'development'
+      ? '9102969010383081813033'
+      : order.shipping.trackingNumber;
+
+  try {
+    const response = await axios.post(
+      'https://api.goshippo.com/v1/tracks/',
+      new URLSearchParams({
+        carrier,
+        tracking_number,
+        metadata: `Order : ${order._id}`,
+      }),
+      {
+        headers: {
+          Authorization: `ShippoToken ${process.env.SHIPPO_API_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       },
-    },
-  );
+    );
 
-  const trackingData = response.data;
-  return {
-    order,
-    trackingData,
-  };
+    console.log(response.data);
+
+    const trackingData = response.data;
+
+    return {
+      order,
+      trackingData,
+    };
+  } catch (error) {
+    // 3️⃣ Axios error handling
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const status =
+        axiosError.response?.status || httpStatus.INTERNAL_SERVER_ERROR;
+      const data: any = axiosError.response?.data || {};
+      throw new AppError(
+        status,
+        `Shippo API Error: ${axiosError.message}`,
+        data,
+      );
+    }
+
+    // 4️⃣ Other unexpected errors
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong while fetching tracking data',
+    );
+  }
 };
-
 const OrderService = {
   createOrder,
   getMyOrders,

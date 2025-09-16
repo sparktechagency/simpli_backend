@@ -30,7 +30,10 @@ const updateCampaign = catchAsync(async (req, res) => {
   });
 });
 const getAllCampaign = catchAsync(async (req, res) => {
-  const result = await CampaignService.getAllCampaignFromDB(req.query);
+  const result = await CampaignService.getAllCampaignFromDB(
+    req.query,
+    req.user.profileId,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -2,6 +2,7 @@
 import paypal from '@paypal/checkout-server-sdk';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import cron from 'node-cron';
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
@@ -177,25 +178,126 @@ const updateCampaignIntoDB = async (
 };
 
 // get campaigns
-const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
-  const campaignQuery = new QueryBuilder(
-    Campaign.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }).populate(
-      'product',
-    ),
-    query,
-  )
-    .search([''])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+// const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
+//   const campaignQuery = new QueryBuilder(
+//     Campaign.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }).populate(
+//       'product',
+//     ),
+//     query,
+//   )
+//     .search([''])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
 
-  const meta = await campaignQuery.countTotal();
-  const result = await campaignQuery.modelQuery;
-  return {
-    meta,
-    result,
-  };
+//   const meta = await campaignQuery.countTotal();
+//   const result = await campaignQuery.modelQuery;
+//   return {
+//     meta,
+//     result,
+//   };
+// };
+
+const getAllCampaignFromDB = async (
+  query: Record<string, any>,
+  userId: string,
+) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const pipeline: any[] = [
+    {
+      $match: {
+        paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+      },
+    },
+    // join with product (pick only required fields)
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'product',
+        foreignField: '_id',
+        as: 'product',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              images: 1,
+              shortDescription: 1,
+            },
+          },
+        ],
+      },
+    },
+    { $unwind: '$product' },
+
+    // join with CampaignOffer (filtered by userId)
+    {
+      $lookup: {
+        from: 'campaignoffers',
+        let: { campaignId: '$_id', productId: '$product._id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$campaign', '$$campaignId'] },
+                  { $eq: ['$product', '$$productId'] },
+                  { $eq: ['$reviewer', new mongoose.Types.ObjectId(userId)] },
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              status: 1,
+              deliveryStatus: 1,
+            },
+          },
+        ],
+        as: 'userOffer',
+      },
+    },
+    {
+      $addFields: {
+        userOffer: { $arrayElemAt: ['$userOffer', 0] },
+      },
+    },
+
+    // pagination with facet
+    {
+      $facet: {
+        meta: [
+          { $count: 'total' },
+          {
+            $addFields: {
+              page,
+              limit,
+              totalPage: {
+                $ceil: {
+                  $divide: ['$total', limit],
+                },
+              },
+            },
+          },
+        ],
+        result: [{ $skip: skip }, { $limit: limit }],
+      },
+    },
+    {
+      $project: {
+        meta: { $arrayElemAt: ['$meta', 0] },
+        result: 1,
+      },
+    },
+  ];
+
+  const data = await Campaign.aggregate(pipeline);
+  return data[0] || { meta: {}, result: [] };
 };
 const getMyCampaigns = async (
   profileId: string,

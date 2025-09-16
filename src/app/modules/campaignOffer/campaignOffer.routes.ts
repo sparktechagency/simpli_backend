@@ -1,8 +1,8 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import CampaignOfferController from './campaignOffer.controller';
-import validateRequest from '../../middlewares/validateRequest';
 import CampaignOfferValidations from './campaignOffer.validation';
 
 const router = express.Router();
@@ -19,4 +19,10 @@ router.get(
   auth(USER_ROLE.reviewer),
   CampaignOfferController.getMyCampaignOffer,
 );
+router.get(
+  '/get-single-campaign-offer/:id',
+  auth(USER_ROLE.reviewer),
+  CampaignOfferController.getSingleCampaignOffer,
+);
+
 export const campaignOfferRoutes = router;

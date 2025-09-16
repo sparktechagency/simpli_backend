@@ -27,10 +27,23 @@ const getMyCampaignOffer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getSingleCampaignOffer = catchAsync(async (req, res) => {
+  const result = await CampaignOfferService.getSingleCampaignOffer(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Single campaign offer retrieved successfully`,
+    data: result,
+  });
+});
 
 const CampaignOfferController = {
   acceptCampaignOffer,
   getMyCampaignOffer,
+  getSingleCampaignOffer,
 };
 
 export default CampaignOfferController;

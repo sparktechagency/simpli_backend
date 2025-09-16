@@ -1,10 +1,10 @@
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
+import { USER_ROLE } from '../user/user.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 import { CampaignOffer } from './campaignOffer.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
 
 const acceptCampaignOffer = async (
   profileId: string,
@@ -66,9 +66,20 @@ const getMyCampaignOfferFromDB = async (
   };
 };
 
+const getSingleCampaignOffer = async (profileId: string, id: string) => {
+  const result = await CampaignOffer.findOne({
+    reviewer: profileId,
+    _id: id,
+  })
+    .populate({ path: 'campaign', select: 'name amountForEachReview endDate' })
+    .populate({ path: 'product', select: 'name images' });
+  return result;
+};
+
 const CampaignOfferService = {
   acceptCampaignOffer,
   getMyCampaignOfferFromDB,
+  getSingleCampaignOffer,
 };
 
 export default CampaignOfferService;
