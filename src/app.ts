@@ -6,6 +6,12 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application } from 'express';
+import httpStatus from 'http-status';
+import {
+  generateMultiplePresignedUrls,
+  generatePresignedUrl,
+} from './app/aws/presignedUrlGenerator';
+import AppError from './app/error/appError';
 import capturePayPalPayment from './app/handlePaypal/capturePaypalPayment';
 import handlePaypalWebhook from './app/handlePaypal/handlePaypalWebhook';
 import onboardingRefresh from './app/handleStripe/onboardingRefresh';
@@ -102,6 +108,37 @@ app.get(
     res.send({ message: 'okey', totalIncome, bussiness });
   },
 );
+
+// for s3 bucket--------------
+app.post('/generate-presigned-url', async (req, res) => {
+  const { fileType, fileCategory } = req.body;
+  if (!fileType || !fileCategory) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'File type and file category is required',
+    );
+  }
+
+  try {
+    const result = await generatePresignedUrl({ fileType, fileCategory });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: 'Error generating pre-signed URL' });
+  }
+});
+
+app.post('/generate-multiple-presigned-urls', async (req, res) => {
+  const { files } = req.body;
+
+  try {
+    const result = await generateMultiplePresignedUrls(files);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error generating multiple pre-signed URLs',
+    });
+  }
+});
 
 // global error handler
 app.use(globalErrorHandler);
