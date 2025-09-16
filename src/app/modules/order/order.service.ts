@@ -2,7 +2,6 @@
 import paypal from '@paypal/checkout-server-sdk';
 import axios from 'axios';
 import httpStatus from 'http-status';
-import { DistanceUnitEnum, ParcelCreateRequest, WeightUnitEnum } from 'shippo';
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
 import AppError from '../../error/appError';
@@ -15,14 +14,13 @@ import shippo from '../../utilities/shippo';
 import stripe from '../../utilities/stripe';
 import Cart from '../cart/cart.model';
 import ShippingAddress from '../shippingAddress/shippingAddress.model';
-import { generateParcels } from '../shippo/shippo.helper';
 import { Store } from '../store/store.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 
 const createOrder = async (
   reviewerId: string,
-  payload: Partial<IOrder> & { selectedRateId: string },
+  payload: Partial<IOrder> & { selectedRateId: string; shipmentId: string },
 ) => {
   const cart = await Cart.findOne({ reviewer: reviewerId });
   if (!cart || cart.items.length === 0) {
@@ -44,43 +42,9 @@ const createOrder = async (
     }
     if (!shippingAddress)
       throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
-
-    const parcels = generateParcels(cart.items);
-
-    const shippoParcels: ParcelCreateRequest[] = parcels.map((p) => ({
-      length: p.length.toString(),
-      width: p.width.toString(),
-      height: p.height.toString(),
-      distanceUnit: DistanceUnitEnum.In, // ✅ use enum
-      weight: p.weight.toString(),
-      massUnit: WeightUnitEnum.Lb, // ✅ use enum
-    }));
-
-    const shipment = await shippo.shipments.create({
-      addressFrom: {
-        name: store.name,
-        street1: store.street1,
-        city: store.city,
-        state: store.state,
-        zip: store.zip,
-        country: store.country,
-        phone: store.phone,
-      },
-      addressTo: {
-        name: shippingAddress.name,
-        street1: shippingAddress.street1,
-        city: shippingAddress.city,
-        state: shippingAddress.state,
-        zip: shippingAddress.zip,
-        country: shippingAddress.country,
-        phone: shippingAddress.phone,
-      },
-      parcels: shippoParcels,
-      async: false,
-    });
-
+    const shipment = await shippo.shipments.get(payload.shipmentId);
     const selectedRate = shipment.rates.find(
-      (r: any) => r.objectId === payload.selectedRateId,
+      (r: any) => r.objectId == payload.selectedRateId,
     );
     if (!selectedRate)
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid shipping rate');
@@ -107,13 +71,16 @@ const createOrder = async (
     reviewer: reviewerId,
     items: cart.items,
     totalPrice,
-    deliveryCharge,
+    deliveryFee: deliveryCharge,
+    subTotal: cart.totalPrice,
     shipping: shippingInfo,
+    totalQuantity: cart.totalQuantity,
+    bussiness: cart.bussiness,
   });
 
   // Payment handling
   if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
-    const amountInCents = totalPrice * 100;
+    const amountInCents = (totalPrice * 100).toFixed();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -123,7 +90,7 @@ const createOrder = async (
           price_data: {
             currency: 'usd',
             product_data: { name: 'Order Payment' },
-            unit_amount: amountInCents,
+            unit_amount: Number(amountInCents),
           },
           quantity: 1,
         },
@@ -294,7 +261,17 @@ const getMyOrders = async (
   query: Record<string, unknown>,
 ) => {
   const orderQuery = new QueryBuilder(
-    Order.find({ $or: [{ reviewer: profileId }, { bussiness: profileId }] }),
+    Order.find({
+      $or: [{ reviewer: profileId }, { bussiness: profileId }],
+    })
+      .populate({
+        path: 'items.product',
+        select: 'name images',
+      })
+      .populate({
+        path: 'items.variant',
+        select: 'name price',
+      }),
     query,
   )
     .search([''])

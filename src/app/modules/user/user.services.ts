@@ -51,6 +51,8 @@ const registerBussinessOwner = async (email: string, password: string) => {
       { profileId: result[0]._id },
       { session },
     );
+    await NotificationSetting.create({ user: result[0]._id }, { session });
+
     sendEmail({
       email: email,
       subject: 'Activate Your Account',
@@ -113,7 +115,7 @@ const registerReviewer = async (payload: any) => {
       subject: 'Activate Your Account',
       html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
     });
-    await NotificationSetting.create({ user: result[0]._id });
+    await NotificationSetting.create({ user: result[0]._id }, { session });
     await session.commitTransaction();
     session.endSession();
 

@@ -3,9 +3,10 @@
 import httpStatus from 'http-status';
 import AppError from '../error/appError';
 import { Order } from '../modules/order/order.model';
-import { ENUM_PAYMENT_STATUS } from '../utilities/enum';
-import Reviewer from '../modules/reviewer/reviewer.model';
 import Review from '../modules/review/reviewer.model';
+import Reviewer from '../modules/reviewer/reviewer.model';
+import { ENUM_PAYMENT_STATUS } from '../utilities/enum';
+import shippo from '../utilities/shippo';
 const handleOrderPaymentSuccess = async (
   orderId: string,
   transactionId: string,
@@ -15,17 +16,33 @@ const handleOrderPaymentSuccess = async (
   if (!order) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      'Order not found , Payment is completed but order is not created so please contact with support',
+      'Order not found, Payment is completed but order is not created. Please contact support.',
     );
   }
 
-  await Order.findByIdAndUpdate(orderId, {
-    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-  });
+  // 1️⃣ Update payment status
+  order.paymentStatus = ENUM_PAYMENT_STATUS.SUCCESS;
 
+  // 2️⃣ Kick off Shippo label purchase if shipping rate selected
+  if (order.shipping?.rateId) {
+    const transaction = await shippo.transactions.create({
+      rate: order.shipping.rateId,
+    });
+
+    // Save Shippo transactionId so we can track it later in webhook
+    order.shipping = {
+      ...order.shipping,
+      status: 'QUEUED',
+      shipmentId: order.shipping.shipmentId,
+      shippoTransactionId: transaction.objectId as string,
+    };
+  }
+
+  await order.save();
+
+  // 3️⃣ Referral updates (same as before)
   const referralPromises = order.items.map(async (item) => {
-    if (item.referral) {
-      // Update reviewer balance
+    if (item.referral && typeof item.referral.amount === 'number') {
       const reviewerUpdatePromise = Reviewer.findByIdAndUpdate(
         item.referral.reviewerId,
         {
@@ -36,7 +53,6 @@ const handleOrderPaymentSuccess = async (
         },
       );
 
-      // Update review
       const reviewUpdatePromise = Review.findByIdAndUpdate(
         item.referral.reviewId,
         {
@@ -52,8 +68,6 @@ const handleOrderPaymentSuccess = async (
   });
 
   await Promise.all(referralPromises);
-
-  // TODO: create transaction
 };
 
 export default handleOrderPaymentSuccess;

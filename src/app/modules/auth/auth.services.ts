@@ -1,21 +1,21 @@
 /* eslint-disable no-unused-vars */
-import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import { User } from '../user/user.model';
-import { TLoginUser } from './auth.interface';
-import { ILoginWithGoogle, TUser, TUserRole } from '../user/user.interface';
-import { createToken, verifyToken } from '../user/user.utils';
-import config from '../../config';
-import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import config from '../../config';
+import AppError from '../../error/appError';
+import changeEmailVerificationBody from '../../mailTemplate/changeEmailVerificationBody';
 import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
 import sendEmail from '../../utilities/sendEmail';
-import mongoose from 'mongoose';
-import { USER_ROLE } from '../user/user.constant';
-import NormalUser from '../normalUser/normalUser.model';
-import changeEmailVerificationBody from '../../mailTemplate/changeEmailVerificationBody';
 import Bussiness from '../bussiness/bussiness.model';
+import NormalUser from '../normalUser/normalUser.model';
 import Reviewer from '../reviewer/reviewer.model';
+import { USER_ROLE } from '../user/user.constant';
+import { ILoginWithGoogle, TUser, TUserRole } from '../user/user.interface';
+import { User } from '../user/user.model';
+import { createToken, verifyToken } from '../user/user.utils';
+import { TLoginUser } from './auth.interface';
 
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
@@ -41,6 +41,8 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
   if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
   }
+  // await NotificationSetting.create({ user: user.profileId });
+
   const jwtPayload = {
     id: user?._id,
     profileId: user.profileId,

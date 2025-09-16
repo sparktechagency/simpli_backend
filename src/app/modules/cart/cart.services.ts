@@ -26,7 +26,6 @@ const addToCart = async ({
   variantId,
   referral,
 }: addToCartProps) => {
-  console.log('buss', bussinessId);
   let cart = await Cart.findOne({ reviewer: reviewerId });
 
   if (cart) {
@@ -97,8 +96,13 @@ export const removeCartItem = async (
       !(item.product.toString() == productId && item.variant == variantId),
   );
 
-  await cart.save();
-  return cart;
+  if (cart.items.length == 0) {
+    await Cart.findOneAndDelete({ reviewer: reviewerId });
+    return null;
+  } else {
+    await cart.save();
+    return cart;
+  }
 };
 
 // view cart
@@ -122,7 +126,6 @@ const increaseCartItemQuantity = async (
   productId: string,
   variantId: string | null,
 ) => {
-  console.log('profil', productId, variantId);
   const cart = await Cart.findOne({ reviewer: reviewerId });
 
   if (!cart) {

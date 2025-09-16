@@ -155,6 +155,10 @@ const moduleRoutes = [
     path: '/follow',
     router: followRoutes,
   },
+  {
+    path: '/order',
+    router: orderRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.router));

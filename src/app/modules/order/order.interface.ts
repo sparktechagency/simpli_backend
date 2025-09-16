@@ -61,6 +61,8 @@ export interface IShippingInfo {
   status?: string; // e.g., "PENDING", "SHIPPED", "DELIVERED"
   trackingNumber?: string;
   labelUrl?: string;
+  trackingUrl?: string;
+  shippoTransactionId: string;
 }
 
 export interface IOrder extends Document {

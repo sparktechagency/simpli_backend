@@ -1,7 +1,5 @@
-import { Types } from 'mongoose';
-
 export interface INotificationSetting {
-  user: Types.ObjectId;
+  user: string;
   pushNotification: boolean;
   mention: boolean;
   commentOnPost: boolean;

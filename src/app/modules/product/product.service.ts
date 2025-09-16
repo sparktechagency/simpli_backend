@@ -116,6 +116,18 @@ const createProduct = async (bussinessId: string, payload: IProduct) => {
   const result = await Product.create({ ...payload, bussiness: bussinessId });
   return result;
 };
+const saveAsDraft = async (bussinessId: string, payload: IProduct) => {
+  const category = await Category.findById(payload.category);
+  if (!category) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+  }
+  const result = await Product.create({
+    ...payload,
+    bussiness: bussinessId,
+    status: ENUM_PRODUCT_STATUS.DRAFT,
+  });
+  return result;
+};
 
 const publishProductFromDraft = async (
   profileId: string,
@@ -137,10 +149,13 @@ const publishProductFromDraft = async (
     runValidators: true,
   });
 
-  //TODO: if you want to uplaod images in cloud then need to change here
-  if (product.images && product.images?.length > 0) {
-    for (const imageUrl of product.images) {
-      deleteFileFromS3(imageUrl);
+  const imagesToDelete = product.images?.filter(
+    (img) => !payload.images?.includes(img),
+  );
+
+  if (imagesToDelete && imagesToDelete.length > 0) {
+    for (const imageUrl of imagesToDelete) {
+      await deleteFileFromS3(imageUrl);
     }
   }
   return result;
@@ -429,6 +444,7 @@ const ProductService = {
   getAllProduct,
   getSingleProductFromDB,
   updateProductIntoDB,
+  saveAsDraft,
 };
 
 export default ProductService;

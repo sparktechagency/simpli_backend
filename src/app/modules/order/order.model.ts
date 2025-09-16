@@ -75,6 +75,8 @@ const OrderSchema: Schema = new Schema<IOrder>(
       status: { type: String, default: 'PENDING' }, // PENDING until shipped
       trackingNumber: { type: String, default: null },
       labelUrl: { type: String, default: '' },
+      trackingUrl: { type: String, default: '' },
+      shippoTransactionId: { type: String, default: '' },
     },
   },
   { timestamps: true },

@@ -15,14 +15,63 @@ import auth from './app/middlewares/auth';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import Bussiness from './app/modules/bussiness/bussiness.model';
+import { Order } from './app/modules/order/order.model';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import router from './app/routes';
+import shippo from './app/utilities/shippo';
 const app: Application = express();
 // parser
 app.post(
   '/sampli-webhook',
   express.raw({ type: 'application/json' }),
   handleWebhook,
+);
+app.post(
+  '/webhook-shippo',
+  express.raw({ type: 'application/json' }),
+
+  async (req, res) => {
+    try {
+      // const event = req.body;
+      const event = JSON.parse(req.body.toString());
+      console.log('Shippo webhook:', event);
+
+      if (
+        event.event === 'transaction_created' &&
+        event.data.status === 'SUCCESS'
+      ) {
+        const transactionId = event.data.object_id;
+        console.log('transactionId', transactionId);
+        const transaction = await shippo.transactions.get(transactionId);
+        console.log('transaction', transaction);
+        // Find order that has this transaction
+        const order: any = await Order.findOne({
+          'shipping.shippoTransactionId': transactionId,
+        });
+        if (!order) {
+          // return res.status(200).send('Order not found, ignoring.');
+          console.log('Order not found, ignoring.');
+        }
+
+        // Update order with label + tracking info
+        order.shipping = {
+          ...order.shipping,
+          status: 'PURCHASED',
+          trackingNumber: transaction.trackingNumber,
+          labelUrl: transaction.labelUrl,
+          trackingUrl: transaction.trackingUrlProvider,
+        };
+
+        await order.save();
+        console.log(`Order ${order._id} updated with tracking info`);
+      }
+
+      res.status(200).send('ok');
+    } catch (err) {
+      console.error('Shippo webhook error:', err);
+      res.status(500).send('Webhook handling failed');
+    }
+  },
 );
 router.post('/paypal-webhook', express.json(), handlePaypalWebhook);
 app.use(express.json());

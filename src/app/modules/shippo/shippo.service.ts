@@ -87,8 +87,12 @@ const getShippingRatesForCheckout = async (
     reviewer: reviewerId,
   });
   const store = await Store.findOne({ bussiness: cart.bussiness });
+  console.log('store=========>', store);
   if (!store) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Store details');
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Store details not found,Contact with business owner',
+    );
   }
   if (!shippingAddress)
     throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');

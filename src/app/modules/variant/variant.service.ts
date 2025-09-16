@@ -31,7 +31,6 @@ const updateVariantIntoDB = async (
     new: true,
     runValidators: true,
   });
-  console.log('result', result);
 
   return result;
 };

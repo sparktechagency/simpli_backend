@@ -23,6 +23,21 @@ const createProduct = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const saveAsDraft = catchAsync(async (req, res) => {
+  if (req.files?.product_image) {
+    req.body.images = req.files.product_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
+  }
+
+  const result = await ProductService.saveAsDraft(req.user.profileId, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Product created successfully',
+    data: result,
+  });
+});
 
 // const saveProductAsDraft = catchAsync(async (req, res) => {
 //   const result = await ProductService.saveProductAsDraftIntoDB(
@@ -153,6 +168,7 @@ const ProductController = {
   getAllProduct,
   getSingleProduct,
   updateProduct,
+  saveAsDraft,
 };
 
 export default ProductController;

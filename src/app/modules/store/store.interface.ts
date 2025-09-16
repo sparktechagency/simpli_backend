@@ -15,5 +15,4 @@ export interface IStore {
   email?: string;
   tagline?: string;
   description?: string;
-  zipCode?: number;
 }

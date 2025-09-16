@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request } from 'express';
 
+import AppError from '../../error/appError';
 import {
   AboutUs,
   ContactUs,
@@ -11,7 +12,6 @@ import {
   Slider,
   TermsConditions,
 } from './manage.model';
-import AppError from '../../error/appError';
 
 //! Privacy and policy
 const addPrivacyPolicy = async (payload: any) => {
@@ -66,10 +66,7 @@ const addPartner = async (payload: any) => {
 const getPartner = async () => {
   return await Partner.findOne();
 };
-const editPartner = async (
-  id: string,
-  payload: { description: string },
-) => {
+const editPartner = async (id: string, payload: { description: string }) => {
   const isExist = await Partner.findById(id);
   if (!isExist) {
     throw new AppError(404, 'Partner not found');
@@ -235,7 +232,6 @@ const getSlider = async () => {
 const editSlider = async (req: Request) => {
   const { files, body } = req;
   const { id } = req.params;
-  // console.log(body);
   let image = undefined;
   //@ts-ignore
   if (files && files.image) {
@@ -248,7 +244,6 @@ const editSlider = async (req: Request) => {
     throw new AppError(404, 'Slider program not found');
   }
   const { ...updateData } = body;
-  // console.log(updateData);
   const result = await Slider.findOneAndUpdate(
     { _id: id },
     {
@@ -298,5 +293,5 @@ export const ManageService = {
   addPartner,
   editPartner,
   getPartner,
-  deletePartner
+  deletePartner,
 };

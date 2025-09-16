@@ -98,8 +98,6 @@ const getReviewerProfile = async (profileId: string) => {
     },
   ]);
 
-  console.log('result', result);
-
   return result[0];
 };
 

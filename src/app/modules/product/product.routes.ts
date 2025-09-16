@@ -23,19 +23,18 @@ router.post(
   validateRequest(ProductValidations.createProductValidationSchema),
   ProductController.createProduct,
 );
-// router.post(
-//   '/save-product-as-draft',
-//   auth(USER_ROLE.bussinessOwner),
-//   uploadFile(),
-//   (req: Request, res: Response, next: NextFunction) => {
-//     if (req.body.data) {
-//       req.body = JSON.parse(req.body.data);
-//     }
-//     next();
-//   },
-//   validateRequest(ProductValidations.saveAsDraftProductValidationSchema),
-//   ProductController.saveProductAsDraft,
-// );
+router.post(
+  '/save-product-as-draft',
+  auth(USER_ROLE.bussinessOwner),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  ProductController.saveAsDraft,
+);
 
 router.post(
   '/publish-product-from-draft/:id',

@@ -15,7 +15,6 @@ const StoreSchema: Schema = new Schema<IStore>(
     city: { type: String, required: true },
     state: { type: String, required: true },
     zip: { type: String, required: true },
-    zipCode: { type: Number },
     country: { type: String, required: true },
     phone: { type: String, required: true },
     alternativePhoneNumber: { type: String, required: true },

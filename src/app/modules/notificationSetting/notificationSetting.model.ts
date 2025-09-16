@@ -4,8 +4,7 @@ import { INotificationSetting } from './notificationSetting.interface';
 const NotificationSettingSchema = new Schema<INotificationSetting>(
   {
     user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
       required: true,
       unique: true,
     },

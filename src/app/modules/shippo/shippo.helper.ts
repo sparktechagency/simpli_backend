@@ -36,10 +36,10 @@ export const generateParcels = (cartItems: CartItem[] | any): Parcel[] => {
 
   cartItems.forEach((item: any) => {
     for (let i = 0; i < item.quantity; i++) {
-      const newWeight = currentParcel.weight + item.weight;
-      const newLength = currentParcel.length + item.length;
-      const newHeight = currentParcel.height + item.height;
-      const newWidth = Math.max(currentParcel.width, item.width);
+      const newWeight = currentParcel.weight + item?.weight || 5;
+      const newLength = currentParcel.length + item.length || 5;
+      const newHeight = currentParcel.height + item.height || 5;
+      const newWidth = Math.max(currentParcel.width, item.width || 5);
 
       // Check if adding this item exceeds carrier-safe limits
       if (
