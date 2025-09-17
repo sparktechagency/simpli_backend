@@ -34,7 +34,7 @@ const getMyCampaignOfferFromDB = async (
   let filterQuery = {};
   if (userData?.role === USER_ROLE.reviewer) {
     filterQuery = {
-      reveviewer: userData.profileId,
+      reviewer: userData.profileId,
     };
   } else if (userData?.role === USER_ROLE.bussinessOwner) {
     filterQuery = {
@@ -70,7 +70,7 @@ const getSingleCampaignOffer = async (userData: JwtPayload, id: string) => {
   let filterQuery = {};
   if (userData?.role === USER_ROLE.reviewer) {
     filterQuery = {
-      reveviewer: userData.profileId,
+      reviewer: userData.profileId,
       _id: id,
     };
   } else if (userData?.role === USER_ROLE.bussinessOwner) {
