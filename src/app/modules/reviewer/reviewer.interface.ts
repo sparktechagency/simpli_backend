@@ -53,4 +53,8 @@ export interface IReviewer {
   //
   totalEarning: number;
   currentBalance: number;
+
+  // for stripe
+  isStripeAccountConnected: { type: boolean; default: false };
+  stripeConnectedAccountId: { type: string };
 }

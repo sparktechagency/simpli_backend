@@ -100,6 +100,10 @@ const BussinessSchema = new Schema<IBussiness>(
       default: false,
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
+
+    // for stripe
+    isStripeAccountConnected: { type: Boolean, default: false },
+    stripeConnectedAccountId: { type: String },
   },
   {
     timestamps: true,

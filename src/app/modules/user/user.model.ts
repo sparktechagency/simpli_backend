@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose';
-import { TUser, UserModel } from './user.interface';
-import config from '../../config';
 import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
+import config from '../../config';
+import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser>(
   {
@@ -65,8 +65,6 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
-    isStripeAccountConnected: { type: Boolean, default: false },
-    stripeConnectedAccountId: { type: String },
     googleId: {
       type: String,
       default: '',

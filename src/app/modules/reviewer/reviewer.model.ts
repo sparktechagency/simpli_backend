@@ -131,6 +131,9 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       type: Number,
       default: 0,
     },
+    // for stripe
+    isStripeAccountConnected: { type: Boolean, default: false },
+    stripeConnectedAccountId: { type: String },
   },
   { timestamps: true },
 );
