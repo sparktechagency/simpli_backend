@@ -66,11 +66,20 @@ const getMyCampaignOfferFromDB = async (
   };
 };
 
-const getSingleCampaignOffer = async (profileId: string, id: string) => {
-  const result = await CampaignOffer.findOne({
-    reviewer: profileId,
-    _id: id,
-  })
+const getSingleCampaignOffer = async (userData: JwtPayload, id: string) => {
+  let filterQuery = {};
+  if (userData?.role === USER_ROLE.reviewer) {
+    filterQuery = {
+      reveviewer: userData.profileId,
+      _id: id,
+    };
+  } else if (userData?.role === USER_ROLE.bussinessOwner) {
+    filterQuery = {
+      bussiness: userData?.profileId,
+      _id: id,
+    };
+  }
+  const result = await CampaignOffer.findOne(filterQuery)
     .populate({ path: 'campaign', select: 'name amountForEachReview endDate' })
     .populate({ path: 'product', select: 'name images' });
   return result;

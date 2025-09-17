@@ -16,12 +16,13 @@ router.post(
 
 router.get(
   '/get-my-campaign-offer',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   CampaignOfferController.getMyCampaignOffer,
 );
+
 router.get(
   '/get-single-campaign-offer/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   CampaignOfferController.getSingleCampaignOffer,
 );
 

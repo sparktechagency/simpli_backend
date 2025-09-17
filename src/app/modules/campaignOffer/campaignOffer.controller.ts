@@ -29,7 +29,7 @@ const getMyCampaignOffer = catchAsync(async (req, res) => {
 });
 const getSingleCampaignOffer = catchAsync(async (req, res) => {
   const result = await CampaignOfferService.getSingleCampaignOffer(
-    req.user.profileId,
+    req.user,
     req.params.id,
   );
   sendResponse(res, {

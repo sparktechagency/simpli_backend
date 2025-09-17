@@ -36,7 +36,7 @@ router.post(
 );
 router.patch(
   '/update-comment/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -62,7 +62,7 @@ router.post(
 
 router.get(
   '/get-review-comments/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   commentController.getReviewComments,
 );
 router.get(
@@ -72,12 +72,12 @@ router.get(
 );
 router.get(
   '/get-replies/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   commentController.getReplies,
 );
 router.get(
   '/get-likers/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   commentController.getAllLikersForComment,
 );
 
