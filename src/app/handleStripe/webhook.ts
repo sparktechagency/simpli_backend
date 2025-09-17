@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import config from '../config';
-import { Request, Response } from 'express';
+import StripeService from '../modules/stripe/stripe.service';
 import handlePaymentSuccess from './handlePaymentSuccess';
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
@@ -20,19 +21,6 @@ const handleWebhook = async (req: Request, res: Response) => {
 
     // Handle different event types
     switch (event.type) {
-      //   case 'payment_intent.succeeded': {
-      //     const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      //     console.log(paymentIntent.metadata);
-      //     const { userId, paymentPurpose } = paymentIntent.metadata;
-
-      //     console.log(
-      //       `Payment successful for user ${userId}, subscription ${userId}`,
-      //     );
-      //     // await handlePaymentSuccess(userId, paymentPurpose);
-      //     // Update subscription status in your database
-
-      //     break;
-      //   }
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
 
@@ -55,7 +43,7 @@ const handleWebhook = async (req: Request, res: Response) => {
         const account = event.data.object as Stripe.Account;
         if (account.details_submitted) {
           try {
-            // await stripeServices.updateClientStripeConnectionStatus(account.id);
+            await StripeService.updateStripeConnectedAccountStatus(account.id);
           } catch (err) {
             console.error(
               `Failed to update client status for Stripe account ID: ${account.id}`,

@@ -118,9 +118,65 @@ const updateOnboardingLink = async (userId: string) => {
   return { link: accountLink.url };
 };
 
+const updateStripeConnectedAccountStatus = async (accountId: string) => {
+  if (!accountId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Stripe account ID is required.',
+    );
+  }
+
+  try {
+    // Try updating Business first
+    const updatedBusiness = await Bussiness.findOneAndUpdate(
+      { stripeConnectedAccountId: accountId },
+      { isStripeAccountConnected: true },
+      { new: true, runValidators: true },
+    );
+
+    if (updatedBusiness) {
+      return {
+        success: true,
+        message: 'Business Stripe account connected successfully.',
+        data: updatedBusiness,
+      };
+    }
+
+    // If not found, try updating Reviewer
+    const updatedReviewer = await Reviewer.findOneAndUpdate(
+      { stripeConnectedAccountId: accountId },
+      { isStripeAccountConnected: true },
+      { new: true, runValidators: true },
+    );
+
+    if (updatedReviewer) {
+      return {
+        success: true,
+        message: 'Reviewer Stripe account connected successfully.',
+        data: updatedReviewer,
+      };
+    }
+
+    // If neither found
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `No business or reviewer found with Stripe account ID: ${accountId}`,
+    );
+  } catch (err) {
+    console.error('Error updating Stripe account status:', err);
+    return {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: 'An error occurred while updating the client status.',
+      error: err instanceof Error ? err.message : 'Unknown error',
+    };
+  }
+};
+
 const StripeService = {
   createConnectedAccountAndOnboardingLink,
   updateOnboardingLink,
+  updateStripeConnectedAccountStatus,
 };
 
 export default StripeService;
