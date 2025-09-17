@@ -392,7 +392,7 @@ const getAllReviewFromDB = async (
                 name: 1,
                 username: 1,
                 profile_image: 1,
-                isFollow: 1, // 👈 included inside reviewer
+                isFollow: 1,
               },
               product: {
                 _id: 1,
