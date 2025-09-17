@@ -23,7 +23,9 @@ const shippingAddressValidationSchema = z.object({
     phone: z
       .string({ required_error: 'Phone is required' })
       .min(1, 'Phone is required'),
-    email: z.string().email('Invalid email address').optional(),
+    email: z
+      .string({ required_error: 'Email is required' })
+      .email('Invalid email address'),
     alternativePhoneNumber: z
       .string({ required_error: 'Alternative phone number is required' })
       .min(1, 'Alternative phone number is required'),
