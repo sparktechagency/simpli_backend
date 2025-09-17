@@ -80,7 +80,9 @@ const likeUnlikeReview = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Liked added successfully',
+    message: result.liked
+      ? 'Liked added successfully'
+      : 'Like removed successfully',
     data: result,
   });
 });

@@ -69,7 +69,9 @@ const likeUnlikeComment = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Comment  successfully',
+    message: result.liked
+      ? 'Like added successfully'
+      : 'Like remove successfully',
     data: result,
   });
 });
