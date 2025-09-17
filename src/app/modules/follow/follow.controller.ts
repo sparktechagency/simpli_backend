@@ -5,7 +5,7 @@ import FollowServices from './follow.service';
 
 const followUnfollowUser = catchAsync(async (req, res) => {
   const followerId = req.user.profileId;
-  const followingId = req.params.userId;
+  const followingId = req.params.id;
 
   const result = await FollowServices.followUnfollowUser(
     followerId,

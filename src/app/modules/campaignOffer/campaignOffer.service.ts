@@ -75,13 +75,14 @@ const getSingleCampaignOffer = async (userData: JwtPayload, id: string) => {
     };
   } else if (userData?.role === USER_ROLE.bussinessOwner) {
     filterQuery = {
-      bussiness: userData?.profileId,
+      business: userData?.profileId,
       _id: id,
     };
   }
   const result = await CampaignOffer.findOne(filterQuery)
     .populate({ path: 'campaign', select: 'name amountForEachReview endDate' })
-    .populate({ path: 'product', select: 'name images' });
+    .populate({ path: 'product', select: 'name images' })
+    .populate({ path: 'shippingAddress' });
   return result;
 };
 

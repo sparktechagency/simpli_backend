@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
+import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Reviewer from '../reviewer/reviewer.model';
 import Review from './reviewer.model';
@@ -32,6 +33,10 @@ const createReview = async (reviewerId: string, payload: any) => {
   // }
 
   // TODO: when create review---------------
+  if (payload.video) {
+    console.log('video', payload.video);
+    payload.video = getCloudFrontUrl(payload.video);
+  }
   const result = await Review.create({
     ...payload,
     reviewer: reviewerId,
