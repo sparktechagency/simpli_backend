@@ -4,12 +4,13 @@
 import httpStatus from 'http-status';
 import AppError from '../error/appError';
 import Campaign from '../modules/campaign/campaign.model';
+import Transaction from '../modules/transaction/transaction.model';
 import {
   ENUM_PAYMENT_PURPOSE,
   ENUM_PAYMENT_STATUS,
   ENUM_TRANSACTION_STATUS,
 } from '../utilities/enum';
-import Transaction from '../modules/transaction/transaction.model';
+import campaignOfferDeliveryPaymentSuccess from './campaignOfferDeliveryPaymentSuccess';
 import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
 
 const handlePaymentSuccess = async (
@@ -27,6 +28,15 @@ const handlePaymentSuccess = async (
     );
   } else if (metaData.paymentPurpose == ENUM_PAYMENT_PURPOSE.ORDER) {
     await handleOrderPaymentSuccess(metaData.orderId, transactionId, amount);
+  } else if (
+    metaData.paymentPurpose ==
+    ENUM_PAYMENT_PURPOSE.PROCEED_CAMPAIGN_OFFER_DELIVERY
+  ) {
+    await campaignOfferDeliveryPaymentSuccess(
+      metaData.campaignOfferId,
+      transactionId,
+      amount,
+    );
   }
 };
 
