@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { Types } from 'mongoose';
+import { z } from 'zod';
 
 // Helper function to validate MongoDB ObjectId
 const ObjectIdSchema = (fieldName: string) =>
@@ -19,8 +19,21 @@ const campaignOfferSchema = z.object({
   }),
 });
 
+const proceedDeliveryForCampaignOfferValidationSchema = z.object({
+  body: z.object({
+    paymentMethod: z.string({ required_error: 'Payment method is required' }),
+    shipmentId: z.string({ required_error: 'Shipment id is required' }),
+    selectedRateId: z.string({
+      required_error: 'Selected rated id is required',
+    }),
+    campaignOfferId: z.string({
+      required_error: 'Campaign offer id is required',
+    }),
+  }),
+});
 const CampaignOfferValidations = {
   campaignOfferSchema,
+  proceedDeliveryForCampaignOfferValidationSchema,
 };
 
 export default CampaignOfferValidations;

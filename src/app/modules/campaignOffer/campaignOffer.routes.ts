@@ -25,5 +25,13 @@ router.get(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   CampaignOfferController.getSingleCampaignOffer,
 );
+router.post(
+  '/proceed-delivery',
+  auth(USER_ROLE.bussinessOwner),
+  validateRequest(
+    CampaignOfferValidations.proceedDeliveryForCampaignOfferValidationSchema,
+  ),
+  CampaignOfferController.proceedDeliveryForCampaignOffer,
+);
 
 export const campaignOfferRoutes = router;

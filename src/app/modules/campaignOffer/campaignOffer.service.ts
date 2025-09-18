@@ -97,14 +97,16 @@ const getSingleCampaignOffer = async (userData: JwtPayload, id: string) => {
   return result;
 };
 
-const proceedDeliveryForCampaignOffer = async (payload: {
-  businessId: string;
-  campaignOfferId: string;
-  selectedRateId: string;
-  shipmentId: string;
-  paymentMethod: string;
-}) => {
-  const { businessId, campaignOfferId, selectedRateId, shipmentId } = payload;
+const proceedDeliveryForCampaignOffer = async (
+  businessId: string,
+  payload: {
+    campaignOfferId: string;
+    selectedRateId: string;
+    shipmentId: string;
+    paymentMethod: string;
+  },
+) => {
+  const { campaignOfferId, selectedRateId, shipmentId } = payload;
   const [businessStore, campaignOffer] = await Promise.all([
     Store.findOne({ bussiness: businessId }),
     CampaignOffer.findOne({ business: businessId, _id: campaignOfferId }),

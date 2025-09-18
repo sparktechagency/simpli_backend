@@ -39,11 +39,24 @@ const getSingleCampaignOffer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const proceedDeliveryForCampaignOffer = catchAsync(async (req, res) => {
+  const result = await CampaignOfferService.proceedDeliveryForCampaignOffer(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Payment link generated for proceed delivery for campaign offer`,
+    data: result,
+  });
+});
 
 const CampaignOfferController = {
   acceptCampaignOffer,
   getMyCampaignOffer,
   getSingleCampaignOffer,
+  proceedDeliveryForCampaignOffer,
 };
 
 export default CampaignOfferController;
