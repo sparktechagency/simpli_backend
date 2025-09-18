@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import paypal from '@paypal/checkout-server-sdk';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import QueryBuilder from '../../builder/QueryBuilder';
+import config from '../../config';
 import AppError from '../../error/appError';
+import {
+  ENUM_PAYMENT_METHOD,
+  ENUM_PAYMENT_PURPOSE,
+} from '../../utilities/enum';
+import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
+import stripe from '../../utilities/stripe';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
@@ -94,6 +102,7 @@ const proceedDeliveryForCampaignOffer = async (payload: {
   campaignOfferId: string;
   selectedRateId: string;
   shipmentId: string;
+  paymentMethod: string;
 }) => {
   const { businessId, campaignOfferId, selectedRateId, shipmentId } = payload;
   const [businessStore, campaignOffer] = await Promise.all([
@@ -114,12 +123,12 @@ const proceedDeliveryForCampaignOffer = async (payload: {
   );
   if (!selectedRate)
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid shipping rate');
-
+  const amount = parseFloat(selectedRate.amount);
   const shippingInfo = {
     rateId: selectedRate.objectId,
     provider: selectedRate.provider,
     service: selectedRate.servicelevel.name,
-    amount: parseFloat(selectedRate.amount),
+    amount: amount,
     currency: selectedRate.currency,
     shipmentId: shipment.objectId,
     status: 'PENDING', // not purchased yet
@@ -128,6 +137,80 @@ const proceedDeliveryForCampaignOffer = async (payload: {
 
   campaignOffer.shipping = shippingInfo;
   campaignOffer.save();
+
+  // Payment handling
+  if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
+    const amountInCents = (amount * 100).toFixed();
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Order Payment' },
+            unit_amount: Number(amountInCents),
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        campaignOfferId: campaignOffer._id.toString(),
+        paymentPurpose: ENUM_PAYMENT_PURPOSE.PROCEED_CAMPAIGN_OFFER_DELIVERY,
+      },
+      success_url: config.stripe.stripe_order_payment_success_url,
+      cancel_url: config.stripe.stripe_order_payment_cancel_url,
+    });
+
+    return { url: session.url };
+  } else {
+    try {
+      const request = new paypal.orders.OrdersCreateRequest();
+      request.prefer('return=representation');
+      request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            amount: {
+              currency_code: 'USD',
+              value: amount.toFixed(2),
+            },
+            description: `Payment for proceed campaign offer delivery: ${campaignOffer._id}`,
+            custom_id: campaignOffer._id.toString(),
+            reference_id: ENUM_PAYMENT_PURPOSE.PROCEED_CAMPAIGN_OFFER_DELIVERY,
+          },
+        ],
+        application_context: {
+          brand_name: 'Your Business Name',
+          landing_page: 'LOGIN',
+          user_action: 'PAY_NOW',
+          return_url: `${config.paypal.payment_capture_url}`,
+          cancel_url: `${config.stripe.stripe_order_payment_cancel_url}`,
+        },
+      });
+
+      const response = await paypalClient.execute(request);
+      const approvalUrl = response.result.links.find(
+        (link: any) => link.rel === 'approve',
+      )?.href;
+
+      if (!approvalUrl) {
+        throw new AppError(
+          httpStatus.INTERNAL_SERVER_ERROR,
+          'PayPal payment creation failed',
+        );
+      }
+
+      return { url: approvalUrl };
+    } catch (error) {
+      console.error('PayPal Payment Error:', error);
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to create PayPal order',
+      );
+    }
+  }
 };
 
 const CampaignOfferService = {
