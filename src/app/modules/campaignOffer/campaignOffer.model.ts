@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
-import { CampaignOfferStatus } from './campaignOffer.constant';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
+import { CampaignOfferStatus } from './campaignOffer.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 
 const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
@@ -27,6 +27,19 @@ const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
       default: ENUM_DELIVERY_STATUS.waiting,
     },
     amount: { type: Number, required: true },
+    shipping: {
+      rateId: { type: String, required: false },
+      provider: { type: String, required: false },
+      service: { type: String, required: false },
+      amount: { type: Number, required: false, default: 0 },
+      currency: { type: String, required: false },
+      shipmentId: { type: String, required: false },
+      status: { type: String, default: 'PENDING' }, // PENDING until shipped
+      trackingNumber: { type: String, default: null },
+      labelUrl: { type: String, default: '' },
+      trackingUrl: { type: String, default: '' },
+      shippoTransactionId: { type: String, default: '' },
+    },
   },
   { timestamps: true },
 );

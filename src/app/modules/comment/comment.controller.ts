@@ -84,7 +84,7 @@ const getReviewComments = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Comment retrieved  successfully',
+    message: 'Comment retrieved successfully',
     data: result,
   });
 });

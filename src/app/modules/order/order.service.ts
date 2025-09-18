@@ -13,8 +13,8 @@ import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
 import stripe from '../../utilities/stripe';
 import Cart from '../cart/cart.model';
-import ShippingAddress from '../shippingAddress/shippingAddress.model';
-import { Store } from '../store/store.model';
+// import ShippingAddress from '../shippingAddress/shippingAddress.model';
+// import { Store } from '../store/store.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 
@@ -32,16 +32,17 @@ const createOrder = async (
 
   if (payload.selectedRateId) {
     // User selected a shipping rate
-    const shippingAddress = await ShippingAddress.findOne({
-      _id: payload.shippingAddress,
-      reviewer: reviewerId,
-    });
-    const store = await Store.findOne({ bussiness: cart.bussiness });
-    if (!store) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Store details');
-    }
-    if (!shippingAddress)
-      throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+    // const shippingAddress = await ShippingAddress.findOne({
+    //   _id: payload.shippingAddress,
+    //   reviewer: reviewerId,
+    // });
+    // const store = await Store.findOne({ bussiness: cart.bussiness });
+    // if (!store) {
+    //   throw new AppError(httpStatus.NOT_FOUND, 'Store details');
+    // }
+    // if (!shippingAddress)
+    //   throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+
     const shipment = await shippo.shipments.get(payload.shipmentId);
     const selectedRate = shipment.rates.find(
       (r: any) => r.objectId == payload.selectedRateId,
