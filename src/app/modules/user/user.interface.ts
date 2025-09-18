@@ -27,6 +27,7 @@ export interface TUser {
   googleId: string;
   appleId: string;
   facebookId: string;
+  playerIds: string[];
 }
 export interface TLoginUser {
   email: string;

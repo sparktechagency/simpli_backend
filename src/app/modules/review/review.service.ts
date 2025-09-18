@@ -244,7 +244,11 @@ const getAllReviewFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const reviewer = await Reviewer.findById(reviewerId).select('following');
-
+  if (query.following == 'true') {
+    query.following = true;
+  } else {
+    query.following = false;
+  }
   const matchStage: any = {};
   if (query.following) {
     matchStage.reviewer = { $in: reviewer?.following || [] };
@@ -580,15 +584,17 @@ const getMyReviews = async (
                 _id: 1,
                 name: 1,
                 price: 1,
+                images: 1,
               },
               category: {
                 _id: 1,
                 name: 1,
+                images: 1,
               },
               campaign: 1,
               amount: 1,
               description: 1,
-              images: 1,
+              // images: 1,
               video: 1,
               thumbnail: 1,
               totalLikers: 1,
