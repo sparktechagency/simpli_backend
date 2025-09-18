@@ -7,7 +7,7 @@ import oAuthController from './oAuth.controller';
 
 const router = express.Router();
 
-router.post('/oauth-login', oAuthController.oAuthLogin);
+router.post('/login', oAuthController.oAuthLogin);
 router.post(
   '/link-social',
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
