@@ -72,14 +72,21 @@ const updateShippingAddress = async (
 };
 
 const getShippingAddress = async (profileId: string) => {
-  const result = await ShippingAddress.find({ reviewer: profileId });
+  const result = await ShippingAddress.find({
+    reviewer: profileId,
+    isDeleted: false,
+  });
   return result;
 };
 const deleteShippingAddress = async (profileId: string, id: string) => {
-  const result = await ShippingAddress.findOneAndDelete({
-    reviewer: profileId,
-    _id: id,
-  });
+  const result = await ShippingAddress.findOneAndUpdate(
+    {
+      reviewer: profileId,
+      _id: id,
+    },
+    { isDeleted: true },
+    { new: true, runValidators: true },
+  );
   return result;
 };
 

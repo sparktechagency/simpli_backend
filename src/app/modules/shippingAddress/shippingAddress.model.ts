@@ -20,6 +20,10 @@ const shippingAddressSchema = new Schema<IShippingAddress>(
     street2: {
       type: String,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

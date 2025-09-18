@@ -13,4 +13,5 @@ export interface IShippingAddress {
   alternativePhoneNumber: string;
   street2?: string;
   email: string;
+  isDeleted: boolean;
 }

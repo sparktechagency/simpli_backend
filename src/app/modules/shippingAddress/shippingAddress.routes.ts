@@ -29,7 +29,7 @@ router.get(
   ShippingAddressController.getShippingAddress,
 );
 
-router.get(
+router.delete(
   '/delete-shipping-address/:id',
   auth(USER_ROLE.reviewer),
   ShippingAddressController.deleteShippingAddress,
