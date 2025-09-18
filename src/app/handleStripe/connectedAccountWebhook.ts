@@ -5,11 +5,11 @@ import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import config from '../config';
 import StripeService from '../modules/stripe/stripe.service';
-import handlePaymentSuccess from './handlePaymentSuccess';
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
-const handleWebhook = async (req: Request, res: Response) => {
-  const endpointSecret = config.stripe.webhook_endpoint_secret as string;
+const handleConnectedAccountWebhook = async (req: Request, res: Response) => {
+  const endpointSecret = config.stripe
+    .webhook_endpoint_secret_for_connected as string;
   const sig = req.headers['stripe-signature'];
 
   try {
@@ -18,29 +18,10 @@ const handleWebhook = async (req: Request, res: Response) => {
       sig as string,
       endpointSecret,
     );
-
-    console.log('Webhook hit ===========>', event.type);
+    console.log('webhook hit from connected account', event.type);
 
     // Handle different event types
     switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-
-        console.log(session.metadata);
-        const paymentIntentId = session.payment_intent;
-
-        const paymentIntent = await stripe.paymentIntents.retrieve(
-          paymentIntentId as string,
-        );
-
-        await handlePaymentSuccess(
-          session.metadata,
-          paymentIntent.id,
-          paymentIntent.amount / 100,
-        );
-
-        break;
-      }
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
         console.log('account-============<', account);
@@ -77,4 +58,4 @@ const handleWebhook = async (req: Request, res: Response) => {
   }
 };
 
-export default handleWebhook;
+export default handleConnectedAccountWebhook;

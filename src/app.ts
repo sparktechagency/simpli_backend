@@ -14,6 +14,7 @@ import {
 import AppError from './app/error/appError';
 import capturePayPalPayment from './app/handlePaypal/capturePaypalPayment';
 import handlePaypalWebhook from './app/handlePaypal/handlePaypalWebhook';
+import handleConnectedAccountWebhook from './app/handleStripe/connectedAccountWebhook';
 import onboardingRefresh from './app/handleStripe/onboardingRefresh';
 import handleWebhook from './app/handleStripe/webhook';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
@@ -32,6 +33,11 @@ app.post(
   '/sampli-webhook',
   express.raw({ type: 'application/json' }),
   handleWebhook,
+);
+app.post(
+  '/sampli-webhook-connected-account',
+  express.raw({ type: 'application/json' }),
+  handleConnectedAccountWebhook,
 );
 app.post(
   '/webhook-shippo',

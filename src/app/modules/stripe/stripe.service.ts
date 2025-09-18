@@ -20,41 +20,51 @@ const createConnectedAccountAndOnboardingLink = async (
       throw new AppError(httpStatus.BAD_REQUEST, 'Stripe is already connected');
     }
 
-    const account = await stripe.accounts.create({
-      type: 'express',
-      email: businessInfo.email,
-      country: 'US',
-      capabilities: {
-        // card_payments: { requested: true },
-        transfers: { requested: true },
-      },
-      settings: {
-        payouts: {
-          schedule: {
-            interval: 'manual',
+    if (businessInfo.stripeConnectedAccountId) {
+      const onboardingLink = await stripe.accountLinks.create({
+        account: businessInfo.stripeConnectedAccountId.toString(),
+        refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${businessInfo.stripeConnectedAccountId.toString()}`,
+        return_url: `${config.stripe.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
+    } else {
+      const account = await stripe.accounts.create({
+        type: 'express',
+        email: businessInfo.email,
+        country: 'US',
+        capabilities: {
+          // card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+        settings: {
+          payouts: {
+            schedule: {
+              interval: 'manual',
+            },
           },
         },
-      },
-    });
-    const updateBusinessData = await Bussiness.findByIdAndUpdate(
-      userData.profileId,
-      {
-        stripeConnectedAccountId: account?.id,
-      },
-    );
-    if (!updateBusinessData) {
-      throw new AppError(
-        httpStatus.SERVICE_UNAVAILABLE,
-        'Unable to add account id in business data',
+      });
+      const updateBusinessData = await Bussiness.findByIdAndUpdate(
+        userData.profileId,
+        {
+          stripeConnectedAccountId: account?.id,
+        },
       );
+      if (!updateBusinessData) {
+        throw new AppError(
+          httpStatus.SERVICE_UNAVAILABLE,
+          'Unable to add account id in business data',
+        );
+      }
+      const onboardingLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
+        return_url: `${config.stripe.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
     }
-    const onboardingLink = await stripe.accountLinks.create({
-      account: account.id,
-      refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
-      return_url: `${config.stripe.onboarding_return_url}`,
-      type: 'account_onboarding',
-    });
-    return onboardingLink.url;
   } else {
     const reviewerInfo = await Reviewer.findById(userData.profileId);
     if (!reviewerInfo) {
@@ -63,42 +73,51 @@ const createConnectedAccountAndOnboardingLink = async (
     if (reviewerInfo?.isStripeAccountConnected) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Stripe is already connected');
     }
-
-    const account = await stripe.accounts.create({
-      type: 'express',
-      email: reviewerInfo.email,
-      country: 'US',
-      capabilities: {
-        // card_payments: { requested: true },
-        transfers: { requested: true },
-      },
-      settings: {
-        payouts: {
-          schedule: {
-            interval: 'manual',
+    if (reviewerInfo.stripeConnectedAccountId) {
+      const onboardingLink = await stripe.accountLinks.create({
+        account: reviewerInfo.stripeConnectedAccountId.toString(),
+        refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${reviewerInfo.stripeConnectedAccountId.toString()}`,
+        return_url: `${config.stripe.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
+    } else {
+      const account = await stripe.accounts.create({
+        type: 'express',
+        email: reviewerInfo.email,
+        country: 'US',
+        capabilities: {
+          // card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+        settings: {
+          payouts: {
+            schedule: {
+              interval: 'manual',
+            },
           },
         },
-      },
-    });
-    const updateReviewerData = await Reviewer.findByIdAndUpdate(
-      userData.profileId,
-      {
-        stripeConnectedAccountId: account?.id,
-      },
-    );
-    if (!updateReviewerData) {
-      throw new AppError(
-        httpStatus.SERVICE_UNAVAILABLE,
-        'Unable to add account id in reviewer data',
+      });
+      const updateReviewerData = await Reviewer.findByIdAndUpdate(
+        userData.profileId,
+        {
+          stripeConnectedAccountId: account?.id,
+        },
       );
+      if (!updateReviewerData) {
+        throw new AppError(
+          httpStatus.SERVICE_UNAVAILABLE,
+          'Unable to add account id in reviewer data',
+        );
+      }
+      const onboardingLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
+        return_url: `${config.stripe.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
     }
-    const onboardingLink = await stripe.accountLinks.create({
-      account: account.id,
-      refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
-      return_url: `${config.stripe.onboarding_return_url}`,
-      type: 'account_onboarding',
-    });
-    return onboardingLink.url;
   }
 };
 
