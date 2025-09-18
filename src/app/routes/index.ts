@@ -16,6 +16,7 @@ import { followRoutes } from '../modules/follow/follow.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
 import { notificationRoutes } from '../modules/notification/notification.routes';
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
+import { oauthRoutes } from '../modules/oAuth/oAuth.routes';
 import { orderRoutes } from '../modules/order/order.routes';
 import { paypalRoutes } from '../modules/paypal/paypal.routes';
 import { productRoutes } from '../modules/product/product.routes';
@@ -158,6 +159,10 @@ const moduleRoutes = [
   {
     path: '/order',
     router: orderRoutes,
+  },
+  {
+    path: '/oauth',
+    router: oauthRoutes,
   },
 ];
 

@@ -19,4 +19,4 @@ router.post(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   oAuthController.oAuthLink,
 );
-export default router;
+export const oauthRoutes = router;
