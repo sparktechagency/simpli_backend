@@ -75,10 +75,18 @@ const getShippingAddress = async (profileId: string) => {
   const result = await ShippingAddress.find({ reviewer: profileId });
   return result;
 };
+const deleteShippingAddress = async (profileId: string, id: string) => {
+  const result = await ShippingAddress.findOneAndDelete({
+    reviewer: profileId,
+    _id: id,
+  });
+  return result;
+};
 
 const ShippingAddressService = {
   createShippingAddress,
   updateShippingAddress,
   getShippingAddress,
+  deleteShippingAddress,
 };
 export default ShippingAddressService;

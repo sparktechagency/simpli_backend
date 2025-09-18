@@ -41,11 +41,24 @@ const getShippingAddress = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deleteShippingAddress = catchAsync(async (req, res) => {
+  const result = await ShippingAddressService.deleteShippingAddress(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Shipping address deleted successfully',
+    data: result,
+  });
+});
 
 const ShippingAddressController = {
   createShippingAddress,
   updateShippingAddress,
   getShippingAddress,
+  deleteShippingAddress,
 };
 
 export default ShippingAddressController;
