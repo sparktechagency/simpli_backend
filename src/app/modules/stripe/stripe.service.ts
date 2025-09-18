@@ -80,7 +80,7 @@ const createConnectedAccountAndOnboardingLink = async (
         },
       },
     });
-    const updateReviewerData = await User.findByIdAndUpdate(
+    const updateReviewerData = await Reviewer.findByIdAndUpdate(
       userData.profileId,
       {
         stripeConnectedAccountId: account?.id,

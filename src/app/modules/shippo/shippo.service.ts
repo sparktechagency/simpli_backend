@@ -141,7 +141,7 @@ const getShippingRatesForOfferShipment = async (
   const campaignOffer: any = await CampaignOffer.findOne({
     _id: campaignOfferId,
     business: businessId,
-  }).populate({ path: 'product', select: 'height length weight width' });
+  }).populate({ path: 'product' });
   const store = await Store.findOne({ bussiness: businessId });
   if (!store) {
     throw new AppError(
@@ -160,7 +160,7 @@ const getShippingRatesForOfferShipment = async (
   // const parcels = generateParcels(cart.items);
   const parcels = [
     {
-      length: campaignOffer?.product.length,
+      length: campaignOffer?.product.length || 0,
       width: campaignOffer?.product?.width || 0,
       height: campaignOffer?.product?.height || 0,
       weight: campaignOffer?.product?.weight || 0,

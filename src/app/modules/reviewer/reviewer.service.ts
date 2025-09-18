@@ -94,6 +94,8 @@ const getReviewerProfile = async (profileId: string) => {
         totalFollowers: { $size: '$followersData' },
         totalFollowing: { $size: '$followingData' },
         totalReviews: { $size: '$reviewsData' },
+        isStripeAccountConnected: 1,
+        stripeConnectedAccountId: 1,
       },
     },
   ]);

@@ -21,6 +21,7 @@ import auth from './app/middlewares/auth';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import Bussiness from './app/modules/bussiness/bussiness.model';
+import { CampaignOffer } from './app/modules/campaignOffer/campaignOffer.model';
 import { Order } from './app/modules/order/order.model';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import router from './app/routes';
@@ -54,22 +55,37 @@ app.post(
         const order: any = await Order.findOne({
           'shipping.shippoTransactionId': transactionId,
         });
-        if (!order) {
+        if (order) {
           // return res.status(200).send('Order not found, ignoring.');
-          console.log('Order not found, ignoring.');
+          console.log('Order found.');
+          // Update order with label + tracking info
+          order.shipping = {
+            ...order.shipping,
+            status: 'PURCHASED',
+            trackingNumber: transaction.trackingNumber,
+            labelUrl: transaction.labelUrl,
+            trackingUrl: transaction.trackingUrlProvider,
+          };
+
+          await order.save();
+          console.log(`Order ${order._id} updated with tracking info`);
         }
 
-        // Update order with label + tracking info
-        order.shipping = {
-          ...order.shipping,
-          status: 'PURCHASED',
-          trackingNumber: transaction.trackingNumber,
-          labelUrl: transaction.labelUrl,
-          trackingUrl: transaction.trackingUrlProvider,
-        };
+        const campaignOffer: any = await CampaignOffer.findOne({
+          'shipping.shippoTransactionId': transactionId,
+        });
+        if (campaignOffer) {
+          order.shipping = {
+            ...order.shipping,
+            status: 'PURCHASED',
+            trackingNumber: transaction.trackingNumber,
+            labelUrl: transaction.labelUrl,
+            trackingUrl: transaction.trackingUrlProvider,
+          };
 
-        await order.save();
-        console.log(`Order ${order._id} updated with tracking info`);
+          await order.save();
+          console.log(`Campaign offer ${order._id} updated with tracking info`);
+        }
       }
 
       res.status(200).send('ok');
