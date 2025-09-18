@@ -28,10 +28,23 @@ const getShippingRatesForCheckout = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getShippingRatesForOfferShipment = catchAsync(async (req, res) => {
+  const result = await ShippoService.getShippingRatesForOfferShipment(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Shipping rates retrieved successfully for offer shipment',
+    data: result,
+  });
+});
 
 const ShippoController = {
   getShippingMethods,
   getShippingRatesForCheckout,
+  getShippingRatesForOfferShipment,
 };
 
 export default ShippoController;

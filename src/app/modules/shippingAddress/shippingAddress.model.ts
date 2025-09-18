@@ -5,14 +5,14 @@ const shippingAddressSchema = new Schema<IShippingAddress>(
   {
     reviewer: { type: Schema.Types.ObjectId, ref: 'Reviewer', required: true },
     name: { type: String, required: true },
-    company: { type: String, required: true },
+    company: { type: String },
     country: { type: String, required: true },
     zip: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
-    alternativePhoneNumber: { type: String, required: true },
+    alternativePhoneNumber: { type: String },
     street1: {
       type: String,
       required: true,

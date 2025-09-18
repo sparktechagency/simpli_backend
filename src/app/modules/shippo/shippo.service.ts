@@ -11,6 +11,7 @@ import {
 } from 'shippo';
 import config from '../../config';
 import AppError from '../../error/appError';
+import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Cart from '../cart/cart.model';
 import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { Store } from '../store/store.model';
@@ -87,7 +88,6 @@ const getShippingRatesForCheckout = async (
     reviewer: reviewerId,
   });
   const store = await Store.findOne({ bussiness: cart.bussiness });
-  console.log('store=========>', store);
   if (!store) {
     throw new AppError(
       httpStatus.NOT_FOUND,
@@ -134,10 +134,80 @@ const getShippingRatesForCheckout = async (
   // Return all available rates to frontend
   return shipment.rates;
 };
+const getShippingRatesForOfferShipment = async (
+  businessId: string,
+  campaignOfferId: string,
+) => {
+  const campaignOffer: any = await CampaignOffer.findOne({
+    _id: campaignOfferId,
+    business: businessId,
+  }).populate({ path: 'product', select: 'height length weight width' });
+  const store = await Store.findOne({ bussiness: businessId });
+  if (!store) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Store details not found,Contact with business owner',
+    );
+  }
+
+  const shippingAddress = await ShippingAddress.findById(
+    campaignOffer?.shippingAddress,
+  );
+
+  if (!shippingAddress)
+    throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+
+  // const parcels = generateParcels(cart.items);
+  const parcels = [
+    {
+      length: campaignOffer?.product.length,
+      width: campaignOffer?.product?.width || 0,
+      height: campaignOffer?.product?.height || 0,
+      weight: campaignOffer?.product?.weight || 0,
+      // items: [],
+    },
+  ];
+
+  const shippoParcels: ParcelCreateRequest[] = parcels.map((p) => ({
+    length: p.length.toString(),
+    width: p.width.toString(),
+    height: p.height.toString(),
+    distanceUnit: DistanceUnitEnum.In, // ✅ use enum
+    weight: p.weight.toString(),
+    massUnit: WeightUnitEnum.Lb, // ✅ use enum
+  }));
+
+  const shipment = await shippo.shipments.create({
+    addressFrom: {
+      name: store.name,
+      street1: store.street1,
+      city: store.city,
+      state: store.state,
+      zip: store.zip,
+      country: store.country,
+      phone: store.phone,
+    },
+    addressTo: {
+      name: shippingAddress.name,
+      street1: shippingAddress.street1,
+      city: shippingAddress.city,
+      state: shippingAddress.state,
+      zip: shippingAddress.zip,
+      country: shippingAddress.country,
+      phone: shippingAddress.phone,
+    },
+    parcels: shippoParcels,
+    async: false,
+  });
+
+  // Return all available rates to frontend
+  return shipment.rates;
+};
 
 const ShippoService = {
   getShippingOptions,
   getShippingRatesForCheckout,
+  getShippingRatesForOfferShipment,
 };
 
 export default ShippoService;

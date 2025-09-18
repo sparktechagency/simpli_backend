@@ -11,5 +11,10 @@ router.post(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   ShippoController.getShippingRatesForCheckout,
 );
+router.post(
+  '/get-shipping-rates-for-offer-shipment/:id',
+  auth(USER_ROLE.bussinessOwner),
+  ShippoController.getShippingRatesForOfferShipment,
+);
 
 export const shippoRoutes = router;

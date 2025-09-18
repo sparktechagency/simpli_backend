@@ -5,9 +5,7 @@ const shippingAddressValidationSchema = z.object({
     name: z
       .string({ required_error: 'Name is required' })
       .min(1, 'Name is required'),
-    company: z
-      .string({ required_error: 'Company is required' })
-      .min(1, 'Company is required'),
+    company: z.string({ required_error: 'Company is required' }).optional(),
     country: z
       .string({ required_error: 'Country is required' })
       .min(1, 'Country is required'),
@@ -28,7 +26,7 @@ const shippingAddressValidationSchema = z.object({
       .email('Invalid email address'),
     alternativePhoneNumber: z
       .string({ required_error: 'Alternative phone number is required' })
-      .min(1, 'Alternative phone number is required'),
+      .optional(),
     street1: z
       .string({ required_error: 'Street1 is required' })
       .min(1, 'Street1 is required'),
