@@ -4,4 +4,4 @@ export const CampaignOfferStatus = {
   completed: 'Completed',
   cancelled: 'Cancelled',
   expired: 'Expired',
-} as const;
+};

@@ -8,17 +8,6 @@ import sendResponse from '../../utilities/sendResponse';
 import ReviewService from './review.service';
 
 const createReview = catchAsync(async (req, res) => {
-  // if (req.files?.review_image) {
-  //   req.body.images = req.files.review_image.map((file: any) => {
-  //     return getCloudFrontUrl(file.key);
-  //   });
-  // }
-
-  // const videoFile: any = req.files?.review_video;
-  // if (req.files?.review_video) {
-  //   req.body.video = getCloudFrontUrl(videoFile[0].key);
-  // }
-
   const thumnail: any = req.files?.thumbnail;
   if (req.files?.thumbnail) {
     req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
@@ -28,6 +17,24 @@ const createReview = catchAsync(async (req, res) => {
     statusCode: httpStatus.CREATED,
     success: true,
     message: 'Review created successfully',
+    data: result,
+  });
+});
+
+const updateReview = catchAsync(async (req, res) => {
+  const thumnail: any = req.files?.thumbnail;
+  if (req.files?.thumbnail) {
+    req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
+  }
+  const result = await ReviewService.updateReviewerIntoDB(
+    req.user.profileId,
+    req.params.id,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Review updated successfully',
     data: result,
   });
 });
@@ -107,6 +114,7 @@ const ReviewController = {
   likeUnlikeReview,
   getMyReview,
   getSingleProductReview,
+  updateReview,
 };
 
 export default ReviewController;
