@@ -4,12 +4,12 @@
 import httpStatus from 'http-status';
 import AppError from '../error/appError';
 import Campaign from '../modules/campaign/campaign.model';
-import Transaction from '../modules/transaction/transaction.model';
 import {
-  ENUM_PAYMENT_PURPOSE,
-  ENUM_PAYMENT_STATUS,
-  ENUM_TRANSACTION_STATUS,
-} from '../utilities/enum';
+  ENUM_TRANSACTION_REASON,
+  ENUM_TRANSACTION_TYPE,
+} from '../modules/transaction/transaction.enum';
+import { Transaction } from '../modules/transaction/transaction.model';
+import { ENUM_PAYMENT_PURPOSE, ENUM_PAYMENT_STATUS } from '../utilities/enum';
 import campaignOfferDeliveryPaymentSuccess from './campaignOfferDeliveryPaymentSuccess';
 import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
 
@@ -20,7 +20,6 @@ const handlePaymentSuccess = async (
 ) => {
   console.log(transactionId, amount);
   if (metaData.paymentPurpose == ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN) {
-    console.log('payment purpucse');
     await handleCampaignRunPaymentSuccess(
       metaData.campaignId,
       transactionId,
@@ -65,11 +64,13 @@ const handleCampaignRunPaymentSuccess = async (
   );
   // create transaction
   await Transaction.create({
-    item: 'Campaign run payment',
+    user: campaign.bussiness,
     amount,
-    paymentSender: campaign.bussiness,
     transactionId,
-    status: ENUM_TRANSACTION_STATUS.SUCCESS,
+    transactionReason: ENUM_TRANSACTION_REASON.CAMPAIGN_PAYMENT,
+    userType: 'Bussiness',
+    type: ENUM_TRANSACTION_TYPE.DEBIT,
+    description: `Payment for campaign is successful`,
   });
 };
 export default handlePaymentSuccess;

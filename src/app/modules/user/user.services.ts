@@ -51,7 +51,7 @@ const registerBussinessOwner = async (email: string, password: string) => {
       { profileId: result[0]._id },
       { session },
     );
-    await NotificationSetting.create({ user: result[0]._id }, { session });
+    await NotificationSetting.create([{ user: result[0]._id }], { session });
 
     sendEmail({
       email: email,

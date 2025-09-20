@@ -5,6 +5,11 @@ import AppError from '../error/appError';
 import { Order } from '../modules/order/order.model';
 import Review from '../modules/review/reviewer.model';
 import Reviewer from '../modules/reviewer/reviewer.model';
+import {
+  ENUM_TRANSACTION_REASON,
+  ENUM_TRANSACTION_TYPE,
+} from '../modules/transaction/transaction.enum';
+import { Transaction } from '../modules/transaction/transaction.model';
 import { ENUM_PAYMENT_STATUS } from '../utilities/enum';
 import shippo from '../utilities/shippo';
 const handleOrderPaymentSuccess = async (
@@ -68,6 +73,17 @@ const handleOrderPaymentSuccess = async (
   });
 
   await Promise.all(referralPromises);
+
+  // create transaction
+  await Transaction.create({
+    user: order.reviewer,
+    amount,
+    transactionId,
+    transactionReason: ENUM_TRANSACTION_REASON.CAMPAIGN_PAYMENT,
+    userType: 'Reviewer',
+    type: ENUM_TRANSACTION_TYPE.DEBIT,
+    description: `Payment for order is successful`,
+  });
 };
 
 export default handleOrderPaymentSuccess;
