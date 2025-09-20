@@ -1,5 +1,5 @@
 import QueryBuilder from '../../builder/QueryBuilder';
-import Transaction from './transaction.model';
+import { Transaction } from './transaction.model';
 
 const getAllTransaction = async (query: Record<string, unknown>) => {
   const transactionQuery = new QueryBuilder(Transaction.find(), query)
@@ -22,9 +22,7 @@ const getMyTransaction = async (
   query: Record<string, unknown>,
 ) => {
   const transactionQuery = new QueryBuilder(
-    Transaction.find({
-      $or: [{ paymentReceiver: profileId }, { paymentSender: profileId }],
-    }),
+    Transaction.find({ user: profileId }),
     query,
   )
     .search([''])

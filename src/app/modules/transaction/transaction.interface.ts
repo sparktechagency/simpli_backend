@@ -5,6 +5,7 @@ import {
 } from './transaction.enum';
 
 export interface ITransaction {
+  userType: 'Reviewer' | 'Bussiness';
   user: Types.ObjectId;
   type: (typeof ENUM_TRANSACTION_TYPE)[keyof typeof ENUM_TRANSACTION_TYPE];
   amount: number;

@@ -7,8 +7,8 @@ import { ITransaction } from './transaction.interface';
 
 const TransactionSchema = new Schema<ITransaction>(
   {
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-
+    userType: { type: String, enum: ['Reviewer', 'Bussiness'], required: true },
+    user: { type: Schema.Types.ObjectId, required: true, refPath: 'userType' },
     type: {
       type: String,
       enum: Object.values(ENUM_TRANSACTION_TYPE),
