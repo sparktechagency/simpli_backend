@@ -4,6 +4,7 @@ import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
+import { shouldSendNotification } from '../../helper/shouldSendNotification';
 import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Follow from '../follow/follow.model';
@@ -64,15 +65,18 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   campaignOffer.status = CampaignOfferStatus.completed;
   await campaignOffer.save();
-
-  Notification.create({
-    receiver: reviewerId,
-    type: ENUM_NOTIFICATION_TYPE.REVIEW,
-    message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
-    data: {
-      reviewId: result._id,
-    },
-  });
+  if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.COMMENT, reviewerId)) {
+    return;
+  } else {
+    Notification.create({
+      receiver: reviewerId,
+      type: ENUM_NOTIFICATION_TYPE.REVIEW,
+      message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
+      data: {
+        reviewId: result._id,
+      },
+    });
+  }
   return result;
 };
 

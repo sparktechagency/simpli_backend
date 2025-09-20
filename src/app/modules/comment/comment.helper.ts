@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { shouldSendNotification } from '../../helper/shouldSendNotification';
 import { ENUM_NOTIFICATION_TYPE } from '../notification/notification.enum';
 import Notification from '../notification/notification.model';
 import Review from '../review/reviewer.model';
@@ -12,6 +13,11 @@ export const sendCommentNotification = async (
     .select('reviewer product')
     .populate({ path: 'product', select: 'name' });
   if (!review) return;
+  if (
+    !shouldSendNotification(ENUM_NOTIFICATION_TYPE.COMMENT, review.reviewer)
+  ) {
+    return;
+  }
   const comment: any = await Comment.findById(commentId)
     .select('commentor')
     .populate({ path: 'commentor', select: 'name' });
