@@ -2,7 +2,6 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import '../middleware/passport';
 import { USER_ROLE } from '../user/user.constant';
 import oAuthController from './oAuth.controller';
 import oAuthValidations from './oAuth.validations';
