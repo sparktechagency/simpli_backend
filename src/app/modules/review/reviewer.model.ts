@@ -13,7 +13,6 @@ const ReviewSchema = new Schema<IReview>(
     video: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
     likers: [{ type: Types.ObjectId, ref: 'Reviewer', default: [] }],
-    // comments: [{ type: Types.ObjectId, ref: 'Comment', default: [] }],
     rating: { type: Number, required: true },
     totalView: {
       type: Number,

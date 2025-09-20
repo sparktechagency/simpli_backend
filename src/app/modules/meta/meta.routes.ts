@@ -13,7 +13,7 @@ router.get(
 
 router.get(
   '/get-bussiness-meta-data',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.bussinessOwner),
   MetaController.getBussinessMetaData,
 );
 

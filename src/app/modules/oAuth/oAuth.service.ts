@@ -128,6 +128,7 @@ const loginWithOAuth = async (
         const nameParts = name.split(' ');
         const firstName = nameParts[0];
         const lastName = nameParts[1] || '';
+        const username = email.split('@')[0];
 
         if (role == USER_ROLE.bussinessOwner) {
           const result = await Bussiness.create(
@@ -137,6 +138,7 @@ const loginWithOAuth = async (
                 user: user._id,
                 email,
                 logo: picture,
+                username,
               },
             ],
             { session },
@@ -158,6 +160,7 @@ const loginWithOAuth = async (
                 user: user._id,
                 email,
                 profile_image: picture,
+                username,
               },
             ],
             { session },

@@ -27,7 +27,8 @@ export interface IBussiness {
   isComplianceInfoProvided: boolean;
   isBussinessInfoProvided: boolean;
   followers: [Types.ObjectId];
-
+  // balance
+  currentBalance: number;
   // for stripe
   isStripeAccountConnected: { type: boolean; default: false };
   stripeConnectedAccountId: { type: string };

@@ -101,6 +101,8 @@ const BussinessSchema = new Schema<IBussiness>(
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
 
+    // balance
+    currentBalance: { type: Number, default: 0 },
     // for stripe
     isStripeAccountConnected: { type: Boolean, default: false },
     stripeConnectedAccountId: { type: String },
