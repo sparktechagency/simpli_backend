@@ -10,7 +10,7 @@ import {
   ENUM_TRANSACTION_TYPE,
 } from '../modules/transaction/transaction.enum';
 import { Transaction } from '../modules/transaction/transaction.model';
-import { ENUM_PAYMENT_STATUS } from '../utilities/enum';
+import { ENUM_PAYMENT_METHOD, ENUM_PAYMENT_STATUS } from '../utilities/enum';
 import shippo from '../utilities/shippo';
 const handleOrderPaymentSuccess = async (
   orderId: string,
@@ -83,6 +83,7 @@ const handleOrderPaymentSuccess = async (
     userType: 'Reviewer',
     type: ENUM_TRANSACTION_TYPE.DEBIT,
     description: `Payment for order is successful`,
+    paymentMethod: ENUM_PAYMENT_METHOD.STRIPE,
   });
 };
 

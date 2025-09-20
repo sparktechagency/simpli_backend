@@ -4,8 +4,8 @@ export const ENUM_TRANSACTION_TYPE = {
 };
 
 export const ENUM_TRANSACTION_REASON = {
-  CAMPAIGN_PAYMENT: 'Campaign Payment',
-  REFERRAL_BONUS: 'Referral Bonus',
+  CAMPAIGN_PAYMENT: 'Campaign_Payment',
+  REFERRAL_BONUS: 'Referral_Bonus',
   WITHDRAWAL: 'Withdrawal',
-  ORDER: 'Order Payment',
+  ORDER: 'Order_Payment',
 };

@@ -8,6 +8,7 @@ const NotificationSchema = new Schema<INotification>(
       type: String,
       required: true,
     },
+    title: { type: String, required: true },
     type: {
       type: String,
       enum: Object.values(ENUM_NOTIFICATION_TYPE),

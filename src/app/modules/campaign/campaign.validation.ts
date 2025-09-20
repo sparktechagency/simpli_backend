@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { Types } from 'mongoose';
+import { z } from 'zod';
 import { CAMPAIGN_STATUS, ENUM_PAYMENT_METHOD } from '../../utilities/enum';
 
 export const createCampaignValidationSchema = z.object({
@@ -27,7 +27,7 @@ export const createCampaignValidationSchema = z.object({
           ? new Date(arg)
           : undefined,
       z.date().refine((date) => date >= new Date(), {
-        message: 'Start date cannot be in the past',
+        message: 'Start date must be in the future',
       }),
     ),
     endDate: z.preprocess(

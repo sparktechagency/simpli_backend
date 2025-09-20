@@ -26,6 +26,7 @@ const TransactionSchema = new Schema<ITransaction>(
     },
 
     description: { type: String },
+    paymentMethod: { type: String, required: true },
   },
   {
     timestamps: true,

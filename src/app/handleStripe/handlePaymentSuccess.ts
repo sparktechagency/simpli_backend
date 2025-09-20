@@ -9,7 +9,11 @@ import {
   ENUM_TRANSACTION_TYPE,
 } from '../modules/transaction/transaction.enum';
 import { Transaction } from '../modules/transaction/transaction.model';
-import { ENUM_PAYMENT_PURPOSE, ENUM_PAYMENT_STATUS } from '../utilities/enum';
+import {
+  ENUM_PAYMENT_METHOD,
+  ENUM_PAYMENT_PURPOSE,
+  ENUM_PAYMENT_STATUS,
+} from '../utilities/enum';
 import campaignOfferDeliveryPaymentSuccess from './campaignOfferDeliveryPaymentSuccess';
 import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
 
@@ -71,6 +75,7 @@ const handleCampaignRunPaymentSuccess = async (
     userType: 'Bussiness',
     type: ENUM_TRANSACTION_TYPE.DEBIT,
     description: `Payment for campaign is successful`,
+    paymentMethod: ENUM_PAYMENT_METHOD.STRIPE,
   });
 };
 export default handlePaymentSuccess;

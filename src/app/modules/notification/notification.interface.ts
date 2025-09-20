@@ -4,6 +4,7 @@ import { ENUM_NOTIFICATION_TYPE } from './notification.enum';
 export interface INotification {
   receiver: string;
   type: (typeof ENUM_NOTIFICATION_TYPE)[keyof typeof ENUM_NOTIFICATION_TYPE];
+  title: string;
   message: string;
   data?: {
     reviewId?: Types.ObjectId;

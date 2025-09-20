@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import Review from '../review/reviewer.model';
+import { sendCommentNotification } from './comment.helper';
 import { IComment } from './comment.interface';
 import Comment from './comment.model';
 
@@ -15,6 +16,10 @@ const createComment = async (user: JwtPayload, payload: Partial<IComment>) => {
     likers: [],
   };
   const result = await Comment.create(commentData);
+  sendCommentNotification(
+    payload.review?.toString() as string,
+    result._id.toString() as string,
+  );
   return result;
 };
 

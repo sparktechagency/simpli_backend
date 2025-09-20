@@ -12,4 +12,5 @@ export interface ITransaction {
   transactionId: string;
   transactionReason: (typeof ENUM_TRANSACTION_REASON)[keyof typeof ENUM_TRANSACTION_REASON];
   description?: string;
+  paymentMethod: string;
 }

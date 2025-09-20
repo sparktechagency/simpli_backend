@@ -7,6 +7,8 @@ import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
 import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Follow from '../follow/follow.model';
+import { ENUM_NOTIFICATION_TYPE } from '../notification/notification.enum';
+import Notification from '../notification/notification.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { IReview } from './review.interface';
 import Review from './reviewer.model';
@@ -62,6 +64,15 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   campaignOffer.status = CampaignOfferStatus.completed;
   await campaignOffer.save();
+
+  Notification.create({
+    receiver: reviewerId,
+    type: ENUM_NOTIFICATION_TYPE.REVIEW,
+    message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
+    data: {
+      reviewId: result._id,
+    },
+  });
   return result;
 };
 
