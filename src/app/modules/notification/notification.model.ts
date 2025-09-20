@@ -1,7 +1,6 @@
-import mongoose, { Schema, Model } from 'mongoose';
-import { INotification } from './notification.interface';
-import { ENUM_SENDER_TYPE } from '../../utilities/enum';
+import mongoose, { Model, Schema } from 'mongoose';
 import { ENUM_NOTIFICATION_TYPE } from './notification.enum';
+import { INotification } from './notification.interface';
 
 const NotificationSchema = new Schema<INotification>(
   {
@@ -9,20 +8,10 @@ const NotificationSchema = new Schema<INotification>(
       type: String,
       required: true,
     },
-    sender: {
-      type: Schema.Types.ObjectId,
-      refPath: 'senderType',
-      required: false,
-    },
-    senderType: {
-      type: String,
-      enum: Object.values(ENUM_SENDER_TYPE),
-      required: true,
-    },
     type: {
       type: String,
       enum: Object.values(ENUM_NOTIFICATION_TYPE),
-      required: true, 
+      required: true,
     },
     message: { type: String, required: true },
     data: {
