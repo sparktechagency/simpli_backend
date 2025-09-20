@@ -65,7 +65,7 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   campaignOffer.status = CampaignOfferStatus.completed;
   await campaignOffer.save();
-  if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.COMMENT, reviewerId)) {
+  if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
     return;
   } else {
     Notification.create({
@@ -77,6 +77,25 @@ const createReview = async (reviewerId: string, payload: any) => {
       },
     });
   }
+  if (
+    !shouldSendNotification(
+      ENUM_NOTIFICATION_TYPE.REVIEW,
+      campaignOffer.business.toString(),
+    )
+  ) {
+    return;
+  } else {
+    Notification.create({
+      receiver: campaignOffer.business.toString(),
+      type: ENUM_NOTIFICATION_TYPE.REVIEW,
+      title: 'New Review Posted',
+      message: `Your review has been posted. See your product review.`,
+      data: {
+        reviewId: result._id,
+      },
+    });
+  }
+
   return result;
 };
 

@@ -2,6 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import httpStatus from 'http-status';
 import AppError from '../error/appError';
+import { shouldSendNotification } from '../helper/shouldSendNotification';
+import { ENUM_NOTIFICATION_TYPE } from '../modules/notification/notification.enum';
+import Notification from '../modules/notification/notification.model';
 import { Order } from '../modules/order/order.model';
 import Review from '../modules/review/reviewer.model';
 import Reviewer from '../modules/reviewer/reviewer.model';
@@ -85,6 +88,25 @@ const handleOrderPaymentSuccess = async (
     description: `Payment for order is successful`,
     paymentMethod: ENUM_PAYMENT_METHOD.STRIPE,
   });
+
+  if (
+    !shouldSendNotification(
+      ENUM_NOTIFICATION_TYPE.ORDER,
+      order.bussiness.toString(),
+    )
+  ) {
+    return;
+  } else {
+    Notification.create({
+      receiver: order.bussiness.toString(),
+      type: ENUM_NOTIFICATION_TYPE.ORDER,
+      title: 'New Order Placed',
+      message: `A new order has been placed. See your order details.`,
+      data: {
+        orderId: order._id,
+      },
+    });
+  }
 };
 
 export default handleOrderPaymentSuccess;
