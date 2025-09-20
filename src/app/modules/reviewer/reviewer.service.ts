@@ -6,6 +6,102 @@ import Bussiness from '../bussiness/bussiness.model';
 import { IReviewer } from './reviewer.interface';
 import Reviewer from './reviewer.model';
 
+// const getReviewerProfile = async (profileId: string) => {
+//   const result = await Reviewer.aggregate([
+//     {
+//       $match: {
+//         _id: new mongoose.Types.ObjectId(profileId),
+//       },
+//     },
+
+//     {
+//       $lookup: {
+//         from: 'categories',
+//         localField: 'interestedCategory',
+//         foreignField: '_id',
+//         as: 'interestedCategory',
+//       },
+//     },
+
+//     {
+//       $lookup: {
+//         from: 'follows',
+//         localField: '_id',
+//         foreignField: 'following',
+//         as: 'followersData',
+//       },
+//     },
+
+//     {
+//       $lookup: {
+//         from: 'follows',
+//         localField: '_id',
+//         foreignField: 'follower',
+//         as: 'followingData',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'reviews',
+//         localField: '_id',
+//         foreignField: 'reviewer',
+//         as: 'reviewsData',
+//       },
+//     },
+
+//     {
+//       $project: {
+//         _id: 1,
+//         user: 1,
+//         name: 1,
+//         username: 1,
+//         email: 1,
+//         city: 1,
+//         zipcode: 1,
+//         gender: 1,
+//         age: 1,
+//         ethnicity: 1,
+//         educationLevel: 1,
+//         maritalStatus: 1,
+//         employmentStatus: 1,
+//         householdIncome: 1,
+//         familyAndDependents: 1,
+//         interestedCategory: 1,
+//         currentlyShareReview: 1,
+//         interestedCategoryStatus: 1,
+//         currentShareReviewStatus: 1,
+//         shippingInformationStatus: 1,
+//         socailInfoStatus: 1,
+//         profileDetailStatus: 1,
+//         receiveProductBy: 1,
+//         minPriceForReview: 1,
+//         maxPriceForReview: 1,
+//         isPersonalInfoProvided: 1,
+//         isAddressProvided: 1,
+//         profile_image: 1,
+//         bio: 1,
+//         instagram: 1,
+//         youtube: 1,
+//         twitter: 1,
+//         tiktok: 1,
+//         whatsapp: 1,
+//         facebook: 1,
+//         blog: 1,
+//         totalEarning: 1,
+//         currentBalance: 1,
+//         createdAt: 1,
+//         updatedAt: 1,
+//         totalFollowers: { $size: '$followersData' },
+//         totalFollowing: { $size: '$followingData' },
+//         totalReviews: { $size: '$reviewsData' },
+//         isStripeAccountConnected: 1,
+//         stripeConnectedAccountId: 1,
+//       },
+//     },
+//   ]);
+
+//   return result[0];
+// };
 const getReviewerProfile = async (profileId: string) => {
   const result = await Reviewer.aggregate([
     {
@@ -40,12 +136,36 @@ const getReviewerProfile = async (profileId: string) => {
         as: 'followingData',
       },
     },
+
     {
       $lookup: {
         from: 'reviews',
         localField: '_id',
         foreignField: 'reviewer',
         as: 'reviewsData',
+      },
+    },
+
+    // 👇 Lookup orders to calculate referral sales
+    {
+      $lookup: {
+        from: 'orders',
+        let: { reviewerId: '$_id' },
+        pipeline: [
+          { $unwind: '$items' },
+          {
+            $match: {
+              $expr: { $eq: ['$items.referral.reviewerId', '$$reviewerId'] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalReferralSales: { $sum: '$items.referral.amount' },
+            },
+          },
+        ],
+        as: 'referralSalesData',
       },
     },
 
@@ -94,6 +214,15 @@ const getReviewerProfile = async (profileId: string) => {
         totalFollowers: { $size: '$followersData' },
         totalFollowing: { $size: '$followingData' },
         totalReviews: { $size: '$reviewsData' },
+
+        // 👇 if referralSalesData is empty, default to 0
+        totalReferralSales: {
+          $ifNull: [
+            { $arrayElemAt: ['$referralSalesData.totalReferralSales', 0] },
+            0,
+          ],
+        },
+
         isStripeAccountConnected: 1,
         stripeConnectedAccountId: 1,
       },
@@ -102,7 +231,6 @@ const getReviewerProfile = async (profileId: string) => {
 
   return result[0];
 };
-
 const addAddress = async (reviewerId: string, payload: Partial<IReviewer>) => {
   payload.isAddressProvided = true;
   const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
