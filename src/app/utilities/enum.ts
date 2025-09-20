@@ -31,11 +31,6 @@ export const ENUM_REDEEM_STATUS = {
   COMPLETED: 'Completed',
 };
 
-export const ENUM_TRANSACTION_TYPE = {
-  DEPOSIT: 'Deposit',
-  WITHDRAW: 'Withdraw',
-};
-
 export const ENUM_PAYMENT_BY = {
   CREDIT_CARD: 'Credit Card',
   PAYPAL: 'Paypal',

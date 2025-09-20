@@ -1,11 +1,14 @@
 import { Types } from 'mongoose';
-import { ENUM_TRANSACTION_STATUS } from '../../utilities/enum';
+import {
+  ENUM_TRANSACTION_REASON,
+  ENUM_TRANSACTION_TYPE,
+} from './transaction.enum';
 
 export interface ITransaction {
-  paymentSender: Types.ObjectId | null;
-  item: string;
+  user: Types.ObjectId;
+  type: (typeof ENUM_TRANSACTION_TYPE)[keyof typeof ENUM_TRANSACTION_TYPE];
   amount: number;
-  status: (typeof ENUM_TRANSACTION_STATUS)[keyof typeof ENUM_TRANSACTION_STATUS];
   transactionId: string;
-  paymentReceiver: Types.ObjectId | null;
+  transactionReason: (typeof ENUM_TRANSACTION_REASON)[keyof typeof ENUM_TRANSACTION_REASON];
+  description?: string;
 }
