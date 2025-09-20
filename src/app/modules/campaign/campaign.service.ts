@@ -27,7 +27,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const reviewCost = payload.amountForEachReview * payload.numberOfReviewers;
   const adminFee = (reviewCost * platformFeeForCampaignParcentage) / 100;
   const totalAmount = reviewCost + adminFee;
-  const amountInCents = totalAmount * 100;
+  const amountInCents = (totalAmount * 100).toFixed(2);
 
   if (!product) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
@@ -63,7 +63,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
           price_data: {
             currency: 'usd',
             product_data: { name: 'Campaign Run' },
-            unit_amount: amountInCents,
+            unit_amount: Number(amountInCents),
           },
           quantity: 1,
         },
