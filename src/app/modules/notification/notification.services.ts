@@ -2,8 +2,8 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { USER_ROLE } from '../user/user.constant';
 import Notification from './notification.model';
 // import getAdminNotificationCount from '../../helper/getAdminNotification';
 // import getUnseenNotificationCount from '../../helper/getUnseenNotification';
@@ -30,7 +30,7 @@ const getAllNotificationFromDB = async (
       Notification.find({ receiver: user?.profileId }),
       query,
     )
-      .search(['name'])
+      .search(['title'])
       .filter()
       .sort()
       .paginate()

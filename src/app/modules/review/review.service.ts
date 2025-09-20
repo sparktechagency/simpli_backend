@@ -759,6 +759,14 @@ const getSingleProductReview = async (
   };
 };
 
+const viewReview = async (profileId: string, reviewId: string) => {
+  const result = await Review.findByIdAndUpdate(reviewId, {
+    $inc: { totalView: 1 },
+  });
+
+  return result;
+};
+
 const ReviewService = {
   createReview,
   getAllReviewFromDB,
@@ -767,6 +775,7 @@ const ReviewService = {
   getMyReviews,
   getSingleProductReview,
   updateReviewerIntoDB,
+  viewReview,
 };
 
 export default ReviewService;

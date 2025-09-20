@@ -107,6 +107,19 @@ const getSingleProductReview = catchAsync(async (req, res) => {
   });
 });
 
+const viewReview = catchAsync(async (req, res) => {
+  const result = await ReviewService.viewReview(
+    req.user.profileId,
+    req.params.id,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review viewed successfully',
+    data: result,
+  });
+});
+
 const ReviewController = {
   createReview,
   getAllReview,
@@ -115,6 +128,7 @@ const ReviewController = {
   getMyReview,
   getSingleProductReview,
   updateReview,
+  viewReview,
 };
 
 export default ReviewController;

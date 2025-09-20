@@ -50,5 +50,6 @@ router.get(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   ReviewController.getSingleProductReview,
 );
+router.post('/view/:id', auth(USER_ROLE.reviewer), ReviewController.viewReview);
 
 export const reviewRoutes = router;
