@@ -1,27 +1,38 @@
-import { model, Schema } from 'mongoose';
+import { Schema, model } from 'mongoose';
+import {
+  ENUM_TRANSACTION_REASON,
+  ENUM_TRANSACTION_TYPE,
+} from './transaction.enum';
 import { ITransaction } from './transaction.interface';
-import { ENUM_TRANSACTION_STATUS } from '../../utilities/enum';
 
 const TransactionSchema = new Schema<ITransaction>(
   {
-    paymentSender: { type: Schema.Types.ObjectId, ref: 'User', default: null },
-    item: { type: String, required: true },
-    amount: { type: Number, required: true, min: 0 },
-    status: {
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+
+    type: {
       type: String,
-      enum: Object.values(ENUM_TRANSACTION_STATUS),
+      enum: Object.values(ENUM_TRANSACTION_TYPE),
       required: true,
     },
-    transactionId: { type: String, unique: true, required: true },
-    paymentReceiver: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
+
+    amount: { type: Number, required: true, min: 0 },
+
+    transactionId: { type: String, required: true, unique: true },
+
+    transactionReason: {
+      type: String,
+      enum: Object.values(ENUM_TRANSACTION_REASON),
+      required: true,
     },
+
+    description: { type: String },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
-const Transaction = model<ITransaction>('Transaction', TransactionSchema);
-
-export default Transaction;
+export const Transaction = model<ITransaction>(
+  'Transaction',
+  TransactionSchema,
+);
