@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose from 'mongoose';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import Bussiness from '../bussiness/bussiness.model';
 import { Order } from '../order/order.model';
@@ -19,7 +20,7 @@ const getReviewerMetaData = async (
   const today = moment().startOf('day');
 
   switch (dateRange) {
-    case 'Today':
+    case 'today':
       currentDateFilter = {
         createdAt: {
           $gte: today.toDate(),
@@ -34,7 +35,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'This week':
+    case 'thisWeek':
       currentDateFilter = {
         createdAt: {
           $gte: today.startOf('week').toDate(),
@@ -49,7 +50,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'Last week':
+    case 'lastWeek':
       currentDateFilter = {
         createdAt: {
           $gte: today.subtract(1, 'week').startOf('week').toDate(),
@@ -64,7 +65,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'This month':
+    case 'thisMonth':
       currentDateFilter = {
         createdAt: {
           $gte: today.startOf('month').toDate(),
@@ -79,7 +80,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'Last month':
+    case 'lastMonth':
       currentDateFilter = {
         createdAt: {
           $gte: today.subtract(1, 'month').startOf('month').toDate(),
@@ -94,7 +95,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'Last 6 Month':
+    case 'last6Months':
       currentDateFilter = {
         createdAt: { $gte: today.subtract(6, 'months').toDate() },
       };
@@ -106,7 +107,7 @@ const getReviewerMetaData = async (
       };
       break;
 
-    case 'This Year':
+    case 'thisYear':
       currentDateFilter = {
         createdAt: { $gte: today.startOf('year').toDate() },
       };
@@ -140,6 +141,7 @@ const getReviewerMetaData = async (
     ],
     ...currentDateFilter,
   });
+  console.log('currentTotalOrderShipment:', currentTotalOrderShipment);
 
   const previousTotalOrderShipment = await Order.countDocuments({
     reviewer: reviewerId,
@@ -150,8 +152,65 @@ const getReviewerMetaData = async (
     ...previousDateFilter,
   });
 
-  const currentTotalEarning = 2398;
-  const previousTotalEarning = 3996;
+  const currentReviewEarning = await Review.aggregate([
+    {
+      $match: {
+        reviewer: new mongoose.Types.ObjectId(reviewerId),
+        ...currentDateFilter,
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+
+  const previousReviewEarning = await Review.aggregate([
+    {
+      $match: {
+        reviewer: new mongoose.Types.ObjectId(reviewerId),
+        ...previousDateFilter,
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+
+  const currentReferralEarning = await Order.aggregate([
+    {
+      $match: {
+        'items.referral.reviewerId': new mongoose.Types.ObjectId(reviewerId),
+        ...currentDateFilter,
+      },
+    },
+    { $unwind: '$items' },
+    {
+      $match: {
+        'items.referral.reviewerId': new mongoose.Types.ObjectId(reviewerId),
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$items.referral.amount' } } },
+  ]);
+
+  const previousReferralEarning = await Order.aggregate([
+    {
+      $match: {
+        'items.referral.reviewerId': new mongoose.Types.ObjectId(reviewerId),
+        ...previousDateFilter,
+      },
+    },
+    { $unwind: '$items' },
+    {
+      $match: {
+        'items.referral.reviewerId': new mongoose.Types.ObjectId(reviewerId),
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$items.referral.amount' } } },
+  ]);
+
+  const currentTotalEarning =
+    (currentReviewEarning[0]?.total || 0) +
+    (currentReferralEarning[0]?.total || 0);
+
+  const previousTotalEarning =
+    (previousReviewEarning[0]?.total || 0) +
+    (previousReferralEarning[0]?.total || 0);
 
   const getPercentageChange = (current: number, previous: number) => {
     if (previous === 0) return current > 0 ? 100 : 0; // Avoid division by zero
@@ -168,7 +227,7 @@ const getReviewerMetaData = async (
       change: getPercentageChange(currentTotalReview, previousTotalReview),
     },
     itemInShipment: {
-      value: currentTotalOrderShipment.toFixed,
+      value: Number(currentTotalOrderShipment.toFixed(2) || 0),
       change: getPercentageChange(
         currentTotalOrderShipment,
         previousTotalOrderShipment,

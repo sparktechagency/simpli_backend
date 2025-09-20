@@ -247,7 +247,7 @@ const linkSocialAccount = async (
       try {
         const ticket = await googleClient.verifyIdToken({
           idToken: token,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: process.env.WEB_CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
