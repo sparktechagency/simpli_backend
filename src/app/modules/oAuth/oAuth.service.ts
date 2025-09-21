@@ -108,7 +108,10 @@ const loginWithOAuth = async (
     // Find or create user
     let user = await User.findOne({ [`${provider}Id`]: id });
 
+    let isNewUser = false;
+
     if (!user) {
+      isNewUser = true;
       const session = await mongoose.startSession();
       session.startTransaction();
 
@@ -226,8 +229,7 @@ const loginWithOAuth = async (
       config.jwt_refresh_secret as string,
       config.jwt_refresh_expires_in as string,
     );
-
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, isNewUser, role: user.role };
   } catch (error: any) {
     console.error('OAuth login error:', error);
 
