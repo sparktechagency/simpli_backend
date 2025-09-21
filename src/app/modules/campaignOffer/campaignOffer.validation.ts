@@ -15,7 +15,6 @@ const campaignOfferSchema = z.object({
     product: ObjectIdSchema('Product ID'),
     business: ObjectIdSchema('Business ID'),
     shippingAddress: ObjectIdSchema('Shipping Address ID'),
-    amount: z.number().positive('Amount must be a positive number'),
   }),
 });
 

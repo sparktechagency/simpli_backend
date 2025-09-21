@@ -12,6 +12,7 @@ import {
 import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
 import stripe from '../../utilities/stripe';
+import Campaign from '../campaign/campaign.model';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
@@ -21,20 +22,31 @@ const acceptCampaignOffer = async (
   profileId: string,
   payload: ICampaignOffer,
 ) => {
-  const campaignOffer = await CampaignOffer.findOne({
-    reviewer: profileId,
-    campaign: payload.campaign,
-  });
-  if (campaignOffer) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'You already accept this offer');
+  // Run queries in parallel
+  const [campaignOffer, campaign] = await Promise.all([
+    CampaignOffer.findOne({
+      reviewer: profileId,
+      campaign: payload.campaign,
+    }),
+    Campaign.findById(payload.campaign).select('amountForEachReview'),
+  ]);
+
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
   }
 
-  const result = await CampaignOffer.create({
+  if (campaignOffer) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You already accepted this offer',
+    );
+  }
+
+  return CampaignOffer.create({
     ...payload,
     reviewer: profileId,
+    amount: campaign.amountForEachReview,
   });
-
-  return result;
 };
 
 // get my campaign offer

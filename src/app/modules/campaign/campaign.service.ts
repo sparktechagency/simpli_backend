@@ -481,10 +481,10 @@ const getCampaignSummary = async (
   if (!mongoose.Types.ObjectId.isValid(campaignId)) {
     throw Object.assign(new Error('Invalid campaign id'), { statusCode: 400 });
   }
-
+  //!TODO: need to check bussiness owner
   const campaign = await Campaign.findOne({
     _id: campaignId,
-    bussiness: profileId,
+    // bussiness: profileId,
   })
     .select([
       '_id',
