@@ -16,5 +16,10 @@ router.get(
   auth(USER_ROLE.bussinessOwner),
   MetaController.getBussinessMetaData,
 );
+router.get(
+  '/get-bussiness-meta-data',
+  auth(USER_ROLE.bussinessOwner),
+  MetaController.getBussinessMetaData,
+);
 
 export const metaRoutes = router;

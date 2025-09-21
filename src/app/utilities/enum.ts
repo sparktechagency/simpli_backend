@@ -68,7 +68,7 @@ export const CAMPAIGN_STATUS = {
 };
 
 export const TRANSACTION_STATUS = {
-  SUCCESSFULL: 'Successful',
+  SUCCESSFUL: 'Successful',
   FAILED: 'Failed',
 };
 

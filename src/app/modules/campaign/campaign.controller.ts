@@ -116,6 +116,16 @@ const getCampaignPerformance = catchAsync(async (req, res) => {
   });
 });
 
+const getCampaignStats = catchAsync(async (req, res) => {
+  const result = await CampaignService.getCampaignStats(req?.user?.profileId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Campaign stats retrieved successfully',
+    data: result,
+  });
+});
+
 const CampaignController = {
   createCampaign,
   getAllCampaign,
@@ -125,5 +135,6 @@ const CampaignController = {
   getMyCampaigns,
   getCampaignSummary,
   getCampaignPerformance,
+  getCampaignStats,
 };
 export default CampaignController;

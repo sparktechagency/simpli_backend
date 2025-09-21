@@ -886,6 +886,60 @@ export const getCampaignPerformance = async (
   );
 };
 
+const getCampaignStats = async (businessId: string) => {
+  if (!mongoose.Types.ObjectId.isValid(businessId)) {
+    throw Object.assign(new Error('Invalid business id'), { statusCode: 400 });
+  }
+
+  const campaignAggregation = await Campaign.aggregate([
+    {
+      $match: { bussiness: new mongoose.Types.ObjectId(businessId) },
+    },
+    {
+      $facet: {
+        totalCampaigns: [{ $count: 'total' }],
+        totalSpent: [
+          { $group: { _id: null, totalSpent: { $sum: '$totalBugget' } } },
+        ],
+        activeCampaigns: [
+          { $match: { status: CAMPAIGN_STATUS.ACTIVE } },
+          { $count: 'activeCampaigns' },
+        ],
+      },
+    },
+  ]);
+
+  const { totalCampaigns, totalSpent, activeCampaigns } =
+    campaignAggregation[0];
+
+  // Total Campaigns
+  const totalCampaignsCount =
+    totalCampaigns.length > 0 ? totalCampaigns[0].total : 0;
+
+  // Total Spent
+  const totalSpentAmount = totalSpent.length > 0 ? totalSpent[0].totalSpent : 0;
+
+  // Active Campaigns
+  const activeCampaignCount =
+    activeCampaigns.length > 0 ? activeCampaigns[0].activeCampaigns : 0;
+
+  // Average Rating for active campaigns
+  const reviewsAggregation = await Review.aggregate([
+    { $match: { campaign: { $in: activeCampaigns.map((c: any) => c._id) } } },
+    { $group: { _id: null, averageRating: { $avg: '$rating' } } },
+  ]);
+
+  const averageRating =
+    reviewsAggregation.length > 0 ? reviewsAggregation[0].averageRating : null;
+
+  return {
+    totalCampaigns: totalCampaignsCount,
+    totalSpent: totalSpentAmount,
+    activeCampaigns: activeCampaignCount,
+    averageRating: averageRating,
+  };
+};
+
 const CampaignService = {
   createCampaign,
   getAllCampaignFromDB,
@@ -895,6 +949,7 @@ const CampaignService = {
   getMyCampaigns,
   getCampaignSummary,
   getCampaignPerformance,
+  getCampaignStats,
 };
 
 export default CampaignService;
