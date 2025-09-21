@@ -4,7 +4,6 @@ import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import cron from 'node-cron';
-import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
 import { platformFeeForCampaignParcentage } from '../../constant';
 import AppError from '../../error/appError';
@@ -304,25 +303,133 @@ const getMyCampaigns = async (
   profileId: string,
   query: Record<string, unknown>,
 ) => {
-  const campaignQuery = new QueryBuilder(
-    Campaign.find({
-      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-      bussiness: profileId,
-    }).populate('product'),
-    query,
-  )
-    .search([''])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const searchTerm = query.searchTerm || '';
+  const status = query.status || '';
 
-  const meta = await campaignQuery.countTotal();
-  const result = await campaignQuery.modelQuery;
-  return {
-    meta,
-    result,
+  const matchStage: any = {
+    bussiness: new mongoose.Types.ObjectId(profileId),
   };
+
+  if (status) {
+    matchStage.status = status;
+  }
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(profileId)) {
+      throw new Error('Invalid business ID format');
+    }
+
+    const pipeline = [
+      { $match: matchStage },
+      ...(searchTerm
+        ? [
+            {
+              $match: {
+                name: { $regex: searchTerm, $options: 'i' },
+              },
+            },
+          ]
+        : []),
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'campaign',
+          as: 'reviews',
+        },
+      },
+      {
+        $addFields: {
+          totalReviews: { $size: '$reviews' },
+          totalAmountOfReviews: {
+            $sum: '$reviews.amount',
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'product',
+        },
+      },
+      {
+        $unwind: {
+          path: '$product',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          campaigns: [
+            { $skip: (page - 1) * limit },
+            { $limit: limit },
+            {
+              $project: {
+                name: 1,
+                startDate: 1,
+                endDate: 1,
+                status: 1,
+                totalBugget: 1,
+                numberOfReviewers: 1,
+                progress: {
+                  $concat: [
+                    { $toString: '$totalReviews' },
+                    '/',
+                    { $toString: '$numberOfReviewers' },
+                  ],
+                },
+                product: {
+                  name: 1,
+                  images: 1,
+                },
+                totalReviews: 1,
+                totalAmountOfReviews: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: '$metadata',
+      },
+      {
+        $project: {
+          meta: {
+            page: page,
+            limit: limit,
+            total: '$metadata.total',
+            totalPage: { $ceil: { $divide: ['$metadata.total', limit] } },
+          },
+          result: '$campaigns',
+        },
+      },
+    ];
+
+    const result = await Campaign.aggregate(pipeline).exec();
+
+    // return result[0]
+
+    return {
+      meta: {
+        page: result[0]?.meta?.page || page,
+        limit: result[0]?.meta?.limit || limit,
+        total: result[0]?.meta?.total || 0,
+        totalPage: result[0]?.meta?.totalPage || 0,
+      },
+      result: result[0]?.result || [],
+    };
+  } catch (error) {
+    console.error(
+      'Error fetching paginated campaign data using facet and search:',
+      error,
+    );
+    throw error;
+  }
 };
 
 // get single campaign
