@@ -24,3 +24,18 @@ export interface ICampaign {
   status: (typeof CAMPAIGN_STATUS)[keyof typeof CAMPAIGN_STATUS];
   paymentIntentId: string;
 }
+
+export type CampaignSummary = {
+  id: string;
+  name: string;
+  timeline: { startDate: string; endDate: string };
+  budget: { spent: number; total: number; remaining: number };
+  status: string;
+  progress: { completed: number; target: number; percent: number };
+  totals: {
+    reviewsCompleted: number;
+    totalSpent: number;
+    averageRating: number | null;
+  };
+  daysRemaining: number;
+};

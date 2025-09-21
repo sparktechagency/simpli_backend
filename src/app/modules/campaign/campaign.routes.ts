@@ -43,4 +43,14 @@ router.get(
   simpleAuth,
   CampaignController.getSingleCampaign,
 );
+router.get(
+  '/get-campaign-summary/:id',
+  auth(USER_ROLE.bussinessOwner),
+  CampaignController.getCampaignSummary,
+);
+router.get(
+  '/get-campaign-performance/:id',
+  auth(USER_ROLE.bussinessOwner),
+  CampaignController.getCampaignPerformance,
+);
 export const campaignRoutes = router;

@@ -18,8 +18,9 @@ import {
 import paypalClient from '../../utilities/paypal';
 import stripe from '../../utilities/stripe';
 import Product from '../product/product.model';
+import Review from '../review/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
-import { ICampaign } from './campaign.interface';
+import { CampaignSummary, ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
@@ -473,6 +474,418 @@ cron.schedule('0 0 * * *', async () => {
   console.log(`Campaigns updated to expired: ${result2.modifiedCount}`);
 });
 
+const getCampaignSummary = async (
+  profileId: string,
+  campaignId: string,
+): Promise<CampaignSummary> => {
+  if (!mongoose.Types.ObjectId.isValid(campaignId)) {
+    throw Object.assign(new Error('Invalid campaign id'), { statusCode: 400 });
+  }
+
+  const campaign = await Campaign.findOne({
+    _id: campaignId,
+    bussiness: profileId,
+  })
+    .select([
+      '_id',
+      'name',
+      'startDate',
+      'endDate',
+      'status',
+      'numberOfReviewers',
+      'totalBugget',
+    ])
+    .lean();
+
+  if (!campaign) {
+    throw Object.assign(new Error('Campaign not found'), { statusCode: 404 });
+  }
+
+  const [agg] = await Review.aggregate<{
+    reviewsCompleted: number;
+    totalSpent: number;
+    averageRating: number;
+  }>([
+    { $match: { campaign: new mongoose.Types.ObjectId(campaignId) } },
+    {
+      $group: {
+        _id: '$campaign',
+        reviewsCompleted: { $sum: 1 },
+        totalSpent: { $sum: { $ifNull: ['$amount', 0] } },
+        averageRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  const reviewsCompleted = agg?.reviewsCompleted ?? 0;
+  const totalSpent = Number(agg?.totalSpent ?? 0);
+  const averageRating =
+    typeof agg?.averageRating === 'number'
+      ? Number(agg.averageRating.toFixed(2))
+      : null;
+
+  const target = Number(campaign.numberOfReviewers ?? 0);
+  const percent =
+    target > 0 ? Math.min(100, (reviewsCompleted / target) * 100) : 0;
+
+  const now = new Date();
+  const end = new Date(campaign.endDate);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const daysRemaining = Math.max(
+    0,
+    Math.ceil((end.getTime() - now.getTime()) / msPerDay),
+  );
+
+  const totalBudget = Number(campaign.totalBugget ?? 0);
+  const remaining = Math.max(0, totalBudget - totalSpent);
+
+  return {
+    id: String(campaign._id),
+    name: campaign.name,
+    timeline: {
+      startDate: new Date(campaign.startDate).toISOString(),
+      endDate: end.toISOString(),
+    },
+    budget: {
+      spent: totalSpent,
+      total: totalBudget,
+      remaining,
+    },
+    status: campaign.status,
+    progress: {
+      completed: reviewsCompleted,
+      target,
+      percent: Number(percent.toFixed(2)),
+    },
+    totals: {
+      reviewsCompleted,
+      totalSpent,
+      averageRating,
+    },
+    daysRemaining,
+  };
+};
+
+// get performance
+
+export type PerformanceFilter = 'this-week' | 'this-month' | 'this-year';
+
+export type CampaignPerformancePoint = {
+  key: string; // stable key for chart x-axis
+  label: string; // Mon | 1-5 | Jan
+  periodStart: string; // ISO start of bucket
+  periodEnd: string; // ISO end of bucket (exclusive)
+  reviews: number; // count
+  spent: number; // sum(Review.amount)
+  averageRating: number | null; // avg(Review.rating) rounded(2) or null
+};
+
+const ONE_DAY_MS = 86_400_000;
+const iso = (d: Date) => d.toISOString();
+const addDays = (d: Date, n: number) => new Date(d.getTime() + n * ONE_DAY_MS);
+const addMonths = (d: Date, n: number) =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1, 0, 0, 0, 0));
+const startOfMonthUTC = (d: Date) =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+const startOfYearUTC = (d: Date) =>
+  new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+const lastDayOfMonth = (y: number, m0: number) =>
+  new Date(Date.UTC(y, m0 + 1, 0)).getUTCDate(); // 28–31
+
+// Monday=1 … Sunday=7; compute the Monday of "this week" (UTC)
+const mondayStartOfThisWeekUTC = (nowUTC: Date) => {
+  const day = nowUTC.getUTCDay(); // 0=Sun..6=Sat
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const d = new Date(
+    Date.UTC(
+      nowUTC.getUTCFullYear(),
+      nowUTC.getUTCMonth(),
+      nowUTC.getUTCDate(),
+    ),
+  );
+  const monday = addDays(d, diffToMonday);
+  return new Date(
+    Date.UTC(
+      monday.getUTCFullYear(),
+      monday.getUTCMonth(),
+      monday.getUTCDate(),
+    ),
+  );
+};
+
+export const getCampaignPerformance = async (
+  campaignId: string,
+  filter: PerformanceFilter,
+  timezone?: string,
+): Promise<CampaignPerformancePoint[]> => {
+  if (!mongoose.Types.ObjectId.isValid(campaignId)) {
+    throw Object.assign(new Error('Invalid campaign id'), { statusCode: 400 });
+  }
+
+  const tz = timezone ?? 'UTC';
+  const now = new Date();
+
+  type Plan = {
+    rangeStart: Date;
+    rangeEnd: Date;
+    mongoGroupStage: any[]; // stages to compute bucket stats
+    expectedBuckets: { key: string; label: string; start: Date; end: Date }[];
+  };
+
+  const plan: Plan = (() => {
+    if (filter === 'this-week') {
+      const start = mondayStartOfThisWeekUTC(now);
+      const end = addDays(start, 7);
+      const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      const expected = Array.from({ length: 7 }).map((_, i) => {
+        const s = addDays(start, i);
+        const e = addDays(s, 1);
+        return { key: iso(s), label: labels[i], start: s, end: e };
+      });
+
+      return {
+        rangeStart: start,
+        rangeEnd: end,
+        mongoGroupStage: [
+          {
+            $addFields: {
+              bucket: {
+                $dateTrunc: { date: '$createdAt', unit: 'day', timezone: tz },
+              },
+            },
+          },
+          {
+            $group: {
+              _id: '$bucket',
+              reviews: { $sum: 1 },
+              spent: { $sum: { $ifNull: ['$amount', 0] } },
+              averageRating: { $avg: '$rating' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              bucket: '$_id',
+              reviews: 1,
+              spent: 1,
+              averageRating: 1,
+            },
+          },
+        ],
+        expectedBuckets: expected,
+      };
+    }
+
+    if (filter === 'this-month') {
+      const start = startOfMonthUTC(now);
+      const end = addMonths(start, 1);
+
+      // 6 bins: 1-5, 6-10, 11-15, 16-20, 21-25, 26-(end)
+      const y = start.getUTCFullYear();
+      const m = start.getUTCMonth();
+      const endDay = lastDayOfMonth(y, m);
+      const bins = [
+        [1, 5],
+        [6, 10],
+        [11, 15],
+        [16, 20],
+        [21, 25],
+        [26, endDay],
+      ] as const;
+
+      const expected = bins.map(([a, b]) => {
+        const s = new Date(Date.UTC(y, m, a));
+        const e = new Date(Date.UTC(y, m, b + 1)); // exclusive end
+        return { key: `${y}-${m}-${a}`, label: `${a}-${b}`, start: s, end: e };
+      });
+
+      // Compute bin 1..6 from day-of-month (TZ-aware)
+      const groupStages = [
+        {
+          $addFields: {
+            monthStart: {
+              $dateTrunc: { date: '$createdAt', unit: 'month', timezone: tz },
+            },
+            dom: { $dayOfMonth: { date: '$createdAt', timezone: tz } },
+          },
+        },
+        {
+          $addFields: {
+            bin: {
+              $let: {
+                vars: { d: '$dom' },
+                in: {
+                  $cond: [
+                    { $lte: ['$$d', 25] },
+                    { $ceil: { $divide: ['$$d', 5] } }, // 1..5=>1, 6..10=>2, ..., 21..25=>5
+                    6, // 26..end => 6
+                  ],
+                },
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { monthStart: '$monthStart', bin: '$bin' },
+            reviews: { $sum: 1 },
+            spent: { $sum: { $ifNull: ['$amount', 0] } },
+            averageRating: { $avg: '$rating' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            monthStart: '$_id.monthStart',
+            bin: '$_id.bin',
+            reviews: 1,
+            spent: 1,
+            averageRating: 1,
+          },
+        },
+      ];
+
+      return {
+        rangeStart: start,
+        rangeEnd: end,
+        mongoGroupStage: groupStages,
+        expectedBuckets: expected,
+      };
+    }
+
+    // this-year
+    const start = startOfYearUTC(now);
+    const end = addMonths(start, 12);
+    const monthLabels = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    const expected = Array.from({ length: 12 }).map((_, i) => {
+      const s = addMonths(start, i);
+      const e = addMonths(s, 1);
+      return {
+        key: `${s.getUTCFullYear()}-${i + 1}`,
+        label: monthLabels[i],
+        start: s,
+        end: e,
+      };
+    });
+
+    return {
+      rangeStart: start,
+      rangeEnd: end,
+      mongoGroupStage: [
+        {
+          $addFields: {
+            bucket: {
+              $dateTrunc: { date: '$createdAt', unit: 'month', timezone: tz },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: '$bucket',
+            reviews: { $sum: 1 },
+            spent: { $sum: { $ifNull: ['$amount', 0] } },
+            averageRating: { $avg: '$rating' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            bucket: '$_id',
+            reviews: 1,
+            spent: 1,
+            averageRating: 1,
+          },
+        },
+      ],
+      expectedBuckets: expected,
+    };
+  })();
+
+  // aggregate
+  const match = {
+    campaign: new mongoose.Types.ObjectId(campaignId),
+
+    createdAt: { $gte: plan.rangeStart, $lt: plan.rangeEnd },
+  };
+
+  const agg = await Review.aggregate<any>([
+    { $match: match },
+    ...plan.mongoGroupStage,
+  ]);
+
+  // zero-fill + merge
+  const map = new Map<string, CampaignPerformancePoint>();
+
+  for (const b of plan.expectedBuckets) {
+    map.set(b.key, {
+      key: b.key,
+      label: b.label,
+      periodStart: iso(b.start),
+      periodEnd: iso(b.end),
+      reviews: 0,
+      spent: 0,
+      averageRating: null,
+    });
+  }
+
+  if (filter === 'this-week' || filter === 'this-year') {
+    for (const r of agg) {
+      const bucket = new Date(r.bucket);
+      const key =
+        filter === 'this-week'
+          ? iso(bucket)
+          : `${bucket.getUTCFullYear()}-${bucket.getUTCMonth() + 1}`;
+      const slot = map.get(key);
+      if (slot) {
+        slot.reviews = r.reviews ?? 0;
+        slot.spent = Number(r.spent ?? 0);
+        slot.averageRating =
+          typeof r.averageRating === 'number'
+            ? Number(r.averageRating.toFixed(2))
+            : null;
+      }
+    }
+  } else {
+    // this-month (bins 1..6)
+    for (const r of agg) {
+      const monthStart = new Date(r.monthStart);
+      const y = monthStart.getUTCFullYear();
+      const m = monthStart.getUTCMonth();
+      const binIndex = r.bin as number; // 1..6
+      const startDay = binIndex <= 5 ? (binIndex - 1) * 5 + 1 : 26;
+      const key = `${y}-${m}-${startDay}`;
+      const slot = map.get(key);
+      if (slot) {
+        slot.reviews = r.reviews ?? 0;
+        slot.spent = Number(r.spent ?? 0);
+        slot.averageRating =
+          typeof r.averageRating === 'number'
+            ? Number(r.averageRating.toFixed(2))
+            : null;
+      }
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) =>
+    a.periodStart < b.periodStart ? -1 : 1,
+  );
+};
+
 const CampaignService = {
   createCampaign,
   getAllCampaignFromDB,
@@ -480,6 +893,8 @@ const CampaignService = {
   getSingleCampaignFromDB,
   updateCampaignIntoDB,
   getMyCampaigns,
+  getCampaignSummary,
+  getCampaignPerformance,
 };
 
 export default CampaignService;
