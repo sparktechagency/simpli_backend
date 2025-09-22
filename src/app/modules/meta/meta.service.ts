@@ -268,8 +268,42 @@ const getBussinessMetaData = async (
   };
 };
 
+// reviewer earning meta data
+const reviewerEarningMetaData = async (reviewerId: string) => {
+  const result = await Review.aggregate([
+    {
+      $match: { reviewer: new mongoose.Types.ObjectId(reviewerId) },
+    },
+    {
+      $group: {
+        _id: '$reviewer',
+        totalReviewRewards: { $sum: '$amount' },
+        totalSalesCommissions: { $sum: '$totalCommissions' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        reviewRewards: '$totalReviewRewards',
+        salesCommissions: '$totalSalesCommissions',
+      },
+    },
+  ]);
+
+  // If there is no data, return 0 balances
+  if (result.length === 0) {
+    return {
+      reviewRewards: 0,
+      salesCommissions: 0,
+    };
+  }
+
+  // Return the aggregated values
+  return result[0];
+};
 const MetaService = {
   getReviewerMetaData,
   getBussinessMetaData,
+  reviewerEarningMetaData,
 };
 export default MetaService;

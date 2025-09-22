@@ -27,10 +27,22 @@ const getBussinessMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const reviewerEarningMetaData = catchAsync(async (req, res) => {
+  const result = await MetaService.reviewerEarningMetaData(
+    req?.user?.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Reviewer earning meta data retrieved successfully',
+    data: result,
+  });
+});
 
 const MetaController = {
   getReviewerMetaData,
   getBussinessMetaData,
+  reviewerEarningMetaData,
 };
 
 export default MetaController;

@@ -21,5 +21,10 @@ router.get(
   auth(USER_ROLE.bussinessOwner),
   MetaController.getBussinessMetaData,
 );
+router.get(
+  '/get-reviewer-earning-meta-data',
+  auth(USER_ROLE.reviewer),
+  MetaController.reviewerEarningMetaData,
+);
 
 export const metaRoutes = router;
