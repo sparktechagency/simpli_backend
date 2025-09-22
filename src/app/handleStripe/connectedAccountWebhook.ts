@@ -10,6 +10,11 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleConnectedAccountWebhook = async (req: Request, res: Response) => {
   const endpointSecret = config.stripe
     .webhook_endpoint_secret_for_connected as string;
+  console.log(
+    'Webhook secret for connected account ================>',
+    endpointSecret,
+  );
+
   const sig = req.headers['stripe-signature'];
 
   try {

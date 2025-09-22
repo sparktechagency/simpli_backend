@@ -10,6 +10,7 @@ import handlePaymentSuccess from './handlePaymentSuccess';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleWebhook = async (req: Request, res: Response) => {
   const endpointSecret = config.stripe.webhook_endpoint_secret as string;
+  console.log('Webhook secret================>', endpointSecret);
   const sig = req.headers['stripe-signature'];
 
   try {

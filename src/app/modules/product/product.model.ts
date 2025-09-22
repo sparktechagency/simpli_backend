@@ -9,11 +9,11 @@ const ProductSchema = new Schema<IProduct>(
       ref: 'Bussiness',
       required: true,
     },
-    name: { type: String, required: true },
+    name: { type: String },
     shortDescription: { type: String, default: '' },
-    description: { type: String, required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-    brand: { type: String, required: false },
+    description: { type: String },
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
+    brand: { type: String },
     status: {
       type: String,
       enum: Object.values(ENUM_PRODUCT_STATUS),
@@ -21,10 +21,9 @@ const ProductSchema = new Schema<IProduct>(
     },
     price: {
       type: Number,
-      required: true,
     },
-    images: { type: [String], required: false, default: [] },
-    tags: { type: [String], required: false },
+    images: { type: [String], default: [] },
+    tags: { type: [String] },
     colors: {
       type: [String],
     },
@@ -33,7 +32,6 @@ const ProductSchema = new Schema<IProduct>(
     },
     stock: {
       type: Number,
-      required: true,
     },
     isDeleted: {
       type: Boolean,

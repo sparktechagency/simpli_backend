@@ -158,6 +158,9 @@ const getAllReviewFromDB = async (
   if (query.product) {
     matchStage.product = new mongoose.Types.ObjectId(query.product as string);
   }
+  if (query.campaign) {
+    matchStage.campaign = new mongoose.Types.ObjectId(query.campaign as string);
+  }
 
   // Pagination
   const page = Number(query.page) || 1;

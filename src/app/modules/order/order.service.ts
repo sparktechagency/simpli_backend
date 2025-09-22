@@ -31,18 +31,6 @@ const createOrder = async (
   let shippingInfo: any = null;
 
   if (payload.selectedRateId) {
-    // User selected a shipping rate
-    // const shippingAddress = await ShippingAddress.findOne({
-    //   _id: payload.shippingAddress,
-    //   reviewer: reviewerId,
-    // });
-    // const store = await Store.findOne({ bussiness: cart.bussiness });
-    // if (!store) {
-    //   throw new AppError(httpStatus.NOT_FOUND, 'Store details');
-    // }
-    // if (!shippingAddress)
-    //   throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
-
     const shipment = await shippo.shipments.get(payload.shipmentId);
     const selectedRate = shipment.rates.find(
       (r: any) => r.objectId == payload.selectedRateId,
