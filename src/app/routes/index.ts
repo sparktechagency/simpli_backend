@@ -18,6 +18,7 @@ import { notificationRoutes } from '../modules/notification/notification.routes'
 import { notificationSettingRoutes } from '../modules/notificationSetting/notificationSetting.routes';
 import { oauthRoutes } from '../modules/oAuth/oAuth.routes';
 import { orderRoutes } from '../modules/order/order.routes';
+import { paymentRoutes } from '../modules/payment/payment.routes';
 import { paypalRoutes } from '../modules/paypal/paypal.routes';
 import { productRoutes } from '../modules/product/product.routes';
 import { referralSalesRoutes } from '../modules/referralSales/referralSales.routes';
@@ -163,6 +164,10 @@ const moduleRoutes = [
   {
     path: '/oauth',
     router: oauthRoutes,
+  },
+  {
+    path: '/payment',
+    router: paymentRoutes,
   },
 ];
 
