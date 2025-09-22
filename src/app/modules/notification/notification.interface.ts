@@ -15,6 +15,7 @@ export interface INotification {
       id: Types.ObjectId;
       name: string;
       quantity: number;
+      images: string[];
     };
   };
   isRead: boolean;

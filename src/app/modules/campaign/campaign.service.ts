@@ -474,6 +474,12 @@ const pauseCampaign = async (
   if (!campaign) {
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
   }
+  if (campaign.status != CAMPAIGN_STATUS.ACTIVE) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Only active campaign can be paused',
+    );
+  }
   const result = await Campaign.findByIdAndUpdate(
     id,
     { status: status },
@@ -489,6 +495,12 @@ const makeCampaignActive = async (
   const campaign = await Campaign.findOne({ _id: id, bussiness: bussinessId });
   if (!campaign) {
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+  if (campaign.status != CAMPAIGN_STATUS.PAUSED) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Only paused campaign can be activated',
+    );
   }
   if (new Date() > campaign?.endDate) {
     throw new AppError(

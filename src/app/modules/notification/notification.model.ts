@@ -24,6 +24,7 @@ const NotificationSchema = new Schema<INotification>(
         id: { type: Schema.Types.ObjectId, ref: 'Product' },
         name: { type: String },
         quantity: { type: Number },
+        images: { type: [String], default: [] },
       },
     },
     isRead: { type: Boolean, default: false },

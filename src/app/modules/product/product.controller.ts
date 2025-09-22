@@ -94,7 +94,7 @@ const softDeleteSingleProduct = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Product deleted permanently',
+    message: 'Product go to archive successfully',
     data: result,
   });
 });
