@@ -27,7 +27,7 @@ export const sendCommentNotification = async (
     receiver: review.reviewer.toString(),
     title: 'New Comment on Your Review',
     type: ENUM_NOTIFICATION_TYPE.COMMENT,
-    message: `${comment.commentor.name} commented on your ${review.product.name} review: ${review.product.name}`,
+    message: `${comment.commentor.name} commented on your ${review.product.name} review`,
     data: {
       reviewId: review._id,
     },

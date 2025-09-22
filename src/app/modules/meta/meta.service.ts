@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import {
+  CAMPAIGN_STATUS,
   ENUM_DELIVERY_STATUS,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
@@ -11,6 +12,7 @@ import { Order } from '../order/order.model';
 import Review from '../review/reviewer.model';
 
 import moment from 'moment';
+import Campaign from '../campaign/campaign.model';
 import Cart from '../cart/cart.model';
 
 const getReviewerMetaData = async (
@@ -301,9 +303,182 @@ const reviewerEarningMetaData = async (reviewerId: string) => {
   // Return the aggregated values
   return result[0];
 };
+
+const getPercentageChange = (current: number, previous: number) => {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+};
+
+const getCampaignMetaData = async (
+  businessId: string,
+  query: Record<string, any>,
+) => {
+  const { dateRange } = query;
+
+  let currentDateFilter: Record<string, any> = {};
+  let previousDateFilter: Record<string, any> = {};
+  const today = moment().startOf('day');
+
+  switch (dateRange) {
+    case 'thisWeek':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().startOf('week').toDate(),
+          $lt: today.clone().endOf('week').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+          $lt: today.clone().startOf('week').toDate(),
+        },
+      };
+      break;
+
+    case 'lastWeek':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+          $lt: today.clone().startOf('week').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(2, 'week').startOf('week').toDate(),
+          $lt: today.clone().subtract(1, 'week').startOf('week').toDate(),
+        },
+      };
+      break;
+
+    case 'thisMonth':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().startOf('month').toDate(),
+          $lt: today.clone().endOf('month').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+          $lt: today.clone().startOf('month').toDate(),
+        },
+      };
+      break;
+
+    case 'lastMonth':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+          $lt: today.clone().startOf('month').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(2, 'month').startOf('month').toDate(),
+          $lt: today.clone().subtract(1, 'month').startOf('month').toDate(),
+        },
+      };
+      break;
+
+    case 'thisYear':
+      currentDateFilter = {
+        createdAt: { $gte: today.clone().startOf('year').toDate() },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'year').startOf('year').toDate(),
+          $lt: today.clone().startOf('year').toDate(),
+        },
+      };
+      break;
+
+    default:
+      currentDateFilter = {};
+      previousDateFilter = {};
+  }
+
+  // Total Spent
+  const currentSpent = await Review.aggregate([
+    {
+      $match: {
+        business: new mongoose.Types.ObjectId(businessId),
+        ...currentDateFilter,
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+
+  const previousSpent = await Review.aggregate([
+    {
+      $match: {
+        business: new mongoose.Types.ObjectId(businessId),
+        ...previousDateFilter,
+      },
+    },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+
+  const spentValue = currentSpent[0]?.total || 0;
+  const spentChange = getPercentageChange(
+    spentValue,
+    previousSpent[0]?.total || 0,
+  );
+
+  // Total Reviews
+  const currentReviewCount = await Review.countDocuments({
+    business: businessId,
+    ...currentDateFilter,
+  });
+  const previousReviewCount = await Review.countDocuments({
+    business: businessId,
+    ...previousDateFilter,
+  });
+
+  // Avg Cost / Review
+  const avgCostPerReview =
+    currentReviewCount > 0 ? spentValue / currentReviewCount : 0;
+
+  // Campaigns
+  const currentCampaignCount = await Campaign.countDocuments({
+    bussiness: businessId,
+    ...currentDateFilter,
+  });
+  const previousCampaignCount = await Campaign.countDocuments({
+    bussiness: businessId,
+    ...previousDateFilter,
+  });
+
+  const activeCampaigns = await Campaign.countDocuments({
+    bussines: CAMPAIGN_STATUS.ACTIVE,
+    ...currentDateFilter,
+  });
+  const scheduledCampaigns = await Campaign.countDocuments({
+    status: CAMPAIGN_STATUS.SCHEDULED,
+    ...currentDateFilter,
+  });
+
+  return {
+    totalSpent: {
+      value: spentValue,
+      change: spentChange,
+    },
+    totalReview: {
+      value: currentReviewCount,
+      change: getPercentageChange(currentReviewCount, previousReviewCount),
+    },
+    avgCostPerReview: avgCostPerReview,
+    totalCampaign: {
+      value: currentCampaignCount,
+      change: getPercentageChange(currentCampaignCount, previousCampaignCount),
+    },
+    activeCampaigns,
+    scheduledCampaigns,
+  };
+};
 const MetaService = {
   getReviewerMetaData,
   getBussinessMetaData,
   reviewerEarningMetaData,
+  getCampaignMetaData,
 };
 export default MetaService;

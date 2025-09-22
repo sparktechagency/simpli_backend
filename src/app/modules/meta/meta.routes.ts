@@ -26,5 +26,10 @@ router.get(
   auth(USER_ROLE.reviewer),
   MetaController.reviewerEarningMetaData,
 );
+router.get(
+  '/get-campaign-meta-data',
+  auth(USER_ROLE.bussinessOwner),
+  MetaController.getCampaignMetaData,
+);
 
 export const metaRoutes = router;

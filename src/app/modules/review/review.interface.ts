@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 export interface IReview {
   reviewer: Types.ObjectId;
   product: Types.ObjectId;
+  business: Types.ObjectId;
   category: Types.ObjectId;
   campaign: Types.ObjectId;
   amount: number;

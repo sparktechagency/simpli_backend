@@ -6,7 +6,6 @@ import stripe from '../../utilities/stripe';
 import Bussiness from '../bussiness/bussiness.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
-import { User } from '../user/user.model';
 
 const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
@@ -121,20 +120,34 @@ const createConnectedAccountAndOnboardingLink = async (
   }
 };
 
-const updateOnboardingLink = async (userId: string) => {
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Shop not found');
+const updateOnboardingLink = async (userData: JwtPayload) => {
+  if (userData.role == USER_ROLE.bussinessOwner) {
+    const user = await Bussiness.findById(userData.profileId);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    const accountLink = await stripe.accountLinks.create({
+      account: user.stripeConnectedAccountId.toString(),
+      refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
+      return_url: config.stripe.onboarding_return_url,
+      type: 'account_onboarding',
+    });
+
+    return { link: accountLink.url };
+  } else {
+    const user = await Reviewer.findById(userData.profileId);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Reviewer not found');
+    }
+    const accountLink = await stripe.accountLinks.create({
+      account: user.stripeConnectedAccountId.toString(),
+      refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
+      return_url: config.stripe.onboarding_return_url,
+      type: 'account_onboarding',
+    });
+
+    return { link: accountLink.url };
   }
-
-  const accountLink = await stripe.accountLinks.create({
-    account: user.stripeConnectedAccountId as string,
-    refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
-    return_url: config.stripe.onboarding_return_url,
-    type: 'account_onboarding',
-  });
-
-  return { link: accountLink.url };
 };
 
 const updateStripeConnectedAccountStatus = async (accountId: string) => {

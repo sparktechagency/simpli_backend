@@ -38,11 +38,24 @@ const reviewerEarningMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getCampaignMetaData = catchAsync(async (req, res) => {
+  const result = await MetaService.getCampaignMetaData(
+    req?.user?.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Campaign meta data retrieved successfully',
+    data: result,
+  });
+});
 
 const MetaController = {
   getReviewerMetaData,
   getBussinessMetaData,
   reviewerEarningMetaData,
+  getCampaignMetaData,
 };
 
 export default MetaController;

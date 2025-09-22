@@ -15,7 +15,7 @@ const createOnboardingLink = catchAsync(async (req, res) => {
   });
 });
 const updateOnboardingLink = catchAsync(async (req, res) => {
-  const result = await StripeService.updateOnboardingLink(req.user.id);
+  const result = await StripeService.updateOnboardingLink(req.user);
   sendResponse(res, {
     statusCode: 201,
     success: true,

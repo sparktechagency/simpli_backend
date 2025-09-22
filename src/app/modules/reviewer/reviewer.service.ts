@@ -300,6 +300,13 @@ const updateReviewerIntoDB = async (
       throw new AppError(httpStatus.NOT_FOUND, 'This username not available');
     }
   }
+
+  if (payload.currentBalance) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not update current balance',
+    );
+  }
   const result = await Reviewer.findByIdAndUpdate(reviewerId, payload, {
     new: true,
     runValidators: true,
