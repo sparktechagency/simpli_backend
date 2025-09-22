@@ -33,3 +33,36 @@ export const sendCommentNotification = async (
     },
   });
 };
+export const sendReplyNotification = async (
+  reviewId: string,
+  commentId: string,
+) => {
+  const review: any = await Review.findById(reviewId)
+    .select('reviewer product')
+    .populate({ path: 'product', select: 'name' });
+  if (!review) return;
+  if (
+    !shouldSendNotification(ENUM_NOTIFICATION_TYPE.COMMENT, review.reviewer)
+  ) {
+    return;
+  }
+  const comment: any = await Comment.findById(commentId)
+    .select('parent')
+    .populate({
+      path: 'parent',
+      select: 'commentor',
+      populate: { path: 'commentor', select: 'name' },
+    });
+  if (!comment) return;
+
+  Notification.create({
+    receiver: review.reviewer.toString(),
+    title: `New Reply on Your Review Comment`,
+    type: ENUM_NOTIFICATION_TYPE.COMMENT,
+    message: `${comment.parent.commentor.name} replied to your comment on review`,
+    data: {
+      reviewId: review._id,
+      commentId: commentId,
+    },
+  });
+};

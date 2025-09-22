@@ -5,7 +5,10 @@ import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import Review from '../review/reviewer.model';
-import { sendCommentNotification } from './comment.helper';
+import {
+  sendCommentNotification,
+  sendReplyNotification,
+} from './comment.helper';
 import { IComment } from './comment.interface';
 import Comment from './comment.model';
 
@@ -36,6 +39,10 @@ const createReply = async (user: JwtPayload, payload: IComment) => {
     review: comment.review,
   };
   const result = await Comment.create(replyData);
+  sendReplyNotification(
+    payload.review?.toString() as string,
+    result._id.toString() as string,
+  );
   return result;
 };
 
