@@ -37,8 +37,10 @@ const createReview = async (reviewerId: string, payload: any) => {
       product: {
         _id: mongoose.Schema.Types.ObjectId;
         category: mongoose.Schema.Types.ObjectId;
+        name: string;
+        images: string[];
       };
-    }>({ path: 'product', select: 'category' });
+    }>({ path: 'product', select: 'category name images' });
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
@@ -88,6 +90,10 @@ const createReview = async (reviewerId: string, payload: any) => {
       message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
       data: {
         reviewId: result._id,
+        product: {
+          name: campaignOffer.product.name,
+          images: campaignOffer.product.images,
+        },
       },
     });
   }

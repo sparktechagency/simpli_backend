@@ -59,7 +59,7 @@ const getMyCampaignOfferFromDB = async (
     filterQuery = {
       reviewer: userData.profileId,
     };
-  } else if (userData?.role === USER_ROLE.bussinessOwner) {
+  } else if (userData?.role == USER_ROLE.bussinessOwner) {
     filterQuery = {
       bussiness: userData?.profileId,
     };
