@@ -17,7 +17,7 @@ const acceptCampaignOffer = catchAsync(async (req, res) => {
 });
 const getMyCampaignOffer = catchAsync(async (req, res) => {
   const result = await CampaignOfferService.getMyCampaignOfferFromDB(
-    req.user.profileId,
+    req.user,
     req.query,
   );
   sendResponse(res, {

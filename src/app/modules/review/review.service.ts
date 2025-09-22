@@ -5,6 +5,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
 import { shouldSendNotification } from '../../helper/shouldSendNotification';
+import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Follow from '../follow/follow.model';
@@ -41,7 +42,8 @@ const createReview = async (reviewerId: string, payload: any) => {
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
-  if (campaignOffer.campaign.status !== CampaignOfferStatus.accept) {
+  // TODO: check campaign status
+  if (campaignOffer.deliveryStatus !== ENUM_DELIVERY_STATUS.waiting) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'This campaign not accepted by you',
@@ -52,6 +54,17 @@ const createReview = async (reviewerId: string, payload: any) => {
   if (payload.video) {
     console.log('video', payload.video);
     payload.video = getCloudFrontUrl(payload.video);
+  }
+  const isReviewExists = await Review.exists({
+    reviewer: reviewerId,
+    campaign: campaignOffer.campaign._id,
+    campaignOffer: payload.campaignOfferId,
+  });
+  if (isReviewExists) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You have already submitted a review for this campaign offer',
+    );
   }
   const result = await Review.create({
     ...payload,
@@ -71,6 +84,7 @@ const createReview = async (reviewerId: string, payload: any) => {
     Notification.create({
       receiver: reviewerId,
       type: ENUM_NOTIFICATION_TYPE.REVIEW,
+      title: 'Review Posted Successfully',
       message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
       data: {
         reviewId: result._id,
