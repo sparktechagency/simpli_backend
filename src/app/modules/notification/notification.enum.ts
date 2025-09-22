@@ -32,7 +32,7 @@ export const ENUM_NOTIFICATION_TYPE = {
   ANNOUNCEMENT: 'general',
   SYSTEM_UPDATE: 'general',
   GENERAL: 'general',
-  PAYMENT_RECEIVED: 'customerNotification',
+  CAMPAIGN: 'campaign',
 } as const;
 
 export type NotificationTypeKey = keyof typeof ENUM_NOTIFICATION_TYPE;

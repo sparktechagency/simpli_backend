@@ -30,6 +30,14 @@ const NotificationSettingSchema = new Schema<INotificationSetting>(
       type: Boolean,
       default: true,
     },
+    campaign: {
+      type: Boolean,
+      default: true,
+    },
+    payment: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );

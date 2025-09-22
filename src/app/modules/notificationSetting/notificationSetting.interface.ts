@@ -13,4 +13,6 @@ export interface INotificationSetting {
   general: boolean;
   customerNotification: boolean;
   orderNotification: boolean;
+  campaign: boolean;
+  payment: boolean;
 }
