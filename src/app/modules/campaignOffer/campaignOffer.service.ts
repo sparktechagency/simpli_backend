@@ -61,7 +61,7 @@ const getMyCampaignOfferFromDB = async (
     };
   } else if (userData?.role == USER_ROLE.bussinessOwner) {
     filterQuery = {
-      bussiness: userData?.profileId,
+      business: userData?.profileId,
     };
   }
 

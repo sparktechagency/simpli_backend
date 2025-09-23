@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { uploadFile } from '../../aws/multer-s3-uploader';
 import auth from '../../middlewares/auth';
-import simpleAuth from '../../middlewares/simpleAuth';
 import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import ProductController from './product.controller';
@@ -73,7 +72,7 @@ router.get(
 );
 router.get(
   '/get-single-product/:id',
-  simpleAuth,
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
   ProductController.getSingleProduct,
 );
 

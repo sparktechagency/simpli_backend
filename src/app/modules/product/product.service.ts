@@ -261,6 +261,167 @@ const getAllProduct = async (
 //   return result;
 // };
 
+// const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
+//   console.log('reviewerId:', reviewerId);
+//   // validate product id
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product id');
+//   }
+//   const objectId = new mongoose.Types.ObjectId(id);
+
+//   // validate reviewer id (optional)
+//   let reviewerObjectId: mongoose.Types.ObjectId | null = null;
+//   if (reviewerId && mongoose.Types.ObjectId.isValid(reviewerId)) {
+//     reviewerObjectId = new mongoose.Types.ObjectId(reviewerId);
+//   }
+
+//   const pipeline: any[] = [
+//     { $match: { _id: objectId, isDeleted: false } },
+
+//     // Lookup business (selected fields)
+//     {
+//       $lookup: {
+//         from: 'bussinesses', // make sure this matches your actual collection name
+//         let: { bussinessId: '$bussiness' },
+//         pipeline: [
+//           { $match: { $expr: { $eq: ['$_id', '$$bussinessId'] } } },
+//           {
+//             $project: {
+//               _id: 1,
+//               bussinessName: 1,
+//               coverImage: 1,
+//               logo: 1,
+//               phoneNumber: 1,
+//             },
+//           },
+//         ],
+//         as: 'bussiness',
+//       },
+//     },
+//     { $unwind: { path: '$bussiness', preserveNullAndEmptyArrays: true } },
+
+//     // Lookup category
+//     {
+//       $lookup: {
+//         from: 'categories',
+//         let: { categoryId: '$category' },
+//         pipeline: [
+//           { $match: { $expr: { $eq: ['$_id', '$$categoryId'] } } },
+//           { $project: { _id: 1, name: 1 } }, // change fields as needed
+//         ],
+//         as: 'category',
+//       },
+//     },
+//     { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+
+//     // Lookup reviews and calculate avg rating
+//     {
+//       $lookup: {
+//         from: 'reviews',
+//         localField: '_id',
+//         foreignField: 'product',
+//         as: 'reviews',
+//       },
+//     },
+//     {
+//       $addFields: {
+//         avgRating: { $ifNull: [{ $avg: '$reviews.rating' }, 0] },
+//       },
+//     },
+//   ];
+
+//   // If reviewer provided and valid -> lookup bookmark
+//   if (reviewerObjectId) {
+//     pipeline.push(
+//       {
+//         $lookup: {
+//           from: 'bookmarks', // ensure matches your bookmarks collection
+//           let: { productId: '$_id' },
+//           pipeline: [
+//             {
+//               $match: {
+//                 $expr: {
+//                   $and: [
+//                     { $eq: ['$product', '$$productId'] },
+//                     { $eq: ['$reviewer', reviewerObjectId] }, // compare to constant ObjectId
+//                   ],
+//                 },
+//               },
+//             },
+//             { $limit: 1 },
+//           ],
+//           as: 'bookmark',
+//         },
+//       },
+
+//       {
+//         $addFields: {
+//           isBookmark: {
+//             $cond: {
+//               if: { $gt: [{ $size: { $ifNull: ['$bookmark', []] } }, 0] },
+//               then: true,
+//               else: false,
+//             },
+//           },
+//         },
+//       },
+//       {
+//         $project: {
+//           reviews: 0,
+//           bookmark: 0,
+//         },
+//       },
+
+//       {
+//         $addFields: {
+//           isBookmark: { $gt: [{ $size: '$bookmark' }, 0] },
+//         },
+//       },
+//       {
+//         $project: {
+//           reviews: 0,
+//           bookmark: 0,
+//         },
+//       },
+
+//       {
+//         $addFields: {
+//           isBookmark: { $gt: [{ $size: '$bookmark' }, 0] },
+//         },
+//       },
+//       // cleanup
+//       {
+//         $project: {
+//           reviews: 0,
+//           bookmark: 0,
+//         },
+//       },
+//     );
+//   } else {
+//     // no reviewer -> always false
+//     pipeline.push(
+//       {
+//         $addFields: {
+//           isBookmark: false,
+//         },
+//       },
+//       {
+//         $project: {
+//           reviews: 0,
+//         },
+//       },
+//     );
+//   }
+
+//   const result = await Product.aggregate(pipeline);
+
+//   if (!result || result.length === 0) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+//   }
+
+//   return result[0];
+// };
+
 const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
   // validate product id
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -280,7 +441,7 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
     // Lookup business (selected fields)
     {
       $lookup: {
-        from: 'bussinesses', // make sure this matches your actual collection name
+        from: 'bussinesses', // ensure this matches your collection name
         let: { bussinessId: '$bussiness' },
         pipeline: [
           { $match: { $expr: { $eq: ['$_id', '$$bussinessId'] } } },
@@ -306,7 +467,7 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
         let: { categoryId: '$category' },
         pipeline: [
           { $match: { $expr: { $eq: ['$_id', '$$categoryId'] } } },
-          { $project: { _id: 1, name: 1 } }, // change fields as needed
+          { $project: { _id: 1, name: 1 } },
         ],
         as: 'category',
       },
@@ -334,15 +495,15 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
     pipeline.push(
       {
         $lookup: {
-          from: 'bookmarks', // ensure matches your bookmarks collection
-          let: { productId: '$_id' },
+          from: 'bookmarks',
+          let: { productId: '$_id', reviewerId: reviewerObjectId },
           pipeline: [
             {
               $match: {
                 $expr: {
                   $and: [
                     { $eq: ['$product', '$$productId'] },
-                    { $eq: ['$reviewer', reviewerObjectId] }, // compare to constant ObjectId
+                    { $eq: ['$reviewer', '$$reviewerId'] },
                   ],
                 },
               },
@@ -354,10 +515,15 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
       },
       {
         $addFields: {
-          isBookmark: { $gt: [{ $size: '$bookmark' }, 0] },
+          isBookmark: {
+            $cond: {
+              if: { $gt: [{ $size: { $ifNull: ['$bookmark', []] } }, 0] },
+              then: true,
+              else: false,
+            },
+          },
         },
       },
-      // cleanup
       {
         $project: {
           reviews: 0,
@@ -369,14 +535,10 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
     // no reviewer -> always false
     pipeline.push(
       {
-        $addFields: {
-          isBookmark: false,
-        },
+        $addFields: { isBookmark: false },
       },
       {
-        $project: {
-          reviews: 0,
-        },
+        $project: { reviews: 0 },
       },
     );
   }
@@ -389,6 +551,7 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
 
   return result[0];
 };
+
 // update product
 
 const updateProductIntoDB = async (

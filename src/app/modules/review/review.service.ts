@@ -62,6 +62,13 @@ const createReview = async (reviewerId: string, payload: any) => {
     );
   }
 
+  if (campaignOffer.status !== CampaignOfferStatus.processing) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This campaign offer is not in processing state',
+    );
+  }
+
   // TODO: when create review---------------
   if (payload.video) {
     payload.video = getCloudFrontUrl(payload.video);
