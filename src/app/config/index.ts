@@ -32,7 +32,10 @@ export default {
     webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
     webhook_endpoint_secret_for_connected:
       process.env.WEBHOOK_ENDPOINT_SECRET_FOR_CONNECTED,
-    onboarding_return_url: process.env.ONBOARDING_RETURN_URL,
+    onboarding_return_url_for_reviewer:
+      process.env.ONBOARDING_RETURN_URL_FOR_REVIEWER,
+    onboarding_return_url_for_business:
+      process.env.ONBOARDING_RETURN_URL_FOR_BUSINESS,
     onboarding_refresh_url: process.env.ONBOARDING_REFRESH_URL,
   },
   paypal: {

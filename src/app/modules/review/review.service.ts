@@ -26,7 +26,10 @@ const createReview = async (reviewerId: string, payload: any) => {
       'You are not allowed to add this field',
     );
   }
-  const campaignOffer = await CampaignOffer.findById(payload.campaignOfferId)
+  const campaignOffer = await CampaignOffer.findOne({
+    _id: payload.campaignOfferId,
+    reviewer: reviewerId,
+  })
     .populate<{
       campaign: { status: string; _id: mongoose.Schema.Types.ObjectId };
     }>({
@@ -52,29 +55,25 @@ const createReview = async (reviewerId: string, payload: any) => {
     );
   }
 
-  // TODO: when create review---------------
-  if (payload.video) {
-    console.log('video', payload.video);
-    payload.video = getCloudFrontUrl(payload.video);
-  }
-  const isReviewExists = await Review.exists({
-    reviewer: reviewerId,
-    campaign: campaignOffer.campaign._id,
-    campaignOffer: payload.campaignOfferId,
-  });
-  if (isReviewExists) {
+  if (campaignOffer.status === CampaignOfferStatus.completed) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'You have already submitted a review for this campaign offer',
+      'This campaign offer already completed',
     );
   }
+
+  // TODO: when create review---------------
+  if (payload.video) {
+    payload.video = getCloudFrontUrl(payload.video);
+  }
+
   const result = await Review.create({
     ...payload,
     reviewer: reviewerId,
     campaign: campaignOffer.campaign._id,
     product: campaignOffer.product._id,
     category: campaignOffer.product.category,
-    bussiness: campaignOffer.business,
+    business: campaignOffer.business,
     amount: campaignOffer.amount,
   });
 

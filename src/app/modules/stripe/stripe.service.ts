@@ -23,7 +23,7 @@ const createConnectedAccountAndOnboardingLink = async (
       const onboardingLink = await stripe.accountLinks.create({
         account: businessInfo.stripeConnectedAccountId.toString(),
         refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${businessInfo.stripeConnectedAccountId.toString()}`,
-        return_url: `${config.stripe.onboarding_return_url}`,
+        return_url: `${config.stripe.onboarding_return_url_for_business}`,
         type: 'account_onboarding',
       });
       return onboardingLink.url;
@@ -59,7 +59,7 @@ const createConnectedAccountAndOnboardingLink = async (
       const onboardingLink = await stripe.accountLinks.create({
         account: account.id,
         refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
-        return_url: `${config.stripe.onboarding_return_url}`,
+        return_url: `${config.stripe.onboarding_return_url_for_business}`,
         type: 'account_onboarding',
       });
       return onboardingLink.url;
@@ -76,7 +76,7 @@ const createConnectedAccountAndOnboardingLink = async (
       const onboardingLink = await stripe.accountLinks.create({
         account: reviewerInfo.stripeConnectedAccountId.toString(),
         refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${reviewerInfo.stripeConnectedAccountId.toString()}`,
-        return_url: `${config.stripe.onboarding_return_url}`,
+        return_url: `${config.stripe.onboarding_return_url_for_reviewer}`,
         type: 'account_onboarding',
       });
       return onboardingLink.url;
@@ -112,7 +112,7 @@ const createConnectedAccountAndOnboardingLink = async (
       const onboardingLink = await stripe.accountLinks.create({
         account: account.id,
         refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${account?.id}`,
-        return_url: `${config.stripe.onboarding_return_url}`,
+        return_url: `${config.stripe.onboarding_return_url_for_reviewer}`,
         type: 'account_onboarding',
       });
       return onboardingLink.url;
@@ -129,7 +129,7 @@ const updateOnboardingLink = async (userData: JwtPayload) => {
     const accountLink = await stripe.accountLinks.create({
       account: user.stripeConnectedAccountId.toString(),
       refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
-      return_url: config.stripe.onboarding_return_url,
+      return_url: config.stripe.onboarding_return_url_for_business,
       type: 'account_onboarding',
     });
 
@@ -142,7 +142,7 @@ const updateOnboardingLink = async (userData: JwtPayload) => {
     const accountLink = await stripe.accountLinks.create({
       account: user.stripeConnectedAccountId.toString(),
       refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${user.stripeConnectedAccountId}`,
-      return_url: config.stripe.onboarding_return_url,
+      return_url: config.stripe.onboarding_return_url_for_reviewer,
       type: 'account_onboarding',
     });
 
