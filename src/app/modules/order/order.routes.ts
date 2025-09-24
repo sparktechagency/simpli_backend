@@ -24,5 +24,10 @@ router.get(
   auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
   OrderController.getSingleOrder,
 );
+router.get(
+  '/track-order/:id',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  OrderController.trackingOrder,
+);
 
 export const orderRoutes = router;

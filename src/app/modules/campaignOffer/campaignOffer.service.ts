@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import paypal from '@paypal/checkout-server-sdk';
+import axios, { AxiosError } from 'axios';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -227,11 +228,90 @@ const proceedDeliveryForCampaignOffer = async (
   }
 };
 
+const trackingOfferShipment = async (
+  campaignOfferId: string,
+  profileId: string,
+) => {
+  const campaignOffer = await CampaignOffer.findOne({
+    $or: [{ reviewer: profileId }, { business: profileId }],
+    _id: campaignOfferId,
+  }).select('shipping');
+
+  if (!campaignOffer) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign offer not found');
+  }
+
+  if (
+    !campaignOffer.shipping?.provider ||
+    !campaignOffer.shipping?.trackingNumber
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Shipping provider or tracking number missing',
+    );
+  }
+
+  const carrier =
+    process.env.NODE_ENV === 'development'
+      ? 'shippo' // Shippo test mode
+      : campaignOffer.shipping.provider.toLowerCase();
+
+  const tracking_number =
+    process.env.NODE_ENV === 'development'
+      ? 'SHIPPO_TRANSIT'
+      : campaignOffer.shipping.trackingNumber;
+
+  try {
+    const response = await axios.post(
+      'https://api.goshippo.com/v1/tracks/',
+      new URLSearchParams({
+        carrier,
+        tracking_number,
+        metadata: `Order : ${campaignOffer._id}`,
+      }),
+      {
+        headers: {
+          Authorization: `ShippoToken ${process.env.SHIPPO_API_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
+
+    // console.log(response.data);
+
+    const trackingData = response.data;
+
+    return {
+      trackingData,
+    };
+  } catch (error) {
+    // 3️⃣ Axios error handling
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const status =
+        axiosError.response?.status || httpStatus.INTERNAL_SERVER_ERROR;
+      const data: any = axiosError.response?.data || {};
+      throw new AppError(
+        status,
+        `Shippo API Error: ${axiosError.message}`,
+        data,
+      );
+    }
+
+    // 4️⃣ Other unexpected errors
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong while fetching tracking data',
+    );
+  }
+};
+
 const CampaignOfferService = {
   acceptCampaignOffer,
   getMyCampaignOfferFromDB,
   getSingleCampaignOffer,
   proceedDeliveryForCampaignOffer,
+  trackingOfferShipment,
 };
 
 export default CampaignOfferService;

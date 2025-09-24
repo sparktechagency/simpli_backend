@@ -34,4 +34,10 @@ router.post(
   CampaignOfferController.proceedDeliveryForCampaignOffer,
 );
 
+router.get(
+  '/track-offer-shipment/:id',
+  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
+  CampaignOfferController.trackingOfferShipment,
+);
+
 export const campaignOfferRoutes = router;

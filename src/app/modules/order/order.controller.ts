@@ -36,11 +36,24 @@ const getSingleOrder = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const trackingOrder = catchAsync(async (req, res) => {
+  const result = await OrderService.trackingOrder(
+    req.params.id,
+    req.user?.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Tracked data retrieved successfully',
+    data: result,
+  });
+});
 
 const OrderController = {
   createOrder,
   getMyOrders,
   getSingleOrder,
+  trackingOrder,
 };
 
 export default OrderController;

@@ -51,12 +51,25 @@ const proceedDeliveryForCampaignOffer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const trackingOfferShipment = catchAsync(async (req, res) => {
+  const result = await CampaignOfferService.trackingOfferShipment(
+    req.params.id,
+    req.user.profileId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Tracking information retrieved successfully`,
+    data: result,
+  });
+});
 
 const CampaignOfferController = {
   acceptCampaignOffer,
   getMyCampaignOffer,
   getSingleCampaignOffer,
   proceedDeliveryForCampaignOffer,
+  trackingOfferShipment,
 };
 
 export default CampaignOfferController;
