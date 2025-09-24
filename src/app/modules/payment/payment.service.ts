@@ -72,7 +72,7 @@ const makeWithDraw = async (userData: JwtPayload, amount: number) => {
 
       await Transaction.create({
         amount: amount,
-        transactionType: ENUM_TRANSACTION_TYPE.CREDIT,
+        type: ENUM_TRANSACTION_TYPE.CREDIT,
         transactionReason: ENUM_TRANSACTION_REASON.WITHDRAWAL,
         userType: 'Bussiness',
         user: userData.profileId,
@@ -130,7 +130,7 @@ const makeWithDraw = async (userData: JwtPayload, amount: number) => {
           stripeAccount: reviewer.stripeConnectedAccountId.toString(),
         },
       );
-      console.log('payout', payout);
+      //   console.log('payout', payout);
 
       // if (payout.status !== 'paid') {
       //   throw new AppError(
@@ -149,7 +149,7 @@ const makeWithDraw = async (userData: JwtPayload, amount: number) => {
 
       await Transaction.create({
         amount: amount,
-        transactionType: ENUM_TRANSACTION_TYPE.CREDIT,
+        type: ENUM_TRANSACTION_TYPE.CREDIT,
         transactionReason: ENUM_TRANSACTION_REASON.WITHDRAWAL,
         userType: 'Reviewer',
         user: userData.profileId,

@@ -50,12 +50,25 @@ const getCampaignMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getBusinessSalesMetaData = catchAsync(async (req, res) => {
+  const result = await MetaService.getBusinessSalesMetaData(
+    req?.user?.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Business sales meta data retrieved successfully',
+    data: result,
+  });
+});
 
 const MetaController = {
   getReviewerMetaData,
   getBussinessMetaData,
   reviewerEarningMetaData,
   getCampaignMetaData,
+  getBusinessSalesMetaData,
 };
 
 export default MetaController;

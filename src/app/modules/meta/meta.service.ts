@@ -475,10 +475,189 @@ const getCampaignMetaData = async (
     scheduledCampaigns,
   };
 };
+
+const getBusinessSalesMetaData = async (
+  businessId: string,
+  query: Record<string, any>,
+) => {
+  const { dateRange } = query;
+
+  let currentDateFilter: Record<string, any> = {};
+  let previousDateFilter: Record<string, any> = {};
+  const today = moment().startOf('day');
+
+  switch (dateRange) {
+    case 'today':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().toDate(),
+          $lt: today.clone().endOf('day').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'day').toDate(),
+          $lt: today.clone().toDate(),
+        },
+      };
+      break;
+    case 'thisWeek':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().startOf('week').toDate(),
+          $lt: today.clone().endOf('week').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+          $lt: today.clone().startOf('week').toDate(),
+        },
+      };
+      break;
+
+    case 'lastWeek':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+          $lt: today.clone().startOf('week').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(2, 'week').startOf('week').toDate(),
+          $lt: today.clone().subtract(1, 'week').startOf('week').toDate(),
+        },
+      };
+      break;
+
+    case 'thisMonth':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().startOf('month').toDate(),
+          $lt: today.clone().endOf('month').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+          $lt: today.clone().startOf('month').toDate(),
+        },
+      };
+      break;
+
+    case 'lastMonth':
+      currentDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+          $lt: today.clone().startOf('month').toDate(),
+        },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(2, 'month').startOf('month').toDate(),
+          $lt: today.clone().subtract(1, 'month').startOf('month').toDate(),
+        },
+      };
+      break;
+
+    case 'thisYear':
+      currentDateFilter = {
+        createdAt: { $gte: today.clone().startOf('year').toDate() },
+      };
+      previousDateFilter = {
+        createdAt: {
+          $gte: today.clone().subtract(1, 'year').startOf('year').toDate(),
+          $lt: today.clone().startOf('year').toDate(),
+        },
+      };
+      break;
+
+    default:
+      currentDateFilter = {};
+      previousDateFilter = {};
+  }
+
+  const businessObjectId = new mongoose.Types.ObjectId(businessId);
+
+  // Single aggregation pipeline for both current and previous periods
+  const results = await Order.aggregate([
+    {
+      $match: {
+        bussiness: businessObjectId,
+        $or: [{ ...currentDateFilter }, { ...previousDateFilter }],
+      },
+    },
+    {
+      $addFields: {
+        period: {
+          $cond: {
+            if: {
+              $and: [
+                { $gte: ['$createdAt', currentDateFilter.createdAt?.$gte] },
+                {
+                  $lt: [
+                    '$createdAt',
+                    currentDateFilter.createdAt?.$lt || new Date(),
+                  ],
+                },
+              ],
+            },
+            then: 'current',
+            else: 'previous',
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: '$period',
+        totalRevenue: { $sum: '$totalPrice' },
+        totalOrders: { $sum: 1 },
+      },
+    },
+  ]);
+
+  // Extract results
+  const currentData = results.find((r) => r._id === 'current') || {
+    totalRevenue: 0,
+    totalOrders: 0,
+  };
+  const previousData = results.find((r) => r._id === 'previous') || {
+    totalRevenue: 0,
+    totalOrders: 0,
+  };
+
+  // Calculate metrics
+  const revenueValue = currentData.totalRevenue;
+  const orderCount = currentData.totalOrders;
+  const avgOrderValue = orderCount > 0 ? revenueValue / orderCount : 0;
+
+  const previousRevenue = previousData.totalRevenue;
+  const previousOrderCount = previousData.totalOrders;
+  const previousAvgOrderValue =
+    previousOrderCount > 0 ? previousRevenue / previousOrderCount : 0;
+
+  return {
+    totalRevenue: {
+      value: revenueValue,
+      change: getPercentageChange(revenueValue, previousRevenue),
+    },
+    totalOrders: {
+      value: orderCount,
+      change: getPercentageChange(orderCount, previousOrderCount),
+    },
+    avgOrderValue: {
+      value: Math.round(avgOrderValue * 100) / 100, // Round to 2 decimal places
+      change: getPercentageChange(avgOrderValue, previousAvgOrderValue),
+    },
+  };
+};
 const MetaService = {
   getReviewerMetaData,
   getBussinessMetaData,
   reviewerEarningMetaData,
   getCampaignMetaData,
+  getBusinessSalesMetaData,
 };
 export default MetaService;

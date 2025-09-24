@@ -21,14 +21,30 @@ export const createCampaignValidationSchema = z.object({
     maxAge: z
       .number({ required_error: 'Max age is required' })
       .min(1, 'Max age must be at least 1'),
+    // startDate: z.preprocess(
+    //   (arg) =>
+    //     typeof arg === 'string' || arg instanceof Date
+    //       ? new Date(arg)
+    //       : undefined,
+    //   z.date().refine((date) => date >= new Date(), {
+    //     message: 'Start date must be in the future',
+    //   }),
+    // ),
     startDate: z.preprocess(
       (arg) =>
         typeof arg === 'string' || arg instanceof Date
           ? new Date(arg)
           : undefined,
-      z.date().refine((date) => date >= new Date(), {
-        message: 'Start date must be in the future',
-      }),
+      z.date().refine(
+        (date) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // normalize today's date to 00:00:00
+          return date >= today;
+        },
+        {
+          message: 'Start date cannot be in the past',
+        },
+      ),
     ),
     endDate: z.preprocess(
       (arg) =>

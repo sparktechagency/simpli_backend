@@ -31,5 +31,10 @@ router.get(
   auth(USER_ROLE.bussinessOwner),
   MetaController.getCampaignMetaData,
 );
+router.get(
+  '/get-business-sales-meta-data',
+  auth(USER_ROLE.bussinessOwner),
+  MetaController.getBusinessSalesMetaData,
+);
 
 export const metaRoutes = router;

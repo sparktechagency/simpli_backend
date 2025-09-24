@@ -56,7 +56,7 @@ const registerBussinessOwner = async (email: string, password: string) => {
     sendEmail({
       email: email,
       subject: 'Activate Your Account',
-      html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
+      html: registrationSuccessEmailBody(`Hi`, user[0].verifyCode),
     });
 
     await session.commitTransaction();
@@ -112,7 +112,10 @@ const registerReviewer = async (payload: any) => {
     sendEmail({
       email: payload.email,
       subject: 'Activate Your Account',
-      html: registrationSuccessEmailBody('Dear', user[0].verifyCode),
+      html: registrationSuccessEmailBody(
+        `Hi${payload.name}`,
+        user[0].verifyCode,
+      ),
     });
     await NotificationSetting.create([{ user: result[0]._id }], { session });
     await session.commitTransaction();

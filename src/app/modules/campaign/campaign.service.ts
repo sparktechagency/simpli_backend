@@ -19,6 +19,7 @@ import stripe from '../../utilities/stripe';
 import Product from '../product/product.model';
 import Review from '../review/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
+import validateDateRange from './campaign.helper';
 import { CampaignSummary, ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
@@ -43,6 +44,13 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const currentDate = new Date();
   if (currentDate < new Date(payload.startDate)) {
     payload.status = CAMPAIGN_STATUS.SCHEDULED;
+  }
+
+  if (!validateDateRange(payload.startDate, payload.endDate)) {
+    throw new AppError(
+      httpStatus.BAD_GATEWAY,
+      'The duration between startDate and endDate must be at least 3 weeks (21 days).',
+    );
   }
 
   // Create campaign in DB (without payment yet)
@@ -321,7 +329,7 @@ const getMyCampaigns = async (
       throw new Error('Invalid business ID format');
     }
 
-    const pipeline = [
+    const pipeline: any = [
       { $match: matchStage },
       ...(searchTerm
         ? [
@@ -361,6 +369,9 @@ const getMyCampaigns = async (
           path: '$product',
           preserveNullAndEmptyArrays: true,
         },
+      },
+      {
+        $sort: { createdAt: -1 },
       },
       {
         $facet: {

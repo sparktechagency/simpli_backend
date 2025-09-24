@@ -86,6 +86,12 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   campaignOffer.status = CampaignOfferStatus.completed;
   await campaignOffer.save();
+
+  // add money for reviewer
+  await Reviewer.findByIdAndUpdate(reviewerId, {
+    $inc: { currentBalance: campaignOffer.amount },
+  });
+
   if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
     return;
   } else {
