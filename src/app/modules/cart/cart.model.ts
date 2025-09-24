@@ -1,7 +1,6 @@
 // cart.model.ts
 import { model, Schema } from 'mongoose';
 import { ICart } from './cart.interface';
-import { deliveryFee } from './cart.constaint';
 
 const CartSchema = new Schema<ICart>(
   {
@@ -79,7 +78,7 @@ CartSchema.pre<ICart>('save', function (next) {
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  this.deliveryFee = deliveryFee;
+  this.deliveryFee = 0;
   this.totalPrice = Number((this.subTotal + deliveryFee).toFixed(2));
   next();
 });
