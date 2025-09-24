@@ -49,7 +49,7 @@ export interface IReviewer {
   followers: [Types.ObjectId];
   following: [Types.ObjectId];
   bussinessFollowing: [Types.ObjectId];
-
+  reasonForLeaving: string;
   //
   totalEarning: number;
   currentBalance: number;

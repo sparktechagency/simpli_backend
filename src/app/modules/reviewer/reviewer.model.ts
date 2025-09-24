@@ -134,6 +134,9 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     // for stripe
     isStripeAccountConnected: { type: Boolean, default: false },
     stripeConnectedAccountId: { type: String },
+
+    // delete
+    reasonForLeaving: { type: String, default: '' },
   },
   { timestamps: true },
 );

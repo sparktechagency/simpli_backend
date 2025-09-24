@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import cron from 'node-cron';
 import config from '../../config';
@@ -11,6 +12,7 @@ import sendEmail from '../../utilities/sendEmail';
 import Bussiness from '../bussiness/bussiness.model';
 import NormalUser from '../normalUser/normalUser.model';
 import { NotificationSetting } from '../notificationSetting/notificationSetting.model';
+import Product from '../product/product.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { USER_ROLE } from './user.constant';
 import { TUser, TUserRole } from './user.interface';
@@ -243,12 +245,84 @@ const changeUserStatus = async (id: string) => {
   );
   return result;
 };
+
+const deleteAccount = async (
+  userData: JwtPayload,
+  payload: { reasonForLeaving: string; password: string },
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findById(userData.id).session(session);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const isMatch = await User.isPasswordMatched(
+      payload?.password,
+      user?.password,
+    );
+    if (!isMatch) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
+    }
+
+    let result;
+    if (userData.role === USER_ROLE.reviewer) {
+      // Soft delete user
+      await User.findByIdAndUpdate(
+        userData.id,
+        { isDeleted: true },
+        { session },
+      );
+      result = await Reviewer.findByIdAndUpdate(
+        userData.profileId,
+        {
+          reasonForLeaving: payload.reasonForLeaving,
+          isDeleted: true,
+        },
+        { session, new: true },
+      );
+    } else {
+      // Soft delete user
+      await User.findByIdAndUpdate(
+        userData.id,
+        { isDeleted: true },
+        { session },
+      );
+      result = await Bussiness.findByIdAndUpdate(
+        userData.profileId,
+        {
+          reasonForLeaving: payload.reasonForLeaving,
+          isDeleted: true,
+        },
+        { session, new: true },
+      );
+
+      await Product.updateMany(
+        { bussiness: userData.profileId },
+        { isDeleted: true },
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 const userServices = {
   registerBussinessOwner,
   registerReviewer,
   verifyCode,
   resendVerifyCode,
   changeUserStatus,
+  deleteAccount,
 };
 
 export default userServices;

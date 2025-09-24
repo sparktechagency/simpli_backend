@@ -32,4 +32,7 @@ export interface IBussiness {
   // for stripe
   isStripeAccountConnected: { type: boolean; default: false };
   stripeConnectedAccountId: { type: string };
+
+  // delete
+  reasonForLeaving: string;
 }

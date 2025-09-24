@@ -82,6 +82,9 @@ const changeUserStatus = z.object({
 const deleteUserAccountValidationSchema = z.object({
   body: z.object({
     password: z.string({ required_error: 'Password is required' }),
+    reasonForLeaving: z.string({
+      required_error: 'Reason for leaving is required',
+    }),
   }),
 });
 

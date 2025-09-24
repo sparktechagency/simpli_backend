@@ -106,6 +106,9 @@ const BussinessSchema = new Schema<IBussiness>(
     // for stripe
     isStripeAccountConnected: { type: Boolean, default: false },
     stripeConnectedAccountId: { type: String },
+
+    // delete
+    reasonForLeaving: { type: String, default: '' },
   },
   {
     timestamps: true,
