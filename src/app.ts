@@ -47,16 +47,14 @@ app.post(
     try {
       // const event = req.body;
       const event = JSON.parse(req.body.toString());
-      console.log('Shippo webhook:', event);
+      // console.log('Shippo webhook:', event);
 
       if (
         event.event === 'transaction_created' &&
         event.data.status === 'SUCCESS'
       ) {
         const transactionId = event.data.object_id;
-        console.log('transactionId', transactionId);
         const transaction = await shippo.transactions.get(transactionId);
-        console.log('transaction', transaction);
         // Find order that has this transaction
         const order: any = await Order.findOne({
           'shipping.shippoTransactionId': transactionId,
@@ -74,7 +72,7 @@ app.post(
           };
 
           await order.save();
-          console.log(`Order ${order._id} updated with tracking info`);
+          // console.log(`Order ${order._id} updated with tracking info`);
         }
 
         const campaignOffer: any = await CampaignOffer.findOne({
@@ -96,9 +94,9 @@ app.post(
 
       if (event.event === 'track_updated') {
         const tracking = event.data;
-        console.log('Track update event:', tracking);
+        // console.log('Track update event:', tracking);
         const trackingNumber = tracking.tracking_number;
-        console.log('Track update for', trackingNumber);
+        // console.log('Track update for', trackingNumber);
 
         const order = await Order.findOne({
           'shipping.trackingNumber': trackingNumber,
