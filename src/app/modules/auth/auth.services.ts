@@ -22,8 +22,15 @@ const generateVerifyCode = (): number => {
 };
 const loginUserIntoDB = async (payload: TLoginUser) => {
   const user = await User.findOne({ email: payload.email });
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
+  }
+  if (user.googleId || user.facebookId || user.appleId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Please login with ${user.googleId ? 'Google' : user.facebookId ? 'Facebook' : 'Apple'}`,
+    );
   }
   if (user.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted');
