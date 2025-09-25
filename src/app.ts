@@ -18,13 +18,10 @@ import handleConnectedAccountWebhook from './app/handleStripe/connectedAccountWe
 import onboardingRefresh from './app/handleStripe/onboardingRefresh';
 import handleWebhook from './app/handleStripe/webhook';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
-import auth from './app/middlewares/auth';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
-import Bussiness from './app/modules/bussiness/bussiness.model';
 import { CampaignOffer } from './app/modules/campaignOffer/campaignOffer.model';
 import { Order } from './app/modules/order/order.model';
-import { USER_ROLE } from './app/modules/user/user.constant';
 import router from './app/routes';
 import shippo from './app/utilities/shippo';
 const app: Application = express();
@@ -140,16 +137,6 @@ app.post('/contact-us', sendContactUsEmail);
 router.get('/stripe/onboarding/refresh', onboardingRefresh);
 
 app.get('/capture-payment', capturePayPalPayment);
-
-app.get(
-  '/nice',
-  auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
-  async (req, res) => {
-    const totalIncome = 100;
-    const bussiness = await Bussiness.findById(req.user.profileId);
-    res.send({ message: 'okey', totalIncome, bussiness });
-  },
-);
 
 // for s3 bucket--------------
 app.post('/generate-presigned-url', async (req, res) => {
