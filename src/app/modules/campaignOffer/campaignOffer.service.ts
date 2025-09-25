@@ -14,6 +14,7 @@ import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
 import stripe from '../../utilities/stripe';
 import Campaign from '../campaign/campaign.model';
+import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
@@ -42,6 +43,14 @@ const acceptCampaignOffer = async (
       'You already accepted this offer',
     );
   }
+
+  const shippingAddress = await ShippingAddress.findById(
+    payload.shippingAddress,
+  );
+  if (!shippingAddress) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+  }
+  payload.shippingAddress = shippingAddress;
 
   return CampaignOffer.create({
     ...payload,

@@ -94,6 +94,28 @@ app.post(
         }
       }
 
+      if (event.event === 'track_updated') {
+        const tracking = event.data;
+        console.log('Track update event:', tracking);
+        const trackingNumber = tracking.tracking_number;
+        console.log('Track update for', trackingNumber);
+
+        const order = await Order.findOne({
+          'shipping.trackingNumber': trackingNumber,
+        });
+
+        if (order && tracking.tracking_status.status) {
+          await Order.findOneAndUpdate(
+            { 'shipping.trackingNumber': trackingNumber },
+            { $set: { 'shipping.status': tracking.tracking_status.status } },
+            { new: true },
+          );
+          console.log(
+            `Order ${order._id} updated to ${tracking.tracking_status.status}`,
+          );
+        }
+      }
+
       res.status(200).send('ok');
     } catch (err) {
       console.error('Shippo webhook error:', err);

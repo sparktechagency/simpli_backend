@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
+import { shippingAddressSchema } from '../shippingAddress/shippingAddress.model';
 import { CampaignOfferStatus } from './campaignOffer.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 
@@ -9,11 +10,13 @@ const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     business: { type: Schema.Types.ObjectId, ref: 'Bussiness', required: true },
     reviewer: { type: Schema.Types.ObjectId, ref: 'Reviewer', required: true },
-    shippingAddress: {
-      type: Schema.Types.ObjectId,
-      ref: 'ShippingAddress',
-      required: true,
-    },
+    // shippingAddress: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'ShippingAddress',
+    //   required: true,
+    // },
+    shippingAddress: shippingAddressSchema,
+
     status: {
       type: String,
       enum: Object.values(CampaignOfferStatus),

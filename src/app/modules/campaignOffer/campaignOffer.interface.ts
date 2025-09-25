@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
+import { IShippingAddress } from '../shippingAddress/shippingAddress.interface';
 import { CampaignOfferStatus } from './campaignOffer.constant';
 
 export interface ICampaignOffer extends Document {
@@ -7,7 +8,9 @@ export interface ICampaignOffer extends Document {
   product: Types.ObjectId;
   business: Types.ObjectId;
   reviewer: Types.ObjectId;
-  shippingAddress: Types.ObjectId;
+  // shippingAddress: Types.ObjectId;
+  shippingAddress: IShippingAddress;
+
   status: (typeof CampaignOfferStatus)[keyof typeof CampaignOfferStatus];
   deliveryStatus: (typeof ENUM_DELIVERY_STATUS)[keyof typeof ENUM_DELIVERY_STATUS];
   amount: number;

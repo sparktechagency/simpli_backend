@@ -15,6 +15,7 @@ import stripe from '../../utilities/stripe';
 import Cart from '../cart/cart.model';
 // import ShippingAddress from '../shippingAddress/shippingAddress.model';
 // import { Store } from '../store/store.model';
+import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 
@@ -54,6 +55,13 @@ const createOrder = async (
   // Total price including shipping
   const totalPrice = cart.totalPrice + deliveryCharge;
 
+  const shippingAddressData = await ShippingAddress.findById(
+    payload.shippingAddress,
+  );
+  if (!shippingAddressData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
+  }
+  payload.shippingAddress = shippingAddressData;
   // Create order
   const order: any = await Order.create({
     ...payload,

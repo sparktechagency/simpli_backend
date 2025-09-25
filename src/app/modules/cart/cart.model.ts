@@ -79,7 +79,7 @@ CartSchema.pre<ICart>('save', function (next) {
     0,
   );
   this.deliveryFee = 0;
-  this.totalPrice = Number((this.subTotal + deliveryFee).toFixed(2));
+  this.totalPrice = Number(this.subTotal.toFixed(2));
   next();
 });
 

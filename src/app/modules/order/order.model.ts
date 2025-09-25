@@ -4,6 +4,7 @@ import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { shippingAddressSchema } from '../shippingAddress/shippingAddress.model';
 import { IOrder, IOrderItem } from './order.interface';
 
 export const OrderItemSchema: Schema = new Schema<IOrderItem>({
@@ -34,11 +35,12 @@ const OrderSchema: Schema = new Schema<IOrder>(
       ref: 'Bussiness',
       required: true,
     },
-    shippingAddress: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'ShippingAddress',
-    },
+    // shippingAddress: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    //   ref: 'ShippingAddress',
+    // },
+    shippingAddress: shippingAddressSchema,
     items: { type: [OrderItemSchema], required: true },
     totalQuantity: { type: Number, required: true, min: 1 },
     subTotal: { type: Number, required: true, min: 0 },

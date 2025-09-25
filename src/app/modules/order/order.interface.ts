@@ -38,6 +38,7 @@ import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { IShippingAddress } from '../shippingAddress/shippingAddress.interface';
 
 export interface IOrderItem {
   product: Types.ObjectId;
@@ -68,7 +69,8 @@ export interface IShippingInfo {
 export interface IOrder extends Document {
   reviewer: Types.ObjectId;
   bussiness: Types.ObjectId;
-  shippingAddress: Types.ObjectId;
+  // shippingAddress: Types.ObjectId;
+  shippingAddress: IShippingAddress;
   items: IOrderItem[];
   totalQuantity: number;
   subTotal: number;

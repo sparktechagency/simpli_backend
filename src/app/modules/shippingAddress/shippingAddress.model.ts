@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { IShippingAddress } from './shippingAddress.interface';
 
-const shippingAddressSchema = new Schema<IShippingAddress>(
+export const shippingAddressSchema = new Schema<IShippingAddress>(
   {
     reviewer: { type: Schema.Types.ObjectId, ref: 'Reviewer', required: true },
     name: { type: String, required: true },
