@@ -53,7 +53,7 @@ export const createCampaignValidationSchema = z.object({
           : undefined,
       z.date(),
     ),
-    gender: z.enum(['male', 'female', 'other']),
+    gender: z.enum(['male', 'female', 'both', 'other']),
     location: z.string().min(1, 'Location is required'),
     paymentMethod: z.enum(
       Object.values(ENUM_PAYMENT_METHOD) as [string, ...string[]],

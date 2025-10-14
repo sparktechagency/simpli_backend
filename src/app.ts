@@ -124,6 +124,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
+    // origin: ['http://dashboard.sampli.io', 'https://sampli.io'],
     origin: '*',
     credentials: true,
   }),
