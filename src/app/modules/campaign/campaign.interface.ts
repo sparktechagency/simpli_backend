@@ -4,6 +4,7 @@ import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { ENUM_REVIEW_TYPE } from './campaign.enum';
 
 export interface ICampaign {
   bussiness: Types.ObjectId;
@@ -22,6 +23,7 @@ export interface ICampaign {
   paymentStatus: (typeof ENUM_PAYMENT_STATUS)[keyof typeof ENUM_PAYMENT_STATUS];
   paymentMethod: (typeof ENUM_PAYMENT_METHOD)[keyof typeof ENUM_PAYMENT_METHOD];
   status: (typeof CAMPAIGN_STATUS)[keyof typeof CAMPAIGN_STATUS];
+  reviewType: (typeof ENUM_REVIEW_TYPE)[keyof typeof ENUM_REVIEW_TYPE];
   paymentIntentId: string;
 }
 

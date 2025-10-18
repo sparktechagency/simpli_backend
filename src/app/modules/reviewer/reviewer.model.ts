@@ -19,6 +19,8 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
       required: true,
     },
     name: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     city: { type: String },

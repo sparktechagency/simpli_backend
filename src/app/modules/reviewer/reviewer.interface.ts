@@ -13,6 +13,8 @@ import {
 export interface IReviewer {
   user: Types.ObjectId;
   name: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
   city: string;

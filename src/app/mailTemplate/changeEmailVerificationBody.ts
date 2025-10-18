@@ -88,11 +88,11 @@ const changeEmailVerificationBody = (
           <div class="verification-code">
             ${verificationCode || 'XXXXXX'}
           </div>
-          <p>Enter this code on the email verification page within the next 10 minutes. If you didn't request this change, you can ignore this email.</p>
+          <p>Enter this code on the email verification page within the next 05 minutes. If you didn't request this change, you can ignore this email.</p>
           <p>If you have any questions, feel free to contact us at <a href="mailto:maniksarker265@gmail.com">maniksarker265@gmail.com</a>.</p>
         </div>
         <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} Template. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Sampli. All rights reserved.</p>
           <p><a href="https://yourwebsite.com/privacy">Privacy Policy</a> | <a href="https://yourwebsite.com/contact">Contact Us</a></p>
         </div>
       </div>

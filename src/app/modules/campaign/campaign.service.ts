@@ -5,7 +5,11 @@ import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import cron from 'node-cron';
 import config from '../../config';
-import { platformFeeForCampaignParcentage } from '../../constant';
+import {
+  imageReviewCost,
+  platformFeeForCampaignParcentage,
+  videoReviewCost,
+} from '../../constant';
 import AppError from '../../error/appError';
 import {
   CAMPAIGN_STATUS,
@@ -19,13 +23,21 @@ import stripe from '../../utilities/stripe';
 import Product from '../product/product.model';
 import Review from '../review/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
+import { ENUM_REVIEW_TYPE } from './campaign.enum';
 import validateDateRange from './campaign.helper';
 import { CampaignSummary, ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
 
-  const reviewCost = payload.amountForEachReview * payload.numberOfReviewers;
+  let amountForEachReview;
+  if (payload.reviewType && payload.reviewType == ENUM_REVIEW_TYPE.video) {
+    amountForEachReview = videoReviewCost;
+  } else {
+    amountForEachReview = imageReviewCost;
+  }
+
+  const reviewCost = amountForEachReview * payload.numberOfReviewers;
   const adminFee = (reviewCost * platformFeeForCampaignParcentage) / 100;
   const totalAmount = reviewCost + adminFee;
   const amountInCents = (totalAmount * 100).toFixed(2);

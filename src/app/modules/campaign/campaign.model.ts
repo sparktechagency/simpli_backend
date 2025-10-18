@@ -4,6 +4,7 @@ import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
+import { ENUM_REVIEW_TYPE } from './campaign.enum';
 import { ICampaign } from './campaign.interface';
 
 const CampaignSchema = new Schema<ICampaign>(
@@ -81,6 +82,11 @@ const CampaignSchema = new Schema<ICampaign>(
       type: String,
       enum: Object.values(CAMPAIGN_STATUS),
       default: CAMPAIGN_STATUS.ACTIVE,
+    },
+    reviewType: {
+      type: String,
+      enum: Object.values(ENUM_REVIEW_TYPE),
+      default: ENUM_REVIEW_TYPE.image,
     },
     paymentIntentId: {
       type: String,
