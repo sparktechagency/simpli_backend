@@ -13,7 +13,7 @@ export const createCampaignValidationSchema = z.object({
       .string({ required_error: 'Name is required' })
       .min(3, 'Name must be at least 3 characters')
       .max(100, 'Name must be less than 100 characters'),
-    amountForEachReview: z.number().min(0, 'Amount must be a positive number'),
+    // amountForEachReview: z.number().min(0, 'Amount must be a positive number'),
     numberOfReviewers: z.number().min(1, 'There must be at least one reviewer'),
     minAge: z
       .number({ required_error: 'Min age is required' })
