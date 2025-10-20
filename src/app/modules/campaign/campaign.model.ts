@@ -26,11 +26,11 @@ const CampaignSchema = new Schema<ICampaign>(
       minlength: 3,
       maxlength: 100,
     },
-    amountForEachReview: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
+    // amountForEachReview: {
+    //   type: Number,
+    //   required: true,
+    //   min: 0,
+    // },
     numberOfReviewers: {
       type: Number,
       required: true,
