@@ -64,6 +64,15 @@ const CampaignSchema = new Schema<ICampaign>(
       required: true,
       trim: true,
     },
+    city: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
     totalFee: {
       type: Number,
       required: true,

@@ -19,6 +19,9 @@ export interface ICampaign {
   endDate: Date;
   gender: string;
   location: string;
+  city: string;
+  country: string;
+  state: string;
   totalFee: number;
   paymentStatus: (typeof ENUM_PAYMENT_STATUS)[keyof typeof ENUM_PAYMENT_STATUS];
   paymentMethod: (typeof ENUM_PAYMENT_METHOD)[keyof typeof ENUM_PAYMENT_METHOD];

@@ -7,7 +7,7 @@ import { ENUM_PAYMENT_PURPOSE } from '../utilities/enum';
 import paypalClient from '../utilities/paypal';
 import handleCampaignRunPaymentSuccess from './handleCampaignPaymentSuccess';
 import handleOrderPaymentSuccess from './handleOrderPaymentSuccess';
-
+//
 const capturePayPalPayment = async (req: Request, res: Response) => {
   const orderId = req.query.token;
   try {

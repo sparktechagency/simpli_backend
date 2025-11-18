@@ -197,28 +197,6 @@ const updateCampaignIntoDB = async (
   return result;
 };
 
-// get campaigns
-// const getAllCampaignFromDB = async (query: Record<string, unknown>) => {
-//   const campaignQuery = new QueryBuilder(
-//     Campaign.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }).populate(
-//       'product',
-//     ),
-//     query,
-//   )
-//     .search([''])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const meta = await campaignQuery.countTotal();
-//   const result = await campaignQuery.modelQuery;
-//   return {
-//     meta,
-//     result,
-//   };
-// };
-
 const getAllCampaignFromDB = async (
   query: Record<string, any>,
   userId: string,
