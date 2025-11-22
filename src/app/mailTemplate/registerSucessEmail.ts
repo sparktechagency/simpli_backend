@@ -98,7 +98,7 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
           <h1>Welcome to Sampli</h1>
         </div>
         <div class="content">
-          <h2>Hello, ${name}</h2>
+          <h2>Hello,</h2>
 
           <p>Thank you for registering with Sampli. To activate your account, please use the following activation code:</p>
             <div class="activation-code">${activationCode || 'XXXXXX'}</div>

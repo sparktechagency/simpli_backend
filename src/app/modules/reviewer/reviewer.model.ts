@@ -24,6 +24,8 @@ const ReviewerSchema: Schema = new Schema<IReviewer>(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     city: { type: String },
+    state: { type: String },
+    country: { type: String },
     zipcode: { type: Number },
     gender: { type: String, enum: Object.values(GENDER) },
     age: { type: Number },

@@ -18,6 +18,8 @@ export interface IReviewer {
   username: string;
   email: string;
   city: string;
+  state: string;
+  country: string;
   zipcode: number;
   gender: (typeof GENDER)[keyof typeof GENDER];
   age: number;

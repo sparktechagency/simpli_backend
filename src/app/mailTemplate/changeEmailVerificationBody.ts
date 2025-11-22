@@ -82,7 +82,7 @@ const changeEmailVerificationBody = (
           <h1>Email Change Verification</h1>
         </div>
         <div class="content">
-          <h2>Hello, ${name}</h2>
+          <h2>Hello,</h2>
 
           <p>We received a request to change your email address. Please use the verification code below to confirm this change:</p>
           <div class="verification-code">

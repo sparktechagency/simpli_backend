@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENUM_SKIP_VALUE, GENDER, INTEREST_STATUS } from '../../utilities/enum';
 import {
   educationLevel,
   employmentStatus,
@@ -8,14 +9,10 @@ import {
   maritalStatus,
   receiveProductBy,
 } from './reviewer.constant';
-import { ENUM_SKIP_VALUE, GENDER, INTEREST_STATUS } from '../../utilities/enum';
 
 const addAddressValidationSchema = z.object({
   body: z.object({
-    city: z
-      .string()
-      .min(3, 'City must be at least 3 characters long')
-      .nonempty('City is required'),
+    city: z.string().optional(),
     zipCode: z
       .string()
       .min(5, 'Zip Code must be at least 5 characters long')

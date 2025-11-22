@@ -61,17 +61,17 @@ const CampaignSchema = new Schema<ICampaign>(
     },
     location: {
       type: String,
-      required: true,
       trim: true,
+      default: '',
     },
     city: {
-      type: String,
+      type: [String],
     },
     country: {
       type: String,
     },
     state: {
-      type: String,
+      type: [String],
     },
     totalFee: {
       type: Number,
@@ -103,6 +103,10 @@ const CampaignSchema = new Schema<ICampaign>(
     totalBugget: {
       type: Number,
       required: true,
+    },
+    isShowEverywhere: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

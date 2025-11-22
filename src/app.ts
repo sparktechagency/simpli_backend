@@ -130,6 +130,7 @@ app.use(
       'https://dashboard.sampli.io',
       'https://dashboard.sampli.io',
       'https://sampli-dashbaord.vercel.app',
+      'http://localhost:3000',
     ],
     // origin: '*',
     credentials: true,

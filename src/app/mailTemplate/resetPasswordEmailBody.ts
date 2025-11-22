@@ -79,7 +79,7 @@ const resetPasswordEmailBody = (name: string, resetCode: number) => `
           <h1>Password Reset Request</h1>
         </div>
         <div class="content">
-          <h2>Hello, ${name}</h2>
+          <h2>Hello,</h2>
 
           <p>We received a request to reset your password. Please use the code below to proceed with resetting your password:</p>
           <div class="reset-code">
