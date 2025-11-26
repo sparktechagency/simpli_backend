@@ -29,8 +29,8 @@ import { CampaignSummary, ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const product = await Product.findById(payload.product);
-
   let amountForEachReview;
+
   if (payload.reviewType && payload.reviewType == ENUM_REVIEW_TYPE.video) {
     amountForEachReview = videoReviewCost;
   } else {
@@ -197,6 +197,107 @@ const updateCampaignIntoDB = async (
   return result;
 };
 
+// const getAllCampaignFromDB = async (
+//   query: Record<string, any>,
+//   userId: string,
+// ) => {
+//   const page = Number(query.page) || 1;
+//   const limit = Number(query.limit) || 10;
+//   const skip = (page - 1) * limit;
+
+//   const pipeline: any[] = [
+//     {
+//       $match: {
+//         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//       },
+//     },
+//     // join with product (pick only required fields)
+//     {
+//       $lookup: {
+//         from: 'products',
+//         localField: 'product',
+//         foreignField: '_id',
+//         as: 'product',
+//         pipeline: [
+//           {
+//             $project: {
+//               _id: 1,
+//               name: 1,
+//               images: 1,
+//               shortDescription: 1,
+//             },
+//           },
+//         ],
+//       },
+//     },
+//     { $unwind: '$product' },
+
+//     // join with CampaignOffer (filtered by userId)
+//     {
+//       $lookup: {
+//         from: 'campaignoffers',
+//         let: { campaignId: '$_id', productId: '$product._id' },
+//         pipeline: [
+//           {
+//             $match: {
+//               $expr: {
+//                 $and: [
+//                   { $eq: ['$campaign', '$$campaignId'] },
+//                   { $eq: ['$product', '$$productId'] },
+//                   { $eq: ['$reviewer', new mongoose.Types.ObjectId(userId)] },
+//                 ],
+//               },
+//             },
+//           },
+//           {
+//             $project: {
+//               _id: 0,
+//               status: 1,
+//               deliveryStatus: 1,
+//             },
+//           },
+//         ],
+//         as: 'userOffer',
+//       },
+//     },
+//     {
+//       $addFields: {
+//         userOffer: { $arrayElemAt: ['$userOffer', 0] },
+//       },
+//     },
+
+//     // pagination with facet
+//     {
+//       $facet: {
+//         meta: [
+//           { $count: 'total' },
+//           {
+//             $addFields: {
+//               page,
+//               limit,
+//               totalPage: {
+//                 $ceil: {
+//                   $divide: ['$total', limit],
+//                 },
+//               },
+//             },
+//           },
+//         ],
+//         result: [{ $skip: skip }, { $limit: limit }],
+//       },
+//     },
+//     {
+//       $project: {
+//         meta: { $arrayElemAt: ['$meta', 0] },
+//         result: 1,
+//       },
+//     },
+//   ];
+
+//   const data = await Campaign.aggregate(pipeline);
+//   return data[0] || { meta: {}, result: [] };
+// };
+
 const getAllCampaignFromDB = async (
   query: Record<string, any>,
   userId: string,
@@ -205,13 +306,67 @@ const getAllCampaignFromDB = async (
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
 
+  const reviewerObjectId = new mongoose.Types.ObjectId(userId);
+
   const pipeline: any[] = [
+    // 0️⃣ Fetch reviewer data
+    {
+      $lookup: {
+        from: 'reviewers',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'reviewerInfo',
+        pipeline: [
+          {
+            $match: { _id: reviewerObjectId },
+          },
+          {
+            $project: {
+              city: 1,
+              state: 1,
+              country: 1,
+            },
+          },
+        ],
+      },
+    },
+    { $unwind: '$reviewerInfo' },
+
+    // 1️⃣ Filter by payment success + location logic
     {
       $match: {
         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+        $expr: {
+          $or: [
+            { $eq: ['$isShowEverywhere', true] }, // show everywhere
+            {
+              $and: [
+                // Country must match
+                { $eq: ['$country', '$reviewerInfo.country'] },
+
+                // State filter — if empty array, allow for all in that country
+                {
+                  $or: [
+                    { $eq: [{ $size: '$state' }, 0] }, // empty → allow
+                    { $in: ['$reviewerInfo.state', '$state'] },
+                  ],
+                },
+
+                // City filter — if empty array, allow for all in that state
+                {
+                  $or: [
+                    { $eq: [{ $size: '$city' }, 0] }, // empty → allow
+                    { $in: ['$reviewerInfo.city', '$city'] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
     },
-    // join with product (pick only required fields)
+
+    // 2️⃣ join with product
     {
       $lookup: {
         from: 'products',
@@ -232,7 +387,7 @@ const getAllCampaignFromDB = async (
     },
     { $unwind: '$product' },
 
-    // join with CampaignOffer (filtered by userId)
+    // 3️⃣ Join with CampaignOffer filtered by reviewer
     {
       $lookup: {
         from: 'campaignoffers',
@@ -244,7 +399,7 @@ const getAllCampaignFromDB = async (
                 $and: [
                   { $eq: ['$campaign', '$$campaignId'] },
                   { $eq: ['$product', '$$productId'] },
-                  { $eq: ['$reviewer', new mongoose.Types.ObjectId(userId)] },
+                  { $eq: ['$reviewer', reviewerObjectId] },
                 ],
               },
             },
@@ -266,7 +421,7 @@ const getAllCampaignFromDB = async (
       },
     },
 
-    // pagination with facet
+    // 4️⃣ Pagination
     {
       $facet: {
         meta: [
@@ -297,6 +452,7 @@ const getAllCampaignFromDB = async (
   const data = await Campaign.aggregate(pipeline);
   return data[0] || { meta: {}, result: [] };
 };
+
 const getMyCampaigns = async (
   profileId: string,
   query: Record<string, unknown>,
