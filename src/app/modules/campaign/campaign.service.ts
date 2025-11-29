@@ -15,13 +15,13 @@ import {
   CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
-  ENUM_PAYMENT_STATUS,
   ENUM_PRODUCT_STATUS,
 } from '../../utilities/enum';
 import paypalClient from '../../utilities/paypal';
 import stripe from '../../utilities/stripe';
 import Product from '../product/product.model';
 import Review from '../review/reviewer.model';
+import Reviewer from '../reviewer/reviewer.model';
 import { USER_ROLE } from '../user/user.constant';
 import { ENUM_REVIEW_TYPE } from './campaign.enum';
 import validateDateRange from './campaign.helper';
@@ -305,58 +305,35 @@ const getAllCampaignFromDB = async (
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
-
-  const reviewerObjectId = new mongoose.Types.ObjectId(userId);
-
+  const reviewer = await Reviewer.findById(userId)
+    .select('city state country')
+    .lean();
+  if (!reviewer) throw new Error('Reviewer not found');
+  console.log('reviewer', reviewer);
   const pipeline: any[] = [
-    // 0️⃣ Fetch reviewer data
-    {
-      $lookup: {
-        from: 'reviewers',
-        localField: '_id',
-        foreignField: '_id',
-        as: 'reviewerInfo',
-        pipeline: [
-          {
-            $match: { _id: reviewerObjectId },
-          },
-          {
-            $project: {
-              city: 1,
-              state: 1,
-              country: 1,
-            },
-          },
-        ],
-      },
-    },
-    { $unwind: '$reviewerInfo' },
-
     // 1️⃣ Filter by payment success + location logic
     {
       $match: {
-        paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
         $expr: {
           $or: [
             { $eq: ['$isShowEverywhere', true] }, // show everywhere
             {
               $and: [
-                // Country must match
-                { $eq: ['$country', '$reviewerInfo.country'] },
+                { $eq: ['$country', reviewer.country || ''] },
 
-                // State filter — if empty array, allow for all in that country
+                // State check
                 {
                   $or: [
                     { $eq: [{ $size: '$state' }, 0] }, // empty → allow
-                    { $in: ['$reviewerInfo.state', '$state'] },
+                    { $in: [reviewer.state, '$state'] }, // string in array
                   ],
                 },
 
-                // City filter — if empty array, allow for all in that state
+                // City check
                 {
                   $or: [
                     { $eq: [{ $size: '$city' }, 0] }, // empty → allow
-                    { $in: ['$reviewerInfo.city', '$city'] },
+                    { $in: [reviewer.city, '$city'] }, // string in array
                   ],
                 },
               ],
@@ -365,8 +342,7 @@ const getAllCampaignFromDB = async (
         },
       },
     },
-
-    // 2️⃣ join with product
+    // 2️⃣ Join with Product
     {
       $lookup: {
         from: 'products',
@@ -374,14 +350,7 @@ const getAllCampaignFromDB = async (
         foreignField: '_id',
         as: 'product',
         pipeline: [
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              images: 1,
-              shortDescription: 1,
-            },
-          },
+          { $project: { _id: 1, name: 1, images: 1, shortDescription: 1 } },
         ],
       },
     },
@@ -399,18 +368,12 @@ const getAllCampaignFromDB = async (
                 $and: [
                   { $eq: ['$campaign', '$$campaignId'] },
                   { $eq: ['$product', '$$productId'] },
-                  { $eq: ['$reviewer', reviewerObjectId] },
+                  { $eq: ['$reviewer', new mongoose.Types.ObjectId(userId)] },
                 ],
               },
             },
           },
-          {
-            $project: {
-              _id: 0,
-              status: 1,
-              deliveryStatus: 1,
-            },
-          },
+          { $project: { _id: 0, status: 1, deliveryStatus: 1 } },
         ],
         as: 'userOffer',
       },
@@ -430,11 +393,7 @@ const getAllCampaignFromDB = async (
             $addFields: {
               page,
               limit,
-              totalPage: {
-                $ceil: {
-                  $divide: ['$total', limit],
-                },
-              },
+              totalPage: { $ceil: { $divide: ['$total', limit] } },
             },
           },
         ],
