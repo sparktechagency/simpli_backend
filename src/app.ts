@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import {
   generateMultiplePresignedUrls,
@@ -24,6 +24,7 @@ import { CampaignOffer } from './app/modules/campaignOffer/campaignOffer.model';
 import { Order } from './app/modules/order/order.model';
 import router from './app/routes';
 import shippo from './app/utilities/shippo';
+import stripe from './app/utilities/stripe';
 const app: Application = express();
 // parser
 app.post(
@@ -174,6 +175,34 @@ app.post('/generate-multiple-presigned-urls', async (req, res) => {
     res.status(500).json({
       message: 'Error generating multiple pre-signed URLs',
     });
+  }
+});
+
+app.post('/create-checkout-session', async (req: Request, res: Response) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card', 'klarna', 'paypal'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Test Product',
+            },
+            unit_amount: 5000, // 50.00 EUR
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'https://example.com/success',
+      cancel_url: 'https://example.com/cancel',
+    });
+
+    res.json({ url: session.url });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
 

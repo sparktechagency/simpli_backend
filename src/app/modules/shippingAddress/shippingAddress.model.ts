@@ -8,7 +8,7 @@ export const shippingAddressSchema = new Schema<IShippingAddress>(
     company: { type: String },
     country: { type: String, required: true },
     zip: { type: String, required: true },
-    city: { type: String, required: true },
+    city: { type: String },
     state: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },

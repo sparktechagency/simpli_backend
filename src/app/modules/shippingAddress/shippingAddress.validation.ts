@@ -12,9 +12,7 @@ const shippingAddressValidationSchema = z.object({
     zip: z
       .string({ required_error: 'Zip is required' })
       .min(1, 'Zip is required'),
-    city: z
-      .string({ required_error: 'City is required' })
-      .min(1, 'City is required'),
+    city: z.string().optional(),
     state: z
       .string({ required_error: 'State is required' })
       .min(1, 'State is required'),
