@@ -113,7 +113,7 @@ const viewCart = async (reviewerId: string) => {
     .populate('items.variant');
 
   if (!cart) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
+    return null;
   }
 
   return cart;

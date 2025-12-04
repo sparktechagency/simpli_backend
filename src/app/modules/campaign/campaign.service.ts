@@ -22,12 +22,20 @@ import stripe from '../../utilities/stripe';
 import Product from '../product/product.model';
 import Review from '../review/reviewer.model';
 import Reviewer from '../reviewer/reviewer.model';
+import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
 import { ENUM_REVIEW_TYPE } from './campaign.enum';
 import validateDateRange from './campaign.helper';
 import { CampaignSummary, ICampaign } from './campaign.interface';
 import Campaign from './campaign.model';
 const createCampaign = async (bussinessId: string, payload: ICampaign) => {
+  const store = await Store.findOne({ bussiness: bussinessId });
+  if (!store) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Before creating any campaign you need to add your store details',
+    );
+  }
   const product = await Product.findById(payload.product);
   let amountForEachReview;
 

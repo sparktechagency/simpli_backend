@@ -7,6 +7,7 @@ import AppError from '../../error/appError';
 import { ENUM_PRODUCT_STATUS } from '../../utilities/enum';
 import Bookmark from '../bookmark/bookmark.mode';
 import Category from '../category/category.model';
+import { Store } from '../store/store.model';
 import { IProduct } from './product.interface';
 import Product from './product.model';
 
@@ -109,6 +110,13 @@ import Product from './product.model';
 // };
 
 const createProduct = async (bussinessId: string, payload: IProduct) => {
+  const store = await Store.findOne({ bussiness: bussinessId });
+  if (!store) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Before creating any product you need to add your store details',
+    );
+  }
   const category = await Category.findById(payload.category);
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');

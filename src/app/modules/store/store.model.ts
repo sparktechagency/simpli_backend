@@ -17,7 +17,7 @@ const StoreSchema: Schema = new Schema<IStore>(
     zip: { type: String, required: true },
     country: { type: String, required: true },
     phone: { type: String, required: true },
-    alternativePhoneNumber: { type: String, required: true },
+    alternativePhoneNumber: { type: String },
     email: { type: String, required: false, unique: true },
     tagline: { type: String },
     description: { type: String },

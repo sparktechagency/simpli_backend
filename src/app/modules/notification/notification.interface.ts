@@ -10,6 +10,7 @@ export interface INotification {
     reviewId?: Types.ObjectId;
     commentId?: Types.ObjectId;
     orderId?: Types.ObjectId;
+    campaignId: Types.ObjectId;
     amount?: number;
     product?: {
       id: Types.ObjectId;

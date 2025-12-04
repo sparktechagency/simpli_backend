@@ -28,9 +28,7 @@ const createStoreValidationSchema = z.object({
     phone: z
       .string({ required_error: 'Phone number is required' })
       .min(10, 'Phone number is required'),
-    alternativePhoneNumber: z
-      .string({ required_error: 'Alternative phone number is required' })
-      .min(10, 'Alternative phone number is required'),
+
     email: z.string().email('Invalid email format').optional(),
     tagline: z.string().optional(),
     description: z.string().optional(),
@@ -74,10 +72,7 @@ const updateStoreValidationSchema = z.object({
       .string({ required_error: 'Phone number is required' })
       .min(10, 'Phone number is required')
       .optional(),
-    alternativePhoneNumber: z
-      .string({ required_error: 'Alternative phone number is required' })
-      .min(10, 'Alternative phone number is required')
-      .optional(),
+
     email: z.string().email('Invalid email format').optional(),
     tagline: z.string().optional(),
     description: z.string().optional(),

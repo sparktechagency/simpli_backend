@@ -6,6 +6,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
 import AppError from '../../error/appError';
+import { shouldSendNotification } from '../../helper/shouldSendNotification';
 import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
@@ -14,6 +15,8 @@ import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
 import stripe from '../../utilities/stripe';
 import Campaign from '../campaign/campaign.model';
+import { ENUM_NOTIFICATION_TYPE } from '../notification/notification.enum';
+import Notification from '../notification/notification.model';
 import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
@@ -30,7 +33,7 @@ const acceptCampaignOffer = async (
       reviewer: profileId,
       campaign: payload.campaign,
     }),
-    Campaign.findById(payload.campaign).select('amountForEachReview'),
+    Campaign.findById(payload.campaign).select('totalBugget numberOfReviewers'),
   ]);
 
   if (!campaign) {
@@ -51,11 +54,26 @@ const acceptCampaignOffer = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Shipping address not found');
   }
   payload.shippingAddress = shippingAddress;
-
+  if (
+    await shouldSendNotification(
+      ENUM_NOTIFICATION_TYPE.CAMPAIGN,
+      campaign.bussiness.toString(),
+    )
+  ) {
+    await Notification.create({
+      receiver: campaign.bussiness.toString(),
+      type: ENUM_NOTIFICATION_TYPE.ORDER,
+      title: 'Campaign offer accepted by a reviewer',
+      message: `A Reviewer accept your campaign for review , please check it out`,
+      data: {
+        campaignId: campaign._id,
+      },
+    });
+  }
   return CampaignOffer.create({
     ...payload,
     reviewer: profileId,
-    amount: campaign.amountForEachReview,
+    amount: campaign.totalBugget / campaign.numberOfReviewers,
   });
 };
 

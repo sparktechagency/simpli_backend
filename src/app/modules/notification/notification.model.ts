@@ -19,6 +19,7 @@ const NotificationSchema = new Schema<INotification>(
       commentId: { type: Schema.Types.ObjectId, ref: 'Comment' },
       orderId: { type: Schema.Types.ObjectId, ref: 'Order' },
       reviewId: { type: Schema.Types.ObjectId, ref: 'Review' },
+      campaignId: { type: Schema.Types.ObjectId, ref: 'Campaign' },
       amount: { type: Number },
       product: {
         id: { type: Schema.Types.ObjectId, ref: 'Product' },
