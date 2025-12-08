@@ -86,6 +86,7 @@ router.patch(
     }
     next();
   },
+  validateRequest(ProductValidations.updateProductValidationSchema),
   ProductController.updateProduct,
 );
 export const productRoutes = router;

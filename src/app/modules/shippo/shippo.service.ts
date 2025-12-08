@@ -177,14 +177,14 @@ const getShippingRatesForOfferShipment = async (
     massUnit: WeightUnitEnum.Lb, // ✅ use enum
   }));
 
-  console.log(
-    'store',
-    store,
-    'shipping address',
-    shippingAddress,
-    'product',
-    campaignOffer.product,
-  );
+  // console.log(
+  //   'store',
+  //   store,
+  //   'shipping address',
+  //   shippingAddress,
+  //   'product',
+  //   campaignOffer.product,
+  // );
 
   const shipment = await shippo.shipments.create({
     addressFrom: {
