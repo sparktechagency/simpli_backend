@@ -33,7 +33,9 @@ const acceptCampaignOffer = async (
       reviewer: profileId,
       campaign: payload.campaign,
     }),
-    Campaign.findById(payload.campaign).select('totalBugget numberOfReviewers'),
+    Campaign.findById(payload.campaign).select(
+      'totalBugget bussiness numberOfReviewers',
+    ),
   ]);
 
   if (!campaign) {
