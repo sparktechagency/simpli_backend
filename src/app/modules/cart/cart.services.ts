@@ -190,6 +190,38 @@ const clearCartFromDB = async (reviewerId: string) => {
   return result;
 };
 
+const updateCartItemQuantity = async (
+  reviewerId: string,
+  productId: string,
+  variantId: string | null,
+  quantity: number,
+) => {
+  if (quantity < 1) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Quantity must be at least 1');
+  }
+
+  const cart = await Cart.findOne({ reviewer: reviewerId });
+
+  if (!cart) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
+  }
+
+  const item = cart.items.find(
+    (item) =>
+      item.product.toString() === productId && item.variant == variantId,
+  );
+
+  if (!item) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Item not found');
+  }
+
+  // Update quantity
+  item.quantity = quantity;
+
+  await cart.save();
+  return cart;
+};
+
 const cartServices = {
   addToCart,
   removeCartItem,
@@ -197,6 +229,7 @@ const cartServices = {
   increaseCartItemQuantity,
   decreaseCartItemQuantity,
   clearCartFromDB,
+  updateCartItemQuantity,
 };
 
 export default cartServices;

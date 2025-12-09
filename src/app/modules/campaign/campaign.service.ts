@@ -327,7 +327,7 @@ const getAllCampaignFromDB = async (
             { $eq: ['$isShowEverywhere', true] }, // show everywhere
             {
               $and: [
-                { $eq: ['$country', reviewer.country || ''] },
+                // { $eq: ['$country', reviewer.country || ''] },
 
                 // State check
                 {

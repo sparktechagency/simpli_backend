@@ -79,6 +79,20 @@ const clearCart = catchAsync(async (req, res) => {
   });
 });
 
+const updateCartItemQuantity = catchAsync(async (req, res) => {
+  const result = await cartServices.updateCartItemQuantity(
+    req?.user?.profileId,
+    req?.body?.productId,
+    req.body.variantId,
+    req.body.quantity,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Item updated  successfully',
+    data: result,
+  });
+});
 const cartControllers = {
   addToCart,
   removeCartItem,
@@ -86,6 +100,7 @@ const cartControllers = {
   clearCart,
   increaseItemQuantity,
   decreaseItemQuantity,
+  updateCartItemQuantity,
 };
 
 export default cartControllers;

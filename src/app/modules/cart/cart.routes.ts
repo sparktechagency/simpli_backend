@@ -1,8 +1,8 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import cartControllers from './cart.controller';
-import validateRequest from '../../middlewares/validateRequest';
 import cartValidations from './cart.validation';
 
 const router = express.Router();
@@ -37,6 +37,12 @@ router.delete(
   '/delete-cart',
   auth(USER_ROLE.reviewer),
   cartControllers.clearCart,
+);
+
+router.patch(
+  '/update-quantity',
+  auth(USER_ROLE.reviewer),
+  cartControllers.updateCartItemQuantity,
 );
 
 export const cartRoutes = router;
