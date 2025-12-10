@@ -20,7 +20,7 @@ export interface IReviewer {
   city: string;
   state: string;
   country: string;
-  zipcode: number;
+  zipcode: string;
   gender: (typeof GENDER)[keyof typeof GENDER];
   age: number;
   ethnicity: (typeof ethnicity)[keyof typeof ethnicity];

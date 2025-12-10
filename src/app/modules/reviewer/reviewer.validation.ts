@@ -64,7 +64,7 @@ const updateReviewerValidationSchema = z.object({
   name: z.string().optional(),
   username: z.string().optional(),
   city: z.string().optional(),
-  zipcode: z.number().optional(),
+  zipcode: z.string().optional(),
   gender: z.enum(Object.values(GENDER) as [string, ...string[]]),
   age: z.number().min(18, 'Age must be at least 18').optional(),
   ethnicity: z

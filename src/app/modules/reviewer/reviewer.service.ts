@@ -177,6 +177,8 @@ const getReviewerProfile = async (profileId: string) => {
         username: 1,
         email: 1,
         city: 1,
+        state: 1,
+        country: 1,
         zipcode: 1,
         gender: 1,
         age: 1,
