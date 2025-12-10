@@ -15,6 +15,7 @@ import {
   CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
+  ENUM_PAYMENT_STATUS,
   ENUM_PRODUCT_STATUS,
 } from '../../utilities/enum';
 import paypalClient from '../../utilities/paypal';
@@ -322,26 +323,77 @@ const getAllCampaignFromDB = async (
     // 1️⃣ Filter by payment success + location logic
     {
       $match: {
+        status: CAMPAIGN_STATUS.ACTIVE,
+        paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
         $expr: {
           $or: [
             { $eq: ['$isShowEverywhere', true] }, // show everywhere
             {
               $and: [
-                // { $eq: ['$country', reviewer.country || ''] },
-
-                // State check
+                // STATE
                 {
                   $or: [
-                    { $eq: [{ $size: '$state' }, 0] }, // empty → allow
-                    { $in: [reviewer.state, '$state'] }, // string in array
+                    // if state is missing or empty array → allow
+                    {
+                      $eq: [
+                        {
+                          $size: {
+                            $cond: [{ $isArray: '$state' }, '$state', []],
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    // if reviewer's state is empty → allow
+                    { $eq: [reviewer.state || '', ''] },
+                    // matching reviewer.state in campaign.state array (case-insensitive & trim)
+                    {
+                      $in: [
+                        {
+                          $toLower: { $trim: { input: reviewer.state || '' } },
+                        },
+                        {
+                          $map: {
+                            input: {
+                              $cond: [{ $isArray: '$state' }, '$state', []],
+                            },
+                            as: 's',
+                            in: { $toLower: { $trim: { input: '$$s' } } },
+                          },
+                        },
+                      ],
+                    },
                   ],
                 },
 
-                // City check
+                // CITY
                 {
                   $or: [
-                    { $eq: [{ $size: '$city' }, 0] }, // empty → allow
-                    { $in: [reviewer.city, '$city'] }, // string in array
+                    {
+                      $eq: [
+                        {
+                          $size: {
+                            $cond: [{ $isArray: '$city' }, '$city', []],
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    { $eq: [reviewer.city || '', ''] },
+                    {
+                      $in: [
+                        { $toLower: { $trim: { input: reviewer.city || '' } } },
+                        {
+                          $map: {
+                            input: {
+                              $cond: [{ $isArray: '$city' }, '$city', []],
+                            },
+                            as: 'c',
+                            in: { $toLower: { $trim: { input: '$$c' } } },
+                          },
+                        },
+                      ],
+                    },
                   ],
                 },
               ],
@@ -431,6 +483,7 @@ const getMyCampaigns = async (
 
   const matchStage: any = {
     bussiness: new mongoose.Types.ObjectId(profileId),
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   };
 
   if (status) {
@@ -1136,7 +1189,10 @@ const getCampaignStats = async (businessId: string) => {
 
   const campaignAggregation = await Campaign.aggregate([
     {
-      $match: { bussiness: new mongoose.Types.ObjectId(businessId) },
+      $match: {
+        bussiness: new mongoose.Types.ObjectId(businessId),
+        paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+      },
     },
     {
       $facet: {

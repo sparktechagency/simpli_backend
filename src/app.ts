@@ -20,10 +20,8 @@ import handleWebhook from './app/handleStripe/webhook';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
-import { CampaignOffer } from './app/modules/campaignOffer/campaignOffer.model';
-import { Order } from './app/modules/order/order.model';
 import router from './app/routes';
-import shippo from './app/utilities/shippo';
+import { handleShippoWebhook } from './app/shippo/handleShippoWebhook';
 import stripe from './app/utilities/stripe';
 const app: Application = express();
 // parser
@@ -40,84 +38,100 @@ app.post(
 app.post(
   '/webhook-shippo',
   express.raw({ type: 'application/json' }),
+  handleShippoWebhook,
+  // async (req, res) => {
+  //   try {
+  //     // const event = req.body;
+  //     const event = JSON.parse(req.body.toString());
+  //     // console.log('Shippo webhook:', event);
 
-  async (req, res) => {
-    try {
-      // const event = req.body;
-      const event = JSON.parse(req.body.toString());
-      // console.log('Shippo webhook:', event);
+  //     if (
+  //       event.event === 'transaction_created' &&
+  //       event.data.status === 'SUCCESS'
+  //     ) {
+  //       console.log('everne dtaa shippo', event.data);
+  //       const transactionId = event.data.object_id;
+  //       const transaction = await shippo.transactions.get(transactionId);
+  //       // Find order that has this transaction
+  //       const order: any = await Order.findOne({
+  //         'shipping.shippoTransactionId': transactionId,
+  //       });
+  //       if (order) {
+  //         // return res.status(200).send('Order not found, ignoring.');
+  //         console.log('Order found.');
+  //         // Update order with label + tracking info
+  //         order.shipping = {
+  //           ...order.shipping,
+  //           status: 'PURCHASED',
+  //           trackingNumber: transaction.trackingNumber,
+  //           labelUrl: transaction.labelUrl,
+  //           trackingUrl: transaction.trackingUrlProvider,
+  //         };
 
-      if (
-        event.event === 'transaction_created' &&
-        event.data.status === 'SUCCESS'
-      ) {
-        const transactionId = event.data.object_id;
-        const transaction = await shippo.transactions.get(transactionId);
-        // Find order that has this transaction
-        const order: any = await Order.findOne({
-          'shipping.shippoTransactionId': transactionId,
-        });
-        if (order) {
-          // return res.status(200).send('Order not found, ignoring.');
-          console.log('Order found.');
-          // Update order with label + tracking info
-          order.shipping = {
-            ...order.shipping,
-            status: 'PURCHASED',
-            trackingNumber: transaction.trackingNumber,
-            labelUrl: transaction.labelUrl,
-            trackingUrl: transaction.trackingUrlProvider,
-          };
+  //         await order.save();
+  //         // console.log(`Order ${order._id} updated with tracking info`);
+  //       }
 
-          await order.save();
-          // console.log(`Order ${order._id} updated with tracking info`);
-        }
+  //       const campaignOffer: any = await CampaignOffer.findOne({
+  //         'shipping.shippoTransactionId': transactionId,
+  //       });
+  //       if (campaignOffer) {
+  //         campaignOffer.shipping = {
+  //           ...campaignOffer.shipping,
+  //           status: 'PURCHASED',
+  //           trackingNumber: transaction.trackingNumber,
+  //           labelUrl: transaction.labelUrl,
+  //           trackingUrl: transaction.trackingUrlProvider,
+  //         };
 
-        const campaignOffer: any = await CampaignOffer.findOne({
-          'shipping.shippoTransactionId': transactionId,
-        });
-        if (campaignOffer) {
-          order.shipping = {
-            ...order.shipping,
-            status: 'PURCHASED',
-            trackingNumber: transaction.trackingNumber,
-            labelUrl: transaction.labelUrl,
-            trackingUrl: transaction.trackingUrlProvider,
-          };
+  //         await campaignOffer.save();
+  //         console.log(
+  //           `Campaign offer ${campaignOffer._id} updated with tracking info`,
+  //         );
+  //       }
+  //     }
 
-          await order.save();
-          console.log(`Campaign offer ${order._id} updated with tracking info`);
-        }
-      }
+  //     if (event.event === 'track_updated') {
+  //       const tracking = event.data;
+  //       console.log('Track update event:', tracking);
+  //       const trackingNumber = tracking.tracking_number;
 
-      if (event.event === 'track_updated') {
-        const tracking = event.data;
-        // console.log('Track update event:', tracking);
-        const trackingNumber = tracking.tracking_number;
-        // console.log('Track update for', trackingNumber);
+  //       const order = await Order.findOne({
+  //         'shipping.trackingNumber': trackingNumber,
+  //       });
 
-        const order = await Order.findOne({
-          'shipping.trackingNumber': trackingNumber,
-        });
+  //       if (order && tracking.tracking_status.status) {
+  //         await Order.findOneAndUpdate(
+  //           { 'shipping.trackingNumber': trackingNumber },
+  //           { $set: { 'shipping.status': tracking.tracking_status.status } },
+  //           { new: true },
+  //         );
+  //         console.log(
+  //           `Order ${order._id} updated to ${tracking.tracking_status.status}`,
+  //         );
+  //       }
+  //       const campaignOffer: any = await CampaignOffer.findOne({
+  //         'shipping.trackingNumber': trackingNumber,
+  //       });
 
-        if (order && tracking.tracking_status.status) {
-          await Order.findOneAndUpdate(
-            { 'shipping.trackingNumber': trackingNumber },
-            { $set: { 'shipping.status': tracking.tracking_status.status } },
-            { new: true },
-          );
-          console.log(
-            `Order ${order._id} updated to ${tracking.tracking_status.status}`,
-          );
-        }
-      }
+  //       if (campaignOffer && tracking.tracking_status.status) {
+  //         await CampaignOffer.findOneAndUpdate(
+  //           { 'shipping.trackingNumber': trackingNumber },
+  //           { $set: { 'shipping.status': tracking.tracking_status.status } },
+  //           { new: true },
+  //         );
+  //         console.log(
+  //           `Order ${campaignOffer._id} updated to ${tracking.tracking_status.status}`,
+  //         );
+  //       }
+  //     }
 
-      res.status(200).send('ok');
-    } catch (err) {
-      console.error('Shippo webhook error:', err);
-      res.status(500).send('Webhook handling failed');
-    }
-  },
+  //     res.status(200).send('ok');
+  //   } catch (err) {
+  //     console.error('Shippo webhook error:', err);
+  //     res.status(500).send('Webhook handling failed');
+  //   }
+  // },
 );
 router.post('/paypal-webhook', express.json(), handlePaypalWebhook);
 app.use(express.json());
