@@ -442,19 +442,23 @@ const getCampaignMetaData = async (
   const currentCampaignCount = await Campaign.countDocuments({
     bussiness: businessId,
     ...currentDateFilter,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
   const previousCampaignCount = await Campaign.countDocuments({
     bussiness: businessId,
     ...previousDateFilter,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
 
   const activeCampaigns = await Campaign.countDocuments({
     bussines: CAMPAIGN_STATUS.ACTIVE,
     ...currentDateFilter,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
   const scheduledCampaigns = await Campaign.countDocuments({
     status: CAMPAIGN_STATUS.SCHEDULED,
     ...currentDateFilter,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
 
   return {

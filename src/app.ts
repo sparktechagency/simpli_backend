@@ -6,6 +6,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
+import helmet from 'helmet';
 import httpStatus from 'http-status';
 import {
   generateMultiplePresignedUrls,
@@ -137,6 +138,8 @@ router.post('/paypal-webhook', express.json(), handlePaypalWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet());
+
 app.use(
   cors({
     origin: [
