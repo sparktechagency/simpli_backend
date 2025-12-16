@@ -15,5 +15,10 @@ router.post(
   auth(USER_ROLE.bussinessOwner, USER_ROLE.reviewer),
   StripeController.updateOnboardingLink,
 );
+router.post(
+  '/make-withdraw',
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  StripeController.withdrawMoney,
+);
 
 export const stripeRoutes = router;

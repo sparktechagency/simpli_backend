@@ -309,6 +309,179 @@ const getPercentageChange = (current: number, previous: number) => {
   return ((current - previous) / previous) * 100;
 };
 
+// const getCampaignMetaData = async (
+//   businessId: string,
+//   query: Record<string, any>,
+// ) => {
+//   const { dateRange } = query;
+
+//   let currentDateFilter: Record<string, any> = {};
+//   let previousDateFilter: Record<string, any> = {};
+//   const today = moment().startOf('day');
+
+//   switch (dateRange) {
+//     case 'thisWeek':
+//       currentDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().startOf('week').toDate(),
+//           $lt: today.clone().endOf('week').toDate(),
+//         },
+//       };
+//       previousDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+//           $lt: today.clone().startOf('week').toDate(),
+//         },
+//       };
+//       break;
+
+//     case 'lastWeek':
+//       currentDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(1, 'week').startOf('week').toDate(),
+//           $lt: today.clone().startOf('week').toDate(),
+//         },
+//       };
+//       previousDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(2, 'week').startOf('week').toDate(),
+//           $lt: today.clone().subtract(1, 'week').startOf('week').toDate(),
+//         },
+//       };
+//       break;
+
+//     case 'thisMonth':
+//       currentDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().startOf('month').toDate(),
+//           $lt: today.clone().endOf('month').toDate(),
+//         },
+//       };
+//       previousDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+//           $lt: today.clone().startOf('month').toDate(),
+//         },
+//       };
+//       break;
+
+//     case 'lastMonth':
+//       currentDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(1, 'month').startOf('month').toDate(),
+//           $lt: today.clone().startOf('month').toDate(),
+//         },
+//       };
+//       previousDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(2, 'month').startOf('month').toDate(),
+//           $lt: today.clone().subtract(1, 'month').startOf('month').toDate(),
+//         },
+//       };
+//       break;
+
+//     case 'thisYear':
+//       currentDateFilter = {
+//         createdAt: { $gte: today.clone().startOf('year').toDate() },
+//       };
+//       previousDateFilter = {
+//         createdAt: {
+//           $gte: today.clone().subtract(1, 'year').startOf('year').toDate(),
+//           $lt: today.clone().startOf('year').toDate(),
+//         },
+//       };
+//       break;
+
+//     default:
+//       currentDateFilter = {};
+//       previousDateFilter = {};
+//   }
+
+//   // Total Spent
+//   const currentSpent = await Review.aggregate([
+//     {
+//       $match: {
+//         business: new mongoose.Types.ObjectId(businessId),
+//         ...currentDateFilter,
+//       },
+//     },
+//     { $group: { _id: null, total: { $sum: '$amount' } } },
+//   ]);
+
+//   const previousSpent = await Review.aggregate([
+//     {
+//       $match: {
+//         business: new mongoose.Types.ObjectId(businessId),
+//         ...previousDateFilter,
+//       },
+//     },
+//     { $group: { _id: null, total: { $sum: '$amount' } } },
+//   ]);
+
+//   const spentValue = currentSpent[0]?.total || 0;
+//   const spentChange = getPercentageChange(
+//     spentValue,
+//     previousSpent[0]?.total || 0,
+//   );
+
+//   // Total Reviews
+//   const currentReviewCount = await Review.countDocuments({
+//     business: businessId,
+//     ...currentDateFilter,
+//   });
+//   const previousReviewCount = await Review.countDocuments({
+//     business: businessId,
+//     ...previousDateFilter,
+//   });
+
+//   // Avg Cost / Review
+//   const avgCostPerReview =
+//     currentReviewCount > 0 ? spentValue / currentReviewCount : 0;
+
+//   // Campaigns
+//   const currentCampaignCount = await Campaign.countDocuments({
+//     bussiness: businessId,
+//     ...currentDateFilter,
+//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//   });
+//   const previousCampaignCount = await Campaign.countDocuments({
+//     bussiness: businessId,
+//     ...previousDateFilter,
+//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//   });
+
+//   const activeCampaigns = await Campaign.countDocuments({
+//     bussiness: businessId,
+//     status: CAMPAIGN_STATUS.ACTIVE,
+//     // ...currentDateFilter,
+//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//   });
+//   const scheduledCampaigns = await Campaign.countDocuments({
+//     bussiness: businessId,
+//     status: CAMPAIGN_STATUS.SCHEDULED,
+//     // ...currentDateFilter,
+//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//   });
+
+//   return {
+//     totalSpent: {
+//       value: spentValue,
+//       change: spentChange,
+//     },
+//     totalReview: {
+//       value: currentReviewCount,
+//       change: getPercentageChange(currentReviewCount, previousReviewCount),
+//     },
+//     avgCostPerReview: avgCostPerReview,
+//     totalCampaign: {
+//       value: currentCampaignCount,
+//       change: getPercentageChange(currentCampaignCount, previousCampaignCount),
+//     },
+//     activeCampaigns,
+//     scheduledCampaigns,
+//   };
+// };
+
 const getCampaignMetaData = async (
   businessId: string,
   query: Record<string, any>,
@@ -317,8 +490,12 @@ const getCampaignMetaData = async (
 
   let currentDateFilter: Record<string, any> = {};
   let previousDateFilter: Record<string, any> = {};
+
   const today = moment().startOf('day');
 
+  // ============================
+  // DATE RANGE FILTERS (EVENT-BASED)
+  // ============================
   switch (dateRange) {
     case 'thisWeek':
       currentDateFilter = {
@@ -382,7 +559,9 @@ const getCampaignMetaData = async (
 
     case 'thisYear':
       currentDateFilter = {
-        createdAt: { $gte: today.clone().startOf('year').toDate() },
+        createdAt: {
+          $gte: today.clone().startOf('year').toDate(),
+        },
       };
       previousDateFilter = {
         createdAt: {
@@ -397,80 +576,103 @@ const getCampaignMetaData = async (
       previousDateFilter = {};
   }
 
-  // Total Spent
-  const currentSpent = await Review.aggregate([
+  const businessObjectId = new mongoose.Types.ObjectId(businessId);
+  const todayDate = today.toDate();
+
+  // ============================
+  // TOTAL SPENT (EVENT-BASED)
+  // ============================
+  const currentSpentAgg = await Review.aggregate([
     {
       $match: {
-        business: new mongoose.Types.ObjectId(businessId),
+        business: businessObjectId,
         ...currentDateFilter,
       },
     },
     { $group: { _id: null, total: { $sum: '$amount' } } },
   ]);
 
-  const previousSpent = await Review.aggregate([
+  const previousSpentAgg = await Review.aggregate([
     {
       $match: {
-        business: new mongoose.Types.ObjectId(businessId),
+        business: businessObjectId,
         ...previousDateFilter,
       },
     },
     { $group: { _id: null, total: { $sum: '$amount' } } },
   ]);
 
-  const spentValue = currentSpent[0]?.total || 0;
-  const spentChange = getPercentageChange(
-    spentValue,
-    previousSpent[0]?.total || 0,
-  );
+  const currentSpent = currentSpentAgg[0]?.total || 0;
+  const previousSpent = previousSpentAgg[0]?.total || 0;
 
-  // Total Reviews
+  // ============================
+  // TOTAL REVIEWS (EVENT-BASED)
+  // ============================
   const currentReviewCount = await Review.countDocuments({
-    business: businessId,
+    business: businessObjectId,
     ...currentDateFilter,
   });
+
   const previousReviewCount = await Review.countDocuments({
-    business: businessId,
+    business: businessObjectId,
     ...previousDateFilter,
   });
 
-  // Avg Cost / Review
+  // ============================
+  // AVG COST / REVIEW
+  // ============================
   const avgCostPerReview =
-    currentReviewCount > 0 ? spentValue / currentReviewCount : 0;
+    currentReviewCount > 0 ? currentSpent / currentReviewCount : 0;
 
-  // Campaigns
+  // ============================
+  // TOTAL CAMPAIGNS (CREATED IN RANGE)
+  // ============================
   const currentCampaignCount = await Campaign.countDocuments({
-    bussiness: businessId,
-    ...currentDateFilter,
+    bussiness: businessObjectId,
     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+    ...currentDateFilter,
   });
+
   const previousCampaignCount = await Campaign.countDocuments({
-    bussiness: businessId,
+    bussiness: businessObjectId,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
     ...previousDateFilter,
-    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
 
+  // ============================
+  // ACTIVE CAMPAIGNS (STATE-BASED)
+  // ============================
   const activeCampaigns = await Campaign.countDocuments({
-    bussines: CAMPAIGN_STATUS.ACTIVE,
-    ...currentDateFilter,
+    bussiness: businessObjectId,
     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-  });
-  const scheduledCampaigns = await Campaign.countDocuments({
-    status: CAMPAIGN_STATUS.SCHEDULED,
-    ...currentDateFilter,
-    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+    status: CAMPAIGN_STATUS.ACTIVE,
+    startDate: { $lte: todayDate },
+    endDate: { $gte: todayDate },
   });
 
+  // ============================
+  // SCHEDULED / PENDING CAMPAIGNS
+  // ============================
+  const scheduledCampaigns = await Campaign.countDocuments({
+    bussiness: businessObjectId,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+    status: CAMPAIGN_STATUS.SCHEDULED,
+    startDate: { $gt: todayDate },
+  });
+
+  // ============================
+  // RESPONSE
+  // ============================
   return {
     totalSpent: {
-      value: spentValue,
-      change: spentChange,
+      value: currentSpent,
+      change: getPercentageChange(currentSpent, previousSpent),
     },
     totalReview: {
       value: currentReviewCount,
       change: getPercentageChange(currentReviewCount, previousReviewCount),
     },
-    avgCostPerReview: avgCostPerReview,
+    avgCostPerReview,
     totalCampaign: {
       value: currentCampaignCount,
       change: getPercentageChange(currentCampaignCount, previousCampaignCount),

@@ -1182,63 +1182,138 @@ export const getCampaignPerformance = async (
   );
 };
 
+// const getCampaignStats = async (businessId: string) => {
+//   if (!mongoose.Types.ObjectId.isValid(businessId)) {
+//     throw Object.assign(new Error('Invalid business id'), { statusCode: 400 });
+//   }
+
+//   const campaignAggregation = await Campaign.aggregate([
+//     {
+//       $match: {
+//         bussiness: new mongoose.Types.ObjectId(businessId),
+//         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//       },
+//     },
+//     {
+//       $facet: {
+//         totalCampaigns: [{ $count: 'total' }],
+//         totalSpent: [
+//           { $group: { _id: null, totalSpent: { $sum: '$totalBugget' } } },
+//         ],
+//         activeCampaigns: [
+//           { $match: { status: CAMPAIGN_STATUS.ACTIVE } },
+//           { $count: 'activeCampaigns' },
+//         ],
+//       },
+//     },
+//   ]);
+
+//   const { totalCampaigns, totalSpent, activeCampaigns } =
+//     campaignAggregation[0];
+
+//   // Total Campaigns
+//   const totalCampaignsCount =
+//     totalCampaigns.length > 0 ? totalCampaigns[0].total : 0;
+
+//   // Total Spent
+//   const totalSpentAmount = totalSpent.length > 0 ? totalSpent[0].totalSpent : 0;
+
+//   // Active Campaigns
+//   const activeCampaignCount =
+//     activeCampaigns.length > 0 ? activeCampaigns[0].activeCampaigns : 0;
+
+//   // Average Rating for active campaigns
+//   const reviewsAggregation = await Review.aggregate([
+//     { $match: { campaign: { $in: activeCampaigns.map((c: any) => c._id) } } },
+//     { $group: { _id: null, averageRating: { $avg: '$rating' } } },
+//   ]);
+
+//   const averageRating =
+//     reviewsAggregation.length > 0 ? reviewsAggregation[0].averageRating : null;
+
+//   return {
+//     totalCampaigns: totalCampaignsCount,
+//     totalSpent: totalSpentAmount,
+//     activeCampaigns: activeCampaignCount,
+//     averageRating: averageRating,
+//   };
+// };
 const getCampaignStats = async (businessId: string) => {
   if (!mongoose.Types.ObjectId.isValid(businessId)) {
     throw Object.assign(new Error('Invalid business id'), { statusCode: 400 });
   }
 
-  const campaignAggregation = await Campaign.aggregate([
+  const businessObjectId = new mongoose.Types.ObjectId(businessId);
+
+  const stats = await Campaign.aggregate([
     {
+      // Match campaigns of this business
       $match: {
-        bussiness: new mongoose.Types.ObjectId(businessId),
+        bussiness: businessObjectId,
         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
       },
     },
+
+    {
+      $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'campaign',
+        as: 'reviews',
+      },
+    },
+
     {
       $facet: {
+        // --------- 1️⃣ Total Campaigns ---------
         totalCampaigns: [{ $count: 'total' }],
-        totalSpent: [
-          { $group: { _id: null, totalSpent: { $sum: '$totalBugget' } } },
-        ],
+
+        // --------- 2️⃣ Active Campaigns ---------
         activeCampaigns: [
           { $match: { status: CAMPAIGN_STATUS.ACTIVE } },
-          { $count: 'activeCampaigns' },
+          { $count: 'count' },
+        ],
+
+        // --------- 3️⃣ Total Spent (sum of all review.amount) ---------
+        totalSpent: [
+          { $unwind: { path: '$reviews', preserveNullAndEmptyArrays: true } },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: '$reviews.amount' },
+            },
+          },
+        ],
+
+        // --------- 4️⃣ Average Rating (all reviews) ---------
+        averageRating: [
+          { $unwind: { path: '$reviews', preserveNullAndEmptyArrays: true } },
+          {
+            $group: {
+              _id: null,
+              avg: { $avg: '$reviews.rating' },
+            },
+          },
         ],
       },
     },
   ]);
 
-  const { totalCampaigns, totalSpent, activeCampaigns } =
-    campaignAggregation[0];
-
-  // Total Campaigns
-  const totalCampaignsCount =
-    totalCampaigns.length > 0 ? totalCampaigns[0].total : 0;
-
-  // Total Spent
-  const totalSpentAmount = totalSpent.length > 0 ? totalSpent[0].totalSpent : 0;
-
-  // Active Campaigns
-  const activeCampaignCount =
-    activeCampaigns.length > 0 ? activeCampaigns[0].activeCampaigns : 0;
-
-  // Average Rating for active campaigns
-  const reviewsAggregation = await Review.aggregate([
-    { $match: { campaign: { $in: activeCampaigns.map((c: any) => c._id) } } },
-    { $group: { _id: null, averageRating: { $avg: '$rating' } } },
-  ]);
-
-  const averageRating =
-    reviewsAggregation.length > 0 ? reviewsAggregation[0].averageRating : null;
+  const result = stats[0];
 
   return {
-    totalCampaigns: totalCampaignsCount,
-    totalSpent: totalSpentAmount,
-    activeCampaigns: activeCampaignCount,
-    averageRating: averageRating,
+    totalCampaigns:
+      result.totalCampaigns.length > 0 ? result.totalCampaigns[0].total : 0,
+
+    activeCampaigns:
+      result.activeCampaigns.length > 0 ? result.activeCampaigns[0].count : 0,
+
+    totalSpent: result.totalSpent.length > 0 ? result.totalSpent[0].total : 0,
+
+    averageRating:
+      result.averageRating.length > 0 ? result.averageRating[0].avg : null,
   };
 };
-
 const CampaignService = {
   createCampaign,
   getAllCampaignFromDB,

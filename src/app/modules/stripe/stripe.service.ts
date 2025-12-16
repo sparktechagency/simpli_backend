@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../error/appError';
 import stripe from '../../utilities/stripe';
 import Bussiness from '../bussiness/bussiness.model';
 import Reviewer from '../reviewer/reviewer.model';
+import {
+  ENUM_TRANSACTION_REASON,
+  ENUM_TRANSACTION_TYPE,
+} from '../transaction/transaction.enum';
+import { Transaction } from '../transaction/transaction.model';
 import { USER_ROLE } from '../user/user.constant';
 
 const createConnectedAccountAndOnboardingLink = async (
@@ -204,11 +211,204 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
     };
   }
 };
+const withdrawMoney = async (userData: JwtPayload, amount: number) => {
+  if (userData.role == USER_ROLE.reviewer) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
+    try {
+      const amountInCent = Math.round(amount * 100);
+
+      const reviewer = await Reviewer.findById(userData.profileId).session(
+        session,
+      );
+      if (!reviewer) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+      }
+
+      if (reviewer.currentBalance < amount) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "You don't have enough balance",
+        );
+      }
+
+      if (!reviewer.isStripeAccountConnected) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'For withdraw you need to connect your bank info with Stripe',
+        );
+      }
+
+      const stripe_account_id = reviewer.stripeConnectedAccountId;
+      if (!stripe_account_id) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Stripe account not found');
+      }
+
+      // ---------- STRIPE TRANSFER ----------
+      const transfer = await stripe.transfers.create({
+        amount: amountInCent,
+        currency: 'usd',
+        destination: stripe_account_id.toString(),
+      });
+
+      // ---------- STRIPE PAYOUT ----------
+      const payout = await stripe.payouts.create(
+        {
+          amount: amountInCent,
+          currency: 'usd',
+        },
+        {
+          stripeAccount: stripe_account_id.toString(),
+        },
+      );
+
+      await Reviewer.findByIdAndUpdate(
+        userData.profileId,
+        {
+          $inc: {
+            currentBalance: -amount,
+          },
+        },
+        { session },
+      );
+
+      await Transaction.create(
+        [
+          {
+            amount,
+            type: ENUM_TRANSACTION_TYPE.CREDIT,
+            transactionReason: ENUM_TRANSACTION_REASON.WITHDRAWAL,
+            user: userData.profileId,
+            transactionId: transfer.id,
+          },
+        ],
+        { session },
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return { transfer, payout };
+    } catch (error: any) {
+      await session.abortTransaction();
+      session.endSession();
+
+      console.error('Withdraw error:', error);
+
+      // If it's already AppError, throw it as it is
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      // Otherwise send fallback error
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        error.message || 'Withdrawal failed. Update your bank info.',
+      );
+    }
+  } else if (USER_ROLE.bussinessOwner) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const amountInCent = Math.round(amount * 100);
+
+      const business = await Bussiness.findById(userData.profileId).session(
+        session,
+      );
+      if (!business) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+      }
+
+      if (business.currentBalance < amount) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "You don't have enough balance",
+        );
+      }
+
+      if (!business.isStripeAccountConnected) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'For withdraw you need to connect your bank info with Stripe',
+        );
+      }
+
+      const stripe_account_id: any = business.stripeConnectedAccountId;
+      if (!stripe_account_id) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Stripe account not found');
+      }
+
+      // ---------- STRIPE TRANSFER ----------
+      const transfer = await stripe.transfers.create({
+        amount: amountInCent,
+        currency: 'usd',
+        destination: stripe_account_id,
+      });
+
+      // ---------- STRIPE PAYOUT ----------
+      const payout = await stripe.payouts.create(
+        {
+          amount: amountInCent,
+          currency: 'usd',
+        },
+        {
+          stripeAccount: stripe_account_id,
+        },
+      );
+
+      await Bussiness.findByIdAndUpdate(
+        userData.profileId,
+        {
+          $inc: {
+            currentBalance: -amount,
+          },
+        },
+        { session },
+      );
+
+      await Transaction.create(
+        [
+          {
+            amount,
+            type: ENUM_TRANSACTION_TYPE.CREDIT,
+            user: userData.profileId,
+            transactionId: transfer.id,
+            transactionReason: ENUM_TRANSACTION_REASON.WITHDRAWAL,
+          },
+        ],
+        { session },
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return { transfer, payout };
+    } catch (error: any) {
+      await session.abortTransaction();
+      session.endSession();
+
+      console.error('Withdraw error:', error);
+
+      // If it's already AppError, throw it as it is
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      // Otherwise send fallback error
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        error.message || 'Withdrawal failed. Update your bank info.',
+      );
+    }
+  }
+};
 const StripeService = {
   createConnectedAccountAndOnboardingLink,
   updateOnboardingLink,
   updateStripeConnectedAccountStatus,
+  withdrawMoney,
 };
 
 export default StripeService;

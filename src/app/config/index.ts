@@ -33,6 +33,10 @@ export default {
       process.env.STRIPE_PROCEED_SHIPPING_PAYMENT_SUCCESS,
     stripe_proceed_shipping_payment_cancel:
       process.env.STRIPE_PROCEED_SHIPPING_PAYMENT_CANCEL,
+    stripe_proceed_shipping_payment_for_campaign_offer_success:
+      process.env.STRIPE_PROCEED_SHIPPING_PAYMENT__FOR_CAMPAIGN_OFFER_SUCCESS,
+    stripe_proceed_shipping_payment_for_campaign_offer_cancel:
+      process.env.STRIPE_PROCEED_SHIPPING_PAYMENT__FOR_CAMPAIGN_OFFER_CANCEL,
     webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
     webhook_endpoint_secret_for_connected:
       process.env.WEBHOOK_ENDPOINT_SECRET_FOR_CONNECTED,

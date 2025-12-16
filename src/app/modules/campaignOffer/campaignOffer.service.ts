@@ -203,8 +203,11 @@ const proceedDeliveryForCampaignOffer = async (
         campaignOfferId: campaignOffer._id.toString(),
         paymentPurpose: ENUM_PAYMENT_PURPOSE.PROCEED_CAMPAIGN_OFFER_DELIVERY,
       },
-      success_url: config.stripe.stripe_order_payment_success_url,
-      cancel_url: config.stripe.stripe_order_payment_cancel_url,
+      success_url:
+        config.stripe
+          .stripe_proceed_shipping_payment_for_campaign_offer_success,
+      cancel_url:
+        config.stripe.stripe_proceed_shipping_payment_for_campaign_offer_cancel,
     });
 
     return { url: session.url };
