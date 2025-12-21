@@ -133,7 +133,10 @@ const getSingleCampaignOffer = async (userData: JwtPayload, id: string) => {
     };
   }
   const result = await CampaignOffer.findOne(filterQuery)
-    .populate({ path: 'campaign', select: 'name amountForEachReview endDate' })
+    .populate({
+      path: 'campaign',
+      select: 'name amountForEachReview endDate reviewType',
+    })
     .populate({ path: 'product', select: 'name images' })
     .populate({ path: 'shippingAddress' });
   return result;

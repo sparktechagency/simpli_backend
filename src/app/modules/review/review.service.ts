@@ -5,7 +5,6 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
 import { shouldSendNotification } from '../../helper/shouldSendNotification';
-import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
 import Follow from '../follow/follow.model';
@@ -48,12 +47,12 @@ const createReview = async (reviewerId: string, payload: any) => {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
   // TODO: check campaign status
-  if (campaignOffer.deliveryStatus !== ENUM_DELIVERY_STATUS.waiting) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'This campaign not accepted by you',
-    );
-  }
+  // if (campaignOffer.deliveryStatus !== ENUM_DELIVERY_STATUS.waiting) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     'This campaign not accepted by you',
+  //   );
+  // }
 
   if (campaignOffer.status === CampaignOfferStatus.completed) {
     throw new AppError(

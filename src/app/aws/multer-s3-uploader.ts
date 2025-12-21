@@ -213,7 +213,7 @@ export const uploadFile = () => {
     { name: 'coverImage', maxCount: 1 },
     { name: 'logo', maxCount: 1 },
     { name: 'review_video', maxCount: 1 },
-    { name: 'review_image', maxCount: 3 },
+    { name: 'review_image', maxCount: 6 },
     { name: 'thumbnail', maxCount: 1 },
     { name: 'comment_image', maxCount: 1 },
   ]);

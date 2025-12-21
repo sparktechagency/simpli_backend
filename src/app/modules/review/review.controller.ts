@@ -12,6 +12,13 @@ const createReview = catchAsync(async (req, res) => {
   if (req.files?.thumbnail) {
     req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
   }
+
+  if (req.files?.review_image) {
+    req.body.images = req.files.review_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
+  }
+
   const result = await ReviewService.createReview(req.user.profileId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

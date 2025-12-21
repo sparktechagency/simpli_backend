@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { uploadFile } from '../../helper/fileUploader';
+import { uploadFile } from '../../aws/multer-s3-uploader';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';

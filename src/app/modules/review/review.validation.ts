@@ -21,7 +21,6 @@ const reviewValidationSchema = z.object({
       })
       .min(1, { message: 'Rating at list 1' })
       .max(5, { message: 'Max rating will be 5' }),
-    video: z.string({ required_error: 'Video url is required' }),
   }),
 });
 
