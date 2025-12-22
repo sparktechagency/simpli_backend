@@ -443,6 +443,9 @@ const getAllCampaignFromDB = async (
         userOffer: { $arrayElemAt: ['$userOffer', 0] },
       },
     },
+    {
+      $sort: { createdAt: -1 },
+    },
 
     // 4️⃣ Pagination
     {

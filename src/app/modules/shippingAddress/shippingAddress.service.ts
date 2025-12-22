@@ -8,6 +8,34 @@ import { IShippingAddress } from './shippingAddress.interface';
 import ShippingAddress from './shippingAddress.model';
 const shippo = new Shippo({ apiKeyHeader: config.shippo.api_key as string });
 // crate shipping address
+// const createShippingAddress = async (
+//   reviewerId: string,
+//   payload: IShippingAddress,
+// ) => {
+//   const validatedAddress = await shippo.addresses.create({
+//     ...payload,
+//     validate: true,
+//   });
+
+//   // Ensure validation_results exists
+//   if (
+//     !validatedAddress.validationResults ||
+//     validatedAddress.validationResults.isValid !== true
+//   ) {
+//     const messages = validatedAddress.validationResults?.messages || [];
+//     const errorText =
+//       messages.map((m) => m.text).join('; ') ||
+//       'Invalid or undeliverable address provided.';
+//     throw new AppError(httpStatus.BAD_REQUEST, errorText);
+//   }
+
+//   const result = await ShippingAddress.create({
+//     ...payload,
+//     reviewer: reviewerId,
+//   });
+//   return result;
+// };
+
 const createShippingAddress = async (
   reviewerId: string,
   payload: IShippingAddress,
@@ -16,22 +44,34 @@ const createShippingAddress = async (
     ...payload,
     validate: true,
   });
-  // Ensure validation_results exists
-  if (
-    !validatedAddress.validationResults ||
-    validatedAddress.validationResults.isValid !== true
-  ) {
-    const messages = validatedAddress.validationResults?.messages || [];
-    const errorText =
-      messages.map((m) => m.text).join('; ') ||
-      'Invalid or undeliverable address provided.';
-    throw new AppError(httpStatus.BAD_REQUEST, errorText);
+
+  const validationResults = validatedAddress.validationResults;
+
+  if (!validationResults || validationResults.isValid !== true) {
+    const messages = validationResults?.messages || [];
+
+    // Format clear, user-friendly message
+    const formattedMessage =
+      messages.length > 0
+        ? messages
+            .map((msg: any) => {
+              const fieldName = msg.field
+                ? msg.field.replace('_', ' ').toUpperCase()
+                : 'ADDRESS';
+
+              return `${fieldName}: ${msg.text}`;
+            })
+            .join(' | ')
+        : 'Invalid or undeliverable address provided.';
+
+    throw new AppError(httpStatus.BAD_REQUEST, formattedMessage);
   }
 
   const result = await ShippingAddress.create({
     ...payload,
     reviewer: reviewerId,
   });
+
   return result;
 };
 

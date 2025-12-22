@@ -13,17 +13,38 @@ import { IComment } from './comment.interface';
 import Comment from './comment.model';
 
 const createComment = async (user: JwtPayload, payload: Partial<IComment>) => {
-  const commentData: any = {
-    ...payload,
-    commentor: user.profileId,
-    likers: [],
-  };
-  const result = await Comment.create(commentData);
-  sendCommentNotification(
-    payload.review?.toString() as string,
-    result._id.toString() as string,
-  );
-  return result;
+  if (!payload.parent) {
+    const commentData: any = {
+      ...payload,
+      commentor: user.profileId,
+      likers: [],
+    };
+    const result = await Comment.create(commentData);
+    sendCommentNotification(
+      payload.review?.toString() as string,
+      result._id.toString() as string,
+    );
+    return result;
+  } else {
+    const comment = await Comment.findById(payload.parent);
+    if (!comment) {
+      throw new AppError(404, 'Parent comment not found');
+    }
+    const rootId = comment.rootId ? comment.rootId : comment._id.toString();
+    const replyData: any = {
+      ...payload,
+      commentor: user.profileId,
+      likers: [],
+      review: comment.review,
+      rootId: rootId,
+    };
+    const result = await Comment.create(replyData);
+    sendReplyNotification(
+      payload.review?.toString() as string,
+      result._id.toString() as string,
+    );
+    return result;
+  }
 };
 
 const createReply = async (user: JwtPayload, payload: IComment) => {
@@ -32,11 +53,13 @@ const createReply = async (user: JwtPayload, payload: IComment) => {
   if (!comment) {
     throw new AppError(404, 'Parent comment not found');
   }
+  const rootId = comment.rootId ? comment.rootId : comment._id.toString();
   const replyData: any = {
     ...payload,
     commentor: user.profileId,
     likers: [],
     review: comment.review,
+    rootId: rootId,
   };
   const result = await Comment.create(replyData);
   sendReplyNotification(
@@ -73,9 +96,11 @@ const deleteComment = async (profileId: string, id: string) => {
   if (!result) {
     throw new AppError(
       404,
-      'Comment not found or you are not authorized to update this comment',
+      'Comment not found or you are not authorized to delete this comment',
     );
   }
+  const rootId = result.rootId ?? result._id;
+  await Comment.deleteMany({ rootId: rootId });
   return result;
 };
 

@@ -21,6 +21,7 @@ const commentSchema = new mongoose.Schema<IComment>(
       ref: 'Comment',
       default: null,
     },
+    rootId: { type: String, default: null },
   },
   { timestamps: true },
 );

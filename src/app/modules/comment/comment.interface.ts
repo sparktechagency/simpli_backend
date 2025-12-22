@@ -8,4 +8,5 @@ export interface IComment {
   image: string;
   likers: Types.ObjectId[];
   parent: Types.ObjectId;
+  rootId: string | null;
 }
