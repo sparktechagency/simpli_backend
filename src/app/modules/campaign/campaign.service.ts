@@ -317,8 +317,7 @@ const getAllCampaignFromDB = async (
   const reviewer = await Reviewer.findById(userId)
     .select('city state country')
     .lean();
-  if (!reviewer) throw new Error('Reviewer not found');
-  console.log('reviewer', reviewer);
+  if (!reviewer) throw new AppError(httpStatus.NOT_FOUND, 'Reviewer not found');
   const pipeline: any[] = [
     // 1️⃣ Filter by payment success + location logic
     {

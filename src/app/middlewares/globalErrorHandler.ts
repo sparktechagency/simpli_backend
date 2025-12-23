@@ -145,9 +145,9 @@
 // export default globalErrorHandler;
 
 import { ErrorRequestHandler } from 'express';
+import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 import AppError from '../error/appError';
-import mongoose from 'mongoose';
 const globalErrorHandler: ErrorRequestHandler = (
   err,
   req,
@@ -198,7 +198,6 @@ const globalErrorHandler: ErrorRequestHandler = (
   return res.status(statusCode).json({
     success: false,
     message: errorMessage,
-    // errorMessage: errorMessage,
     errorDetails,
     stack: err?.stack || null,
     // err,
