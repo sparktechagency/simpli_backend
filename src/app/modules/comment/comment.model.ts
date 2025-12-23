@@ -13,7 +13,7 @@ const commentSchema = new mongoose.Schema<IComment>(
       ref: 'Reviewer',
       required: true,
     },
-    text: { type: String, required: true },
+    text: { type: String },
     image: { type: String, default: '' },
     likers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reviewer' }],
     parent: {

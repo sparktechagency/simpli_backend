@@ -241,32 +241,65 @@ const getReviewerMetaData = async (
   };
 };
 
+// const getBussinessMetaData = async (
+//   bussinessId: string,
+//   query: Record<string, unknown>,
+// ) => {
+//   const bussiness = await Bussiness.findById(bussinessId).select(
+//     'name currentBalance',
+//   );
+//   const totalOrder = await Order.countDocuments({
+//     bussiness: bussinessId,
+//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//   });
+
+//   // Checkout rate calculation (pseudo-aggregation)
+//   const cartsUsers = await Cart.distinct('reviewer', {
+//     items: { $exists: true, $ne: [] },
+//   });
+
+//   const ordersUsers = await Order.distinct('reviewer');
+
+//   const checkoutRate =
+//     cartsUsers.length > 0 ? (ordersUsers.length / cartsUsers.length) * 100 : 0;
+
+//   return {
+//     currentBalance: bussiness?.currentBalance || 0,
+//     totalOrder,
+//     checkoutRate: Number(checkoutRate.toFixed(2)) || 0,
+//   };
+// };
+
 const getBussinessMetaData = async (
   bussinessId: string,
-  query: Record<string, unknown>,
+  query: Record<string, any>,
 ) => {
   const bussiness = await Bussiness.findById(bussinessId).select(
     'name currentBalance',
   );
+
   const totalOrder = await Order.countDocuments({
     bussiness: bussinessId,
     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   });
 
-  // Checkout rate calculation (pseudo-aggregation)
-  const cartsUsers = await Cart.distinct('reviewer', {
+  const cartUsers = await Cart.distinct('reviewer', {
+    bussiness: bussinessId,
     items: { $exists: true, $ne: [] },
   });
 
-  const ordersUsers = await Order.distinct('reviewer');
+  const orderUsers = await Order.distinct('reviewer', {
+    bussiness: bussinessId,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+  });
 
   const checkoutRate =
-    cartsUsers.length > 0 ? (ordersUsers.length / cartsUsers.length) * 100 : 0;
+    cartUsers.length > 0 ? (orderUsers.length / cartUsers.length) * 100 : 0;
 
   return {
     currentBalance: bussiness?.currentBalance || 0,
     totalOrder,
-    checkoutRate: Number(checkoutRate.toFixed(2)) || 0,
+    checkoutRate: Number(checkoutRate.toFixed(2)),
   };
 };
 

@@ -12,11 +12,7 @@ const ObjectIdSchema = (fieldName: string) =>
 const createCommentSchema = z.object({
   body: z.object({
     review: ObjectIdSchema('Review  id'),
-    text: z
-      .string()
-      .trim()
-      .min(1, { message: 'Text is required' })
-      .max(500, { message: 'Text cannot exceed 500 characters' }),
+    text: z.string().optional(),
   }),
 });
 const updateCommentValidationSchema = z.object({
