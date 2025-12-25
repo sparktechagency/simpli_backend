@@ -50,6 +50,7 @@ export const handleShippoWebhook = async (req: Request, res: Response) => {
     // TRACK UPDATED
     // -------------------------------------
     if (event.event === 'track_updated') {
+      console.log('Track update event:', event.data);
       const trackingNumber = event.data?.tracking_number;
       const status = event.data?.tracking_status?.status;
 

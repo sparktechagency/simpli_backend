@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
+import { createMasterPlaylist } from '../../aws/createMasterPlaylist';
+import { createHlsJobFromUrl } from '../../aws/mediaConverter';
+import { waitForJobCompletion } from '../../aws/waitForMediaConvertJob';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
-import { getCloudFrontUrl } from '../../helper/getCloudFontUrl';
 import { shouldSendNotification } from '../../helper/shouldSendNotification';
 import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import { CampaignOffer } from '../campaignOffer/campaignOffer.model';
@@ -43,6 +46,7 @@ const createReview = async (reviewerId: string, payload: any) => {
         images: string[];
       };
     }>({ path: 'product', select: 'category name images' });
+
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
@@ -54,23 +58,81 @@ const createReview = async (reviewerId: string, payload: any) => {
   //   );
   // }
 
-  if (campaignOffer.status === CampaignOfferStatus.completed) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'This campaign offer already completed',
-    );
-  }
+  // if (campaignOffer.status === CampaignOfferStatus.completed) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     'This campaign offer already completed',
+  //   );
+  // }
 
-  if (campaignOffer.status !== CampaignOfferStatus.processing) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'This campaign offer is not in processing state',
-    );
-  }
+  // if (campaignOffer?.shipping?.status !== 'DELIVERED') {
+  //   throw new AppError(httpStatus.BAD_REQUEST, 'Product not delivered yet');
+  // }
+
+  // if (campaignOffer.status !== CampaignOfferStatus.processing) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     'This campaign offer is not in processing state',
+  //   );
+  // }
 
   // TODO: when create review---------------
+  // if (payload.video) {
+  //   payload.video = getCloudFrontUrl(payload.video);
+  // }
+
+  // if (payload.video) {
+  //   const videoId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+  //   // // Create MediaConvert HLS job from the presigned URL
+  //   // await createHlsJobFromUrl({
+  //   //   videoUrl: payload.video,
+  //   //   videoId,
+  //   //   roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+  //   // });
+
+  //   // // Save CloudFront HLS URL in DB
+  //   // payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+
+  //   // another approach without videoId
+  //   const job = await createHlsJobFromUrl({
+  //     videoUrl: payload.video,
+  //     videoId,
+  //     roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+  //   });
+
+  //   console.log('MediaConvert Job created:', job, job.Job?.Id);
+
+  //   // TEMP: wait 15–30 sec (quick fix)
+  //   // setTimeout(async () => {
+  //   //   console.log('Creating master playlist for videoId:', videoId);
+  //   //   await createMasterPlaylist('sampli-bucket101', videoId);
+  //   // }, 80000);
+
+  //   // Save CloudFront URL
+  //   payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+  // }
+
   if (payload.video) {
-    payload.video = getCloudFrontUrl(payload.video);
+    const videoId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+    const job = await createHlsJobFromUrl({
+      videoUrl: payload.video,
+      videoId,
+      roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+    });
+
+    console.log('MediaConvert Job created:', job.Job?.Id);
+
+    // Save review with processing status (NO waiting)
+    payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+    payload.videoStatus = 'processing';
+    payload.videoId = videoId;
+    payload.jobId = job.Job?.Id;
+    payload.isReady = false;
+
+    // Start background process (don't await this!)
+    processVideoInBackground(job.Job!.Id!, videoId).catch(console.error);
   }
 
   const result = await Review.create({
@@ -130,6 +192,12 @@ const createReview = async (reviewerId: string, payload: any) => {
   return result;
 };
 
+async function processVideoInBackground(jobId: string, videoId: string) {
+  await waitForJobCompletion(jobId); // This waits in background
+  await createMasterPlaylist('sampli-bucket101', videoId);
+  await Review.findOneAndUpdate({ videoId: videoId }, { isReady: true });
+}
+
 const updateReviewerIntoDB = async (
   profileId: string,
   id: string,
@@ -177,6 +245,7 @@ const getAllReviewFromDB = async (
   }
 
   const matchStage: any = {};
+  matchStage.isReady = true;
 
   // Only include reviews from followed reviewers
   if (query.following === 'true') {

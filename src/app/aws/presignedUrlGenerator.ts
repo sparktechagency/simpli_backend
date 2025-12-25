@@ -38,7 +38,7 @@ export const generatePresignedUrl = async ({
   } else if (fileCategory === 'material_image') {
     folder = 'uploads/images/project_material_image/';
   } else if (fileCategory === 'review_video') {
-    folder = 'uploads/videos/review_videos/';
+    folder = 'uploads/videos/review_videos/raw/';
   }
 
   const fileName = `${folder}${timestamp}-${Math.random()

@@ -17,4 +17,6 @@ export interface IReview {
   totalView: number;
   totalReferralSales: number;
   totalCommissions: number;
+  videoId: string;
+  isReady: boolean;
 }

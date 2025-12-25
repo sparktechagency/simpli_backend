@@ -8,11 +8,12 @@ import sendResponse from '../../utilities/sendResponse';
 import ReviewService from './review.service';
 
 const createReview = catchAsync(async (req, res) => {
-  const thumnail: any = req.files?.thumbnail;
+  const thumbnail: any = req.files?.thumbnail;
   if (req.files?.thumbnail) {
-    req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
+    req.body.thumbnail = getCloudFrontUrl(thumbnail[0].key);
   }
-
+  console.log('req.files', req.files);
+  console.log('req.body', req.body);
   if (req.files?.review_image) {
     req.body.images = req.files.review_image.map((file: any) => {
       return getCloudFrontUrl(file.key);
@@ -29,10 +30,11 @@ const createReview = catchAsync(async (req, res) => {
 });
 
 const updateReview = catchAsync(async (req, res) => {
-  const thumnail: any = req.files?.thumbnail;
+  const thumbnail: any = req.files?.thumbnail;
   if (req.files?.thumbnail) {
-    req.body.thumbnail = getCloudFrontUrl(thumnail[0].key);
+    req.body.thumbnail = getCloudFrontUrl(thumbnail[0].key);
   }
+
   const result = await ReviewService.updateReviewerIntoDB(
     req.user.profileId,
     req.params.id,

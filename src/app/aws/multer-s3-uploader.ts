@@ -54,7 +54,7 @@ export const uploadFile = () => {
       'review_image',
       'comment_image',
     ];
-
+    // okey
     if (file.fieldname === undefined) {
       // Allow requests without any files
       cb(null, true);

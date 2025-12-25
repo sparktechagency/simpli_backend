@@ -223,6 +223,21 @@ app.post('/create-checkout-session', async (req: Request, res: Response) => {
   }
 });
 
+import {
+  DescribeEndpointsCommand,
+  MediaConvertClient,
+} from '@aws-sdk/client-mediaconvert';
+
+const client = new MediaConvertClient({ region: 'us-west-2' });
+
+async function getEndpoint() {
+  const command = new DescribeEndpointsCommand({});
+  const response = await client.send(command);
+  console.log(response.Endpoints);
+}
+
+getEndpoint();
+
 // global error handler
 app.use(globalErrorHandler);
 // not found
