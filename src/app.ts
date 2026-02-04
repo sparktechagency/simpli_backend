@@ -149,6 +149,8 @@ app.use(
       'https://dashboard.sampli.io',
       'https://sampli-dashbaord.vercel.app',
       'http://localhost:3000',
+      'http://45.55.251.203:3001',
+      'http://45.55.251.203',
     ],
     // origin: '*',
     credentials: true,
