@@ -12,15 +12,24 @@ export const createHlsJobFromUrl = async ({
   videoUrl,
   videoId,
   roleArn,
+  reviewId,
+  reviewerId,
 }: {
   videoUrl: string;
   videoId: string;
   roleArn: string;
+  reviewId: string;
+  reviewerId: string;
 }) => {
   const { bucket, key } = parseS3Url(videoUrl);
 
   const command = new CreateJobCommand({
     Role: roleArn,
+    UserMetadata: {
+      reviewId: reviewId,
+      reviewerId: reviewerId,
+      videoId: videoId,
+    },
     Settings: {
       Inputs: [
         {

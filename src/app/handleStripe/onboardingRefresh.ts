@@ -14,7 +14,7 @@ const onboardingRefresh = async (req: Request, res: Response) => {
     const accountLink = await stripe.accountLinks.create({
       account: accountId as string,
       refresh_url: `${config.stripe.onboarding_refresh_url}?accountId=${accountId}`,
-      return_url: config.stripe.onboarding_return_url,
+      return_url: config.stripe.onboarding_refresh_url,
       type: 'account_onboarding',
     });
 

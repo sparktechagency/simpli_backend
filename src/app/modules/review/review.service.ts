@@ -1,10 +1,9 @@
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
-import { createMasterPlaylist } from '../../aws/createMasterPlaylist';
 import { createHlsJobFromUrl } from '../../aws/mediaConverter';
-import { waitForJobCompletion } from '../../aws/waitForMediaConvertJob';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
 import { shouldSendNotification } from '../../helper/shouldSendNotification';
@@ -16,7 +15,10 @@ import Notification from '../notification/notification.model';
 import Reviewer from '../reviewer/reviewer.model';
 import { IReview } from './review.interface';
 import Review from './reviewer.model';
-
+export const extractS3KeyFromUrl = (url: string): string => {
+  const parsedUrl = new URL(url);
+  return decodeURIComponent(parsedUrl.pathname.substring(1));
+};
 const createReview = async (reviewerId: string, payload: any) => {
   if (
     payload.totalCommissions ||
@@ -113,28 +115,6 @@ const createReview = async (reviewerId: string, payload: any) => {
   //   payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
   // }
 
-  if (payload.video) {
-    const videoId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-
-    const job = await createHlsJobFromUrl({
-      videoUrl: payload.video,
-      videoId,
-      roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
-    });
-
-    console.log('MediaConvert Job created:', job.Job?.Id);
-
-    // Save review with processing status (NO waiting)
-    payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
-    payload.videoStatus = 'processing';
-    payload.videoId = videoId;
-    payload.jobId = job.Job?.Id;
-    payload.isReady = false;
-
-    // Start background process (don't await this!)
-    processVideoInBackground(job.Job!.Id!, videoId).catch(console.error);
-  }
-
   const result = await Review.create({
     ...payload,
     reviewer: reviewerId,
@@ -144,6 +124,28 @@ const createReview = async (reviewerId: string, payload: any) => {
     business: campaignOffer.business,
     amount: campaignOffer.amount,
   });
+  if (payload.video) {
+    const videoId = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}`;
+
+    const job = await createHlsJobFromUrl({
+      videoUrl: payload.video,
+      videoId,
+      roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+      reviewId: result._id.toString(),
+      reviewerId: reviewerId.toString(),
+    });
+    const rawKey = extractS3KeyFromUrl(payload.video);
+
+    await Review.findByIdAndUpdate(result._id, {
+      video: `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`,
+      videoId,
+      isReady: false,
+      jobId: job.Job?.Id,
+      rawVideoKey: rawKey,
+    });
+  }
 
   campaignOffer.status = CampaignOfferStatus.completed;
   await campaignOffer.save();
@@ -191,12 +193,186 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   return result;
 };
+// const createReview = async (reviewerId: string, payload: any) => {
+//   if (
+//     payload.totalCommissions ||
+//     payload.totalReferralSales ||
+//     payload.totalView
+//   ) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       'You are not allowed to add this field',
+//     );
+//   }
+//   const campaignOffer = await CampaignOffer.findOne({
+//     _id: payload.campaignOfferId,
+//     reviewer: reviewerId,
+//   })
+//     .populate<{
+//       campaign: { status: string; _id: mongoose.Schema.Types.ObjectId };
+//     }>({
+//       path: 'campaign',
+//       select: 'status',
+//     })
+//     .populate<{
+//       product: {
+//         _id: mongoose.Schema.Types.ObjectId;
+//         category: mongoose.Schema.Types.ObjectId;
+//         name: string;
+//         images: string[];
+//       };
+//     }>({ path: 'product', select: 'category name images' });
 
-async function processVideoInBackground(jobId: string, videoId: string) {
-  await waitForJobCompletion(jobId); // This waits in background
-  await createMasterPlaylist('sampli-bucket101', videoId);
-  await Review.findOneAndUpdate({ videoId: videoId }, { isReady: true });
-}
+//   if (!campaignOffer) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
+//   }
+//   // TODO: check campaign status
+//   // if (campaignOffer.deliveryStatus !== ENUM_DELIVERY_STATUS.waiting) {
+//   //   throw new AppError(
+//   //     httpStatus.BAD_REQUEST,
+//   //     'This campaign not accepted by you',
+//   //   );
+//   // }
+
+//   // if (campaignOffer.status === CampaignOfferStatus.completed) {
+//   //   throw new AppError(
+//   //     httpStatus.BAD_REQUEST,
+//   //     'This campaign offer already completed',
+//   //   );
+//   // }
+
+//   // if (campaignOffer?.shipping?.status !== 'DELIVERED') {
+//   //   throw new AppError(httpStatus.BAD_REQUEST, 'Product not delivered yet');
+//   // }
+
+//   // if (campaignOffer.status !== CampaignOfferStatus.processing) {
+//   //   throw new AppError(
+//   //     httpStatus.BAD_REQUEST,
+//   //     'This campaign offer is not in processing state',
+//   //   );
+//   // }
+
+//   // TODO: when create review---------------
+//   // if (payload.video) {
+//   //   payload.video = getCloudFrontUrl(payload.video);
+//   // }
+
+//   // if (payload.video) {
+//   //   const videoId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+//   //   // // Create MediaConvert HLS job from the presigned URL
+//   //   // await createHlsJobFromUrl({
+//   //   //   videoUrl: payload.video,
+//   //   //   videoId,
+//   //   //   roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+//   //   // });
+
+//   //   // // Save CloudFront HLS URL in DB
+//   //   // payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+
+//   //   // another approach without videoId
+//   //   const job = await createHlsJobFromUrl({
+//   //     videoUrl: payload.video,
+//   //     videoId,
+//   //     roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+//   //   });
+
+//   //   console.log('MediaConvert Job created:', job, job.Job?.Id);
+
+//   //   // TEMP: wait 15–30 sec (quick fix)
+//   //   // setTimeout(async () => {
+//   //   //   console.log('Creating master playlist for videoId:', videoId);
+//   //   //   await createMasterPlaylist('sampli-bucket101', videoId);
+//   //   // }, 80000);
+
+//   //   // Save CloudFront URL
+//   //   payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+//   // }
+
+//   if (payload.video) {
+//     const videoId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+//     const job = await createHlsJobFromUrl({
+//       videoUrl: payload.video,
+//       videoId,
+//       roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+//     });
+
+//     console.log('MediaConvert Job created:', job.Job?.Id);
+
+//     // Save review with processing status (NO waiting)
+//     payload.video = `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/master.m3u8`;
+//     payload.videoStatus = 'processing';
+//     payload.videoId = videoId;
+//     payload.jobId = job.Job?.Id;
+//     payload.isReady = false;
+
+//     // Start background process (don't await this!)
+//     processVideoInBackground(job.Job!.Id!, videoId).catch(console.error);
+//   }
+
+//   const result = await Review.create({
+//     ...payload,
+//     reviewer: reviewerId,
+//     campaign: campaignOffer.campaign._id,
+//     product: campaignOffer.product._id,
+//     category: campaignOffer.product.category,
+//     business: campaignOffer.business,
+//     amount: campaignOffer.amount,
+//   });
+
+//   campaignOffer.status = CampaignOfferStatus.completed;
+//   await campaignOffer.save();
+
+//   // add money for reviewer
+//   await Reviewer.findByIdAndUpdate(reviewerId, {
+//     $inc: { currentBalance: campaignOffer.amount },
+//   });
+
+//   if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
+//     return;
+//   } else {
+//     Notification.create({
+//       receiver: reviewerId,
+//       type: ENUM_NOTIFICATION_TYPE.REVIEW,
+//       title: 'Review Posted Successfully',
+//       message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
+//       data: {
+//         reviewId: result._id,
+//         product: {
+//           name: campaignOffer.product.name,
+//           images: campaignOffer.product.images,
+//         },
+//       },
+//     });
+//   }
+//   if (
+//     !shouldSendNotification(
+//       ENUM_NOTIFICATION_TYPE.REVIEW,
+//       campaignOffer.business.toString(),
+//     )
+//   ) {
+//     return;
+//   } else {
+//     Notification.create({
+//       receiver: campaignOffer.business.toString(),
+//       type: ENUM_NOTIFICATION_TYPE.REVIEW,
+//       title: 'New Review Posted',
+//       message: `Your review has been posted. See your product review.`,
+//       data: {
+//         reviewId: result._id,
+//       },
+//     });
+//   }
+
+//   return result;
+// };
+
+// async function processVideoInBackground(jobId: string, videoId: string) {
+//   await waitForJobCompletion(jobId); // This waits in background
+//   await createMasterPlaylist('sampli-bucket101', videoId);
+//   await Review.findOneAndUpdate({ videoId: videoId }, { isReady: true });
+// }
 
 const updateReviewerIntoDB = async (
   profileId: string,
@@ -862,6 +1038,15 @@ const getSingleProductReview = async (
   };
 };
 
+const deleteReviewWithVideo = async (reviewId: string) => {
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+
+  await Review.findByIdAndDelete(reviewId);
+};
+
 const viewReview = async (profileId: string, reviewId: string) => {
   const result = await Review.findByIdAndUpdate(reviewId, {
     $inc: { totalView: 1 },
@@ -879,6 +1064,7 @@ const ReviewService = {
   getSingleProductReview,
   updateReviewerIntoDB,
   viewReview,
+  deleteReviewWithVideo,
 };
 
 export default ReviewService;

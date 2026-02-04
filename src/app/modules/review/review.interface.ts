@@ -19,4 +19,6 @@ export interface IReview {
   totalCommissions: number;
   videoId: string;
   isReady: boolean;
+  rawVideoKey?: string;
+  jobId?: string;
 }

@@ -12,8 +12,7 @@ const createReview = catchAsync(async (req, res) => {
   if (req.files?.thumbnail) {
     req.body.thumbnail = getCloudFrontUrl(thumbnail[0].key);
   }
-  console.log('req.files', req.files);
-  console.log('req.body', req.body);
+
   if (req.files?.review_image) {
     req.body.images = req.files.review_image.map((file: any) => {
       return getCloudFrontUrl(file.key);
