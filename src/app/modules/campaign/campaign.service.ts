@@ -199,6 +199,22 @@ const updateCampaignIntoDB = async (
     }
   }
 
+  const today = new Date();
+
+  if (
+    payload.startDate &&
+    new Date(payload.startDate) <= today &&
+    payload.status == CAMPAIGN_STATUS.SCHEDULED
+  ) {
+    payload.status = CAMPAIGN_STATUS.ACTIVE;
+  } else if (
+    payload.startDate &&
+    new Date(payload.startDate) > today &&
+    payload.status == CAMPAIGN_STATUS.ACTIVE
+  ) {
+    payload.status = CAMPAIGN_STATUS.SCHEDULED;
+  }
+
   const result = await Campaign.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
