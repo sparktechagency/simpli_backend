@@ -151,6 +151,8 @@ app.use(
       'http://localhost:3000',
       'http://45.55.251.203:3001',
       'http://45.55.251.203',
+      'http://localhost:3000',
+      'http://localhost:8000',
     ],
     // origin: '*',
     credentials: true,

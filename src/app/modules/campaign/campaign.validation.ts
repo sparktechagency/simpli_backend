@@ -26,20 +26,31 @@ export const createCampaignValidationSchema = z.object({
     //     typeof arg === 'string' || arg instanceof Date
     //       ? new Date(arg)
     //       : undefined,
-    //   z.date().refine((date) => date >= new Date(), {
-    //     message: 'Start date must be in the future',
-    //   }),
+    //   z.date().refine(
+    //     (date) => {
+    //       const today = new Date();
+    //       today.setHours(0, 0, 0, 0); // normalize today's date to 00:00:00
+    //       return date >= today;
+    //     },
+    //     {
+    //       message: 'Start date cannot be in the past',
+    //     },
+    //   ),
     // ),
     startDate: z.preprocess(
-      (arg) =>
-        typeof arg === 'string' || arg instanceof Date
-          ? new Date(arg)
-          : undefined,
+      (arg) => {
+        if (typeof arg === 'string' || arg instanceof Date) {
+          const date = new Date(arg);
+          date.setHours(0, 0, 0, 0); // 🔥 normalize input
+          return date;
+        }
+        return undefined;
+      },
       z.date().refine(
         (date) => {
           const today = new Date();
-          today.setHours(0, 0, 0, 0); // normalize today's date to 00:00:00
-          return date >= today;
+          today.setHours(0, 0, 0, 0); // normalize today
+          return date >= today; // allow today + future
         },
         {
           message: 'Start date cannot be in the past',
