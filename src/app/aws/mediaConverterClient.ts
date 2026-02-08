@@ -1,7 +1,7 @@
 import { MediaConvertClient } from '@aws-sdk/client-mediaconvert';
 
 const mcClient = new MediaConvertClient({
-  region: 'us-west-2',
+  region: 'us-east-1',
   // endpoint: 'https://mediaconvert.us-west-2.amazonaws.com',
   endpoint: 'https://mediaconvert.us-east-1.amazonaws.com',
 
