@@ -129,6 +129,7 @@ const createReview = async (reviewerId: string, payload: any) => {
     const videoId = `${Date.now()}-${Math.random()
       .toString(36)
       .substring(2, 8)}`;
+    const rawFileName = payload.video.split('/').pop()?.replace('.mp4', '');
 
     const job = await createHlsJobFromUrl({
       videoUrl: payload.video,
@@ -136,6 +137,7 @@ const createReview = async (reviewerId: string, payload: any) => {
       roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
       reviewId: result._id.toString(),
       reviewerId: reviewerId.toString(),
+      rawFileName,
     });
     const rawKey = extractS3KeyFromUrl(payload.video);
 
