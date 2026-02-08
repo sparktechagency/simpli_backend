@@ -157,6 +157,7 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   // add money for reviewer
   if (!payload.video) {
+    console.log('Adding balance for reviewer without video');
     await Reviewer.findByIdAndUpdate(reviewerId, {
       $inc: { currentBalance: campaignOffer.amount },
     });
