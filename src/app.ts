@@ -180,6 +180,7 @@ app.post('/generate-presigned-url', async (req, res) => {
 
   try {
     const result = await generatePresignedUrl({ fileType, fileCategory });
+    console.log('Generated presigned URL:', result);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: 'Error generating pre-signed URL' });
