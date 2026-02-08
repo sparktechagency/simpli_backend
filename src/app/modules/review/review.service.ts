@@ -20,7 +20,6 @@ export const extractS3KeyFromUrl = (url: string): string => {
   return decodeURIComponent(parsedUrl.pathname.substring(1));
 };
 const createReview = async (reviewerId: string, payload: any) => {
-  console.log('payload=================>', payload);
   if (
     payload.totalCommissions ||
     payload.totalReferralSales ||
@@ -157,9 +156,11 @@ const createReview = async (reviewerId: string, payload: any) => {
   await campaignOffer.save();
 
   // add money for reviewer
-  await Reviewer.findByIdAndUpdate(reviewerId, {
-    $inc: { currentBalance: campaignOffer.amount },
-  });
+  if (!payload.video) {
+    await Reviewer.findByIdAndUpdate(reviewerId, {
+      $inc: { currentBalance: campaignOffer.amount },
+    });
+  }
 
   if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
     return;
@@ -168,7 +169,9 @@ const createReview = async (reviewerId: string, payload: any) => {
       receiver: reviewerId,
       type: ENUM_NOTIFICATION_TYPE.REVIEW,
       title: 'Review Posted Successfully',
-      message: `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`,
+      message: !payload.video
+        ? `Your review has been posted successfully. You have earned $${campaignOffer.amount} for this review.`
+        : `Your review has been posted successfully. Wait for processing video. After complete video processing, you will earn $${campaignOffer.amount} for this review.`,
       data: {
         reviewId: result._id,
         product: {
@@ -178,23 +181,26 @@ const createReview = async (reviewerId: string, payload: any) => {
       },
     });
   }
-  if (
-    !shouldSendNotification(
-      ENUM_NOTIFICATION_TYPE.REVIEW,
-      campaignOffer.business.toString(),
-    )
-  ) {
-    return;
-  } else {
-    Notification.create({
-      receiver: campaignOffer.business.toString(),
-      type: ENUM_NOTIFICATION_TYPE.REVIEW,
-      title: 'New Review Posted',
-      message: `Your review has been posted. See your product review.`,
-      data: {
-        reviewId: result._id,
-      },
-    });
+
+  if (!payload.video) {
+    if (
+      !shouldSendNotification(
+        ENUM_NOTIFICATION_TYPE.REVIEW,
+        campaignOffer.business.toString(),
+      )
+    ) {
+      return;
+    } else {
+      Notification.create({
+        receiver: campaignOffer.business.toString(),
+        type: ENUM_NOTIFICATION_TYPE.REVIEW,
+        title: 'New Review Posted',
+        message: `Your review has been posted. See your product review.`,
+        data: {
+          reviewId: result._id,
+        },
+      });
+    }
   }
 
   return result;
