@@ -20,6 +20,7 @@ export const extractS3KeyFromUrl = (url: string): string => {
   return decodeURIComponent(parsedUrl.pathname.substring(1));
 };
 const createReview = async (reviewerId: string, payload: any) => {
+  console.log('payload=================>', payload);
   if (
     payload.totalCommissions ||
     payload.totalReferralSales ||
