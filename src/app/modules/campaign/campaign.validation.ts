@@ -51,7 +51,7 @@ export const createCampaignValidationSchema = z.object({
           const today = new Date();
           today.setHours(0, 0, 0, 0); // normalize today
           today.setDate(today.getDate() - 1); // 🔥 subtract 1 day
-          return date > today;
+          return date >= today;
         },
         {
           message: 'Start date cannot be in the past',
