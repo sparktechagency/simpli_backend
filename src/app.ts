@@ -232,7 +232,7 @@ import {
   MediaConvertClient,
 } from '@aws-sdk/client-mediaconvert';
 
-const client = new MediaConvertClient({ region: 'us-west-2' });
+const client = new MediaConvertClient({ region: 'us-east-1' });
 
 async function getEndpoint() {
   const command = new DescribeEndpointsCommand({});
