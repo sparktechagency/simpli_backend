@@ -129,7 +129,10 @@ const createReview = async (reviewerId: string, payload: any) => {
     const videoId = `${Date.now()}-${Math.random()
       .toString(36)
       .substring(2, 8)}`;
-    const rawFileName = payload.video.split('/').pop()?.replace('.mp4', '');
+    const rawFileName = payload.video
+      .split('/')
+      .pop()!
+      .replace(/\.[^/.]+$/, '');
 
     const job = await createHlsJobFromUrl({
       videoUrl: payload.video,
