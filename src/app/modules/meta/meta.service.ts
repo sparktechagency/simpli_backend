@@ -133,10 +133,12 @@ const getReviewerMetaData = async (
   const currentTotalReview = await Review.countDocuments({
     reviewer: reviewerId,
     ...currentDateFilter,
+    isReady: true,
   });
   const previousTotalReview = await Review.countDocuments({
     reviewer: reviewerId,
     ...previousDateFilter,
+    isReady: true,
   });
 
   const currentTotalOrderShipment = await Order.countDocuments({
