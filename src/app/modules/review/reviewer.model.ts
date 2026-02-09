@@ -31,6 +31,7 @@ const ReviewSchema = new Schema<IReview>(
     isReady: { type: Boolean, default: true },
     hlsEntryKey: { type: String, default: '' },
     hlsPrefix: { type: String, default: '' },
+    rawVideoKey: { type: String, default: '' },
   },
   {
     timestamps: true,
