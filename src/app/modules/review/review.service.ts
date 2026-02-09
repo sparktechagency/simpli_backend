@@ -108,8 +108,6 @@ const createReview = async (reviewerId: string, payload: any) => {
     });
     const rawKey = extractS3KeyFromUrl(payload.video);
 
-    console.log('Created MediaConvert job: raw key', rawKey);
-
     await Review.findByIdAndUpdate(result._id, {
       video: `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/${rawFileName}.m3u8`,
       videoId,
@@ -126,7 +124,6 @@ const createReview = async (reviewerId: string, payload: any) => {
 
   // add money for reviewer
   if (!payload.video) {
-    console.log('Adding balance for reviewer without video');
     await Reviewer.findByIdAndUpdate(reviewerId, {
       $inc: { currentBalance: campaignOffer.amount },
     });
@@ -849,8 +846,6 @@ const deleteReview = async (reviewId: string) => {
   if (!review) {
     throw new AppError(404, 'Review not found');
   }
-
-  console.log('Deleting review and related video assets...', review);
 
   if (review.video) {
     // 🔥 delete all related video assets
