@@ -3,6 +3,7 @@
 
 import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
+import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 import { deleteS3VideoWithHls } from '../../aws/deleteS3VideWihtHls';
 import { createHlsJobFromUrl } from '../../aws/mediaConverter';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -851,12 +852,23 @@ const deleteReview = async (reviewId: string) => {
 
   console.log('Deleting review and related video assets...', review);
 
-  // 🔥 delete all related video assets
-  await deleteS3VideoWithHls({
-    rawKey: review.rawVideoKey,
-    hlsPrefix: review.hlsPrefix,
-  });
+  if (review.video) {
+    // 🔥 delete all related video assets
+    await deleteS3VideoWithHls({
+      rawKey: review.rawVideoKey,
+      hlsPrefix: review.hlsPrefix,
+    });
 
+    if (review.thumbnail) {
+      deleteFileFromS3(review.thumbnail);
+    }
+  } else {
+    if (review.images && review.images.length > 0) {
+      for (const imgUrl of review.images) {
+        deleteFileFromS3(imgUrl);
+      }
+    }
+  }
   await Review.findByIdAndDelete(reviewId);
 
   return review;

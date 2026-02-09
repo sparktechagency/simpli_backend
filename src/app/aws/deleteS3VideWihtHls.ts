@@ -10,7 +10,7 @@ const s3 = new S3Client({
 });
 
 // SINGLE SOURCE OF TRUTH
-const BUCKET = process.env.AWS_S3_BUCKET!;
+const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
 
 type DeleteS3VideoParams = {
   rawKey?: string; // raw video file key
