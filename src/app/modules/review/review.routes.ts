@@ -51,5 +51,9 @@ router.get(
   ReviewController.getSingleProductReview,
 );
 router.post('/view/:id', auth(USER_ROLE.reviewer), ReviewController.viewReview);
-
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLE.reviewer),
+  ReviewController.deleteVideo,
+);
 export const reviewRoutes = router;

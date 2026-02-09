@@ -29,6 +29,8 @@ const ReviewSchema = new Schema<IReview>(
     },
     videoId: { type: String, default: '' },
     isReady: { type: Boolean, default: true },
+    hlsEntryKey: { type: String, default: '' },
+    hlsPrefix: { type: String, default: '' },
   },
   {
     timestamps: true,

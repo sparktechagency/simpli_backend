@@ -21,4 +21,6 @@ export interface IReview {
   isReady: boolean;
   rawVideoKey?: string;
   jobId?: string;
+  hlsEntryKey?: string;
+  hlsPrefix?: string;
 }

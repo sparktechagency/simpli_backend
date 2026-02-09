@@ -127,6 +127,15 @@ const viewReview = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deleteVideo = catchAsync(async (req, res) => {
+  const result = await ReviewService.deleteReview(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review deleted successfully',
+    data: result,
+  });
+});
 
 const ReviewController = {
   createReview,
@@ -137,6 +146,7 @@ const ReviewController = {
   getSingleProductReview,
   updateReview,
   viewReview,
+  deleteVideo,
 };
 
 export default ReviewController;
