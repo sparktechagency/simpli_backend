@@ -309,7 +309,10 @@ const getBussinessMetaData = async (
 const reviewerEarningMetaData = async (reviewerId: string) => {
   const result = await Review.aggregate([
     {
-      $match: { reviewer: new mongoose.Types.ObjectId(reviewerId) },
+      $match: {
+        reviewer: new mongoose.Types.ObjectId(reviewerId),
+        isReady: true,
+      },
     },
     {
       $group: {
