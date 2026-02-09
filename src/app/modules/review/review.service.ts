@@ -161,6 +161,8 @@ const createReview = async (reviewerId: string, payload: any) => {
     await Reviewer.findByIdAndUpdate(reviewerId, {
       $inc: { currentBalance: campaignOffer.amount },
     });
+  } else {
+    console.log('Video review created, balance will be added after processing');
   }
 
   if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
