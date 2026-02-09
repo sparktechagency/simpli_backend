@@ -24,7 +24,7 @@ router.post(
 
 router.get(
   '/get-all-review',
-  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner),
+  auth(USER_ROLE.reviewer, USER_ROLE.bussinessOwner, USER_ROLE.superAdmin),
   ReviewController.getAllReview,
 );
 
