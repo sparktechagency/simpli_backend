@@ -56,4 +56,18 @@ router.delete(
   auth(USER_ROLE.reviewer, USER_ROLE.superAdmin),
   ReviewController.deleteVideo,
 );
+
+router.post(
+  '/update-review',
+  auth(USER_ROLE.reviewer),
+  uploadFile(),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+    }
+    next();
+  },
+  ReviewController.updateReview,
+);
+
 export const reviewRoutes = router;
