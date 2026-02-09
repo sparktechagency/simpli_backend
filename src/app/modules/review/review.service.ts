@@ -420,6 +420,7 @@ const getAllReviewFromDB = async (
               isLike: 1,
               isMyReview: 1,
               likers: 1,
+              rawVideoKey: 1,
             },
           },
         ],
@@ -845,6 +846,8 @@ const deleteReview = async (reviewId: string) => {
   if (!review) {
     throw new AppError(404, 'Review not found');
   }
+
+  console.log('Deleting review and related video assets...', review);
 
   // 🔥 delete all related video assets
   await deleteS3VideoWithHls({
