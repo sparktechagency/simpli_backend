@@ -107,6 +107,8 @@ const createReview = async (reviewerId: string, payload: any) => {
     });
     const rawKey = extractS3KeyFromUrl(payload.video);
 
+    console.log('Created MediaConvert job: raw key', rawKey);
+
     await Review.findByIdAndUpdate(result._id, {
       video: `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/${rawFileName}.m3u8`,
       videoId,

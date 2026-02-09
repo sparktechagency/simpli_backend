@@ -18,7 +18,7 @@ const mediaConvert = new MediaConvertClient({
 });
 
 export const deleteReviewVideoAssets = async (review: any) => {
-  const BUCKET = process.env.AWS_S3_BUCKET!;
+  const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
 
   /* ---------------------------------- */
   /* 1️⃣ Cancel MediaConvert Job (if active) */
