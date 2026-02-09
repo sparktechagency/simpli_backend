@@ -1,7 +1,10 @@
 import { model, Schema } from 'mongoose';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import { shippingAddressSchema } from '../shippingAddress/shippingAddress.model';
-import { CampaignOfferStatus } from './campaignOffer.constant';
+import {
+  CAMPAIGN_OFFER_SHIPPING_STATUS,
+  CampaignOfferStatus,
+} from './campaignOffer.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 
 const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
@@ -37,7 +40,11 @@ const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
       amount: { type: Number, required: false, default: 0 },
       currency: { type: String, required: false },
       shipmentId: { type: String, required: false },
-      status: { type: String, default: 'PENDING' }, // PENDING until shipped
+      status: {
+        type: String,
+        enum: Object.values(CAMPAIGN_OFFER_SHIPPING_STATUS),
+        default: CAMPAIGN_OFFER_SHIPPING_STATUS.pending,
+      }, // PENDING until shipped
       trackingNumber: { type: String, default: null },
       labelUrl: { type: String, default: '' },
       trackingUrl: { type: String, default: '' },

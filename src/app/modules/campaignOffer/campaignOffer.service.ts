@@ -3,6 +3,7 @@ import paypal from '@paypal/checkout-server-sdk';
 import axios, { AxiosError } from 'axios';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import cron from 'node-cron';
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
 import AppError from '../../error/appError';
@@ -21,6 +22,7 @@ import Notification from '../notification/notification.model';
 import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
+import { CAMPAIGN_OFFER_DELETE_AFTER_DAYS } from './campaignOffer.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 import { CampaignOffer } from './campaignOffer.model';
 
@@ -366,6 +368,27 @@ const trackingOfferShipment = async (
   }
 };
 
+// Crone job ================================================
+
+cron.schedule('0 */12 * * *', async () => {
+  try {
+    console.log('Running cleanup for old delivered campaign offers...');
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - CAMPAIGN_OFFER_DELETE_AFTER_DAYS);
+
+    const result = await CampaignOffer.deleteMany({
+      'shipping.status': 'DELIVERED',
+      updatedAt: { $lte: cutoffDate },
+    });
+
+    console.log(
+      `Deleted ${result.deletedCount} old delivered campaign offers.`,
+    );
+  } catch (error) {
+    console.error('Error deleting old campaign offers:', error);
+  }
+});
 const CampaignOfferService = {
   acceptCampaignOffer,
   getMyCampaignOfferFromDB,
