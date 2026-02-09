@@ -8,6 +8,7 @@ import config from '../../config';
 import AppError from '../../error/appError';
 import { shouldSendNotification } from '../../helper/shouldSendNotification';
 import {
+  CAMPAIGN_STATUS,
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
 } from '../../utilities/enum';
@@ -38,14 +39,38 @@ const acceptCampaignOffer = async (
     ),
   ]);
 
-  if (!campaign) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
-  }
-
   if (campaignOffer) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'You already accepted this offer',
+    );
+  }
+
+  const totalCampaignOffer = await CampaignOffer.countDocuments({
+    campaign: payload.campaign,
+  });
+
+  if (!campaign) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
+  }
+
+  if (campaign.status != CAMPAIGN_STATUS.ACTIVE) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not accept offer for inactive campaign',
+    );
+  }
+  if (campaign.status == CAMPAIGN_STATUS.EXPIRED) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not accept offer for expired campaign',
+    );
+  }
+
+  if (totalCampaignOffer >= campaign.numberOfReviewers) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not accept offer for this campaign because required number of reviewers already accepted offer for this campaign',
     );
   }
 
