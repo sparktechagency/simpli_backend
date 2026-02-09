@@ -53,7 +53,7 @@ router.get(
 router.post('/view/:id', auth(USER_ROLE.reviewer), ReviewController.viewReview);
 router.delete(
   '/delete/:id',
-  auth(USER_ROLE.reviewer),
+  auth(USER_ROLE.reviewer, USER_ROLE.superAdmin),
   ReviewController.deleteVideo,
 );
 export const reviewRoutes = router;
