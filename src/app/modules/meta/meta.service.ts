@@ -164,6 +164,7 @@ const getReviewerMetaData = async (
       $match: {
         reviewer: new mongoose.Types.ObjectId(reviewerId),
         ...currentDateFilter,
+        isReady: true,
       },
     },
     { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -174,6 +175,7 @@ const getReviewerMetaData = async (
       $match: {
         reviewer: new mongoose.Types.ObjectId(reviewerId),
         ...previousDateFilter,
+        isReady: true,
       },
     },
     { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -242,35 +244,6 @@ const getReviewerMetaData = async (
     },
   };
 };
-
-// const getBussinessMetaData = async (
-//   bussinessId: string,
-//   query: Record<string, unknown>,
-// ) => {
-//   const bussiness = await Bussiness.findById(bussinessId).select(
-//     'name currentBalance',
-//   );
-//   const totalOrder = await Order.countDocuments({
-//     bussiness: bussinessId,
-//     paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-//   });
-
-//   // Checkout rate calculation (pseudo-aggregation)
-//   const cartsUsers = await Cart.distinct('reviewer', {
-//     items: { $exists: true, $ne: [] },
-//   });
-
-//   const ordersUsers = await Order.distinct('reviewer');
-
-//   const checkoutRate =
-//     cartsUsers.length > 0 ? (ordersUsers.length / cartsUsers.length) * 100 : 0;
-
-//   return {
-//     currentBalance: bussiness?.currentBalance || 0,
-//     totalOrder,
-//     checkoutRate: Number(checkoutRate.toFixed(2)) || 0,
-//   };
-// };
 
 const getBussinessMetaData = async (
   bussinessId: string,
