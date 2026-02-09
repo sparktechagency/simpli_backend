@@ -54,31 +54,17 @@ const createReview = async (reviewerId: string, payload: any) => {
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'This campaign offer not found');
   }
-  // TODO: check campaign status
-  // if (campaignOffer.deliveryStatus !== ENUM_DELIVERY_STATUS.waiting) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'This campaign not accepted by you',
-  //   );
-  // }
 
-  // if (campaignOffer.status === CampaignOfferStatus.completed) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'This campaign offer already completed',
-  //   );
-  // }
+  if (campaignOffer.status === CampaignOfferStatus.completed) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This campaign offer already completed',
+    );
+  }
 
-  // if (campaignOffer?.shipping?.status !== 'DELIVERED') {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'Product not delivered yet');
-  // }
-
-  // if (campaignOffer.status !== CampaignOfferStatus.processing) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'This campaign offer is not in processing state',
-  //   );
-  // }
+  if (campaignOffer?.shipping?.status !== 'DELIVERED') {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Product not delivered yet');
+  }
 
   const result = await Review.create({
     ...payload,
@@ -89,6 +75,7 @@ const createReview = async (reviewerId: string, payload: any) => {
     business: campaignOffer.business,
     amount: campaignOffer.amount,
   });
+
   if (payload.video) {
     const videoId = `${Date.now()}-${Math.random()
       .toString(36)
