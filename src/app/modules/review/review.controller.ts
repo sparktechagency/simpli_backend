@@ -34,6 +34,12 @@ const updateReview = catchAsync(async (req, res) => {
     req.body.thumbnail = getCloudFrontUrl(thumbnail[0].key);
   }
 
+  if (req.files?.review_image) {
+    req.body.images = req.files.review_image.map((file: any) => {
+      return getCloudFrontUrl(file.key);
+    });
+  }
+
   const result = await ReviewService.updateReviewerIntoDB(
     req.user.profileId,
     req.params.id,

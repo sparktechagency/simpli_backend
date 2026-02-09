@@ -11,104 +11,6 @@ import { Store } from '../store/store.model';
 import { IProduct } from './product.interface';
 import Product from './product.model';
 
-// create product into db
-// const createProductIntoDB = async (
-//   profileId: string,
-//   payload: IProduct,
-//   files: any,
-// ) => {
-//   const category = await Category.findById(payload.category);
-//   if (!category) {
-//     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
-//   }
-
-//   let productImages: string[] = [];
-//   if (Array.isArray(files)) {
-//     productImages = files
-//       .filter((file: any) => file.fieldname === 'product_image')
-//       .map((file: any) => file.path);
-//   }
-//   // variant images
-//   const variantImagesMap: { [key: string]: string[] } = {};
-//   if (Array.isArray(files)) {
-//     files.forEach((file: any) => {
-//       if (file.fieldname.startsWith('variant_image_')) {
-//         const sku = file.fieldname.replace('variant_image_', '');
-//         if (!variantImagesMap[sku]) {
-//           variantImagesMap[sku] = [];
-//         }
-//         variantImagesMap[sku].push(file.path);
-//       }
-//     });
-//   }
-//   const result = await Product.create({
-//     ...payload,
-//     bussiness: profileId,
-//     images: productImages,
-//   });
-
-//   const updatedVariants = payload.variants.map((variant) => ({
-//     ...variant,
-//     images: variantImagesMap[variant.sku] || [],
-//     product: result._id,
-//     bussiness: profileId,
-//   }));
-
-//   await Variant.insertMany(updatedVariants);
-
-//   return result;
-// };
-
-// save as drafh -----------------
-
-// const saveProductAsDraftIntoDB = async (
-//   profileId: string,
-//   payload: IProduct,
-//   files: any,
-// ) => {
-//   const category = await Category.findById(payload.category);
-//   if (!category) {
-//     throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
-//   }
-
-//   let productImages: string[] = [];
-//   if (Array.isArray(files)) {
-//     productImages = files
-//       .filter((file: any) => file.fieldname === 'product_image')
-//       .map((file: any) => file.path);
-//   }
-//   // variant images
-//   const variantImagesMap: { [key: string]: string[] } = {};
-//   if (Array.isArray(files)) {
-//     files.forEach((file: any) => {
-//       if (file.fieldname.startsWith('variant_image_')) {
-//         const sku = file.fieldname.replace('variant_image_', '');
-//         if (!variantImagesMap[sku]) {
-//           variantImagesMap[sku] = [];
-//         }
-//         variantImagesMap[sku].push(file.path);
-//       }
-//     });
-//   }
-//   const result = await Product.create({
-//     ...payload,
-//     bussiness: profileId,
-//     images: productImages,
-//     status: ENUM_PRODUCT_STATUS.DRAFT,
-//   });
-
-//   const updatedVariants = payload.variants.map((variant) => ({
-//     ...variant,
-//     images: variantImagesMap[variant.sku] || [],
-//     product: result._id,
-//     bussiness: profileId,
-//   }));
-
-//   await Variant.insertMany(updatedVariants);
-
-//   return result;
-// };
-
 const createProduct = async (bussinessId: string, payload: IProduct) => {
   const store = await Store.findOne({ bussiness: bussinessId });
   if (!store) {
@@ -255,28 +157,12 @@ const getAllProduct = async (
   };
 };
 
-// const getSingleProductFromDB = async (id: string) => {
-//   const result = await Product.findById(id)
-//     .populate({
-//       path: 'bussiness',
-//       select: 'bussinessName coverImage logo phoneNumber',
-//     })
-//     .populate({ path: 'category' });
-//   if (!result) {
-//     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-//   }
-
-//   return result;
-// };
-
 const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
-  // validate product id
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product id');
   }
   const objectId = new mongoose.Types.ObjectId(id);
 
-  // validate reviewer id (optional)
   let reviewerObjectId: mongoose.Types.ObjectId | null = null;
   if (reviewerId && mongoose.Types.ObjectId.isValid(reviewerId)) {
     reviewerObjectId = new mongoose.Types.ObjectId(reviewerId);
@@ -285,10 +171,9 @@ const getSingleProductFromDB = async (id: string, reviewerId?: string) => {
   const pipeline: any[] = [
     { $match: { _id: objectId, isDeleted: false } },
 
-    // Lookup business (selected fields)
     {
       $lookup: {
-        from: 'bussinesses', // ensure this matches your collection name
+        from: 'bussinesses',
         let: { bussinessId: '$bussiness' },
         pipeline: [
           { $match: { $expr: { $eq: ['$_id', '$$bussinessId'] } } },

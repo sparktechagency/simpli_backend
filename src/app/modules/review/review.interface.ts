@@ -23,4 +23,6 @@ export interface IReview {
   jobId?: string;
   hlsEntryKey?: string;
   hlsPrefix?: string;
+  newImages?: string;
+  deletedImages?: string;
 }

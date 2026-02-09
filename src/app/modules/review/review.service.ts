@@ -163,36 +163,114 @@ const createReview = async (reviewerId: string, payload: any) => {
 };
 
 const updateReviewerIntoDB = async (
-  profileId: string,
-  id: string,
+  reviewerId: string,
+  reviewId: string,
   payload: Partial<IReview>,
 ) => {
-  if (
-    payload.totalCommissions ||
-    payload.totalReferralSales ||
-    payload.totalView ||
-    payload.amount ||
-    payload.campaign ||
-    payload.category ||
-    payload.product
-  ) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You are not allowed to update this field',
-    );
+  // 1️⃣ Prevent forbidden fields
+  const forbiddenFields = [
+    'totalCommissions',
+    'totalReferralSales',
+    'totalView',
+    'amount',
+    'campaign',
+    'category',
+    'product',
+  ];
+
+  for (const field of forbiddenFields) {
+    if (Object.prototype.hasOwnProperty.call(payload, field)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `You are not allowed to update the field: ${field}`,
+      );
+    }
   }
-  const review = await Reviewer.findOne({ _id: id, reviewer: profileId });
+
+  const review: any = await Review.findOne({
+    _id: reviewId,
+    reviewer: reviewerId,
+  }).populate('product', 'name images');
   if (!review) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      'Reviewer not found or you are not authorized to update this reviewer',
+      'Review not found or you are not authorized to update this review',
     );
   }
-  const result = await Reviewer.findByIdAndUpdate(id, payload, {
+
+  if (payload.newImages) {
+    payload.images = [...payload.newImages, ...review.images];
+  } else {
+    payload.images = [...review.images];
+  }
+  if (payload?.deletedImages) {
+    payload.images = payload.images.filter(
+      (url) => !payload?.deletedImages?.includes(url),
+    );
+  }
+
+  const updatedReview = await Review.findByIdAndUpdate(reviewId, payload, {
     new: true,
     runValidators: true,
   });
-  return result;
+
+  if (payload.video) {
+    const videoId = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}`;
+    const rawFileName = payload.video
+      .split('/')
+      .pop()!
+      .replace(/\.[^/.]+$/, '');
+    const rawKey = extractS3KeyFromUrl(payload.video);
+
+    const job = await createHlsJobFromUrl({
+      videoUrl: payload.video,
+      videoId,
+      roleArn: process.env.AWS_MEDIACONVERT_ROLE_ARN!,
+      reviewId: updatedReview!._id.toString(),
+      reviewerId: reviewerId.toString(),
+      rawFileName,
+    });
+
+    await Review.findByIdAndUpdate(updatedReview!._id, {
+      video: `${process.env.CLOUDFRONT_URL}/uploads/videos/review_videos/hls/${videoId}/${rawFileName}.m3u8`,
+      videoId,
+      isReady: false,
+      jobId: job.Job?.Id,
+      rawVideoKey: rawKey,
+      hlsPrefix: `uploads/videos/review_videos/hls/${videoId}/`,
+      hlsEntryKey: `${rawFileName}.m3u8`,
+    });
+  }
+
+  if (!shouldSendNotification(ENUM_NOTIFICATION_TYPE.REVIEW, reviewerId)) {
+    return;
+  } else {
+    Notification.create({
+      receiver: reviewerId,
+      type: ENUM_NOTIFICATION_TYPE.REVIEW,
+      title: 'Review Updated Successfully',
+      message: !payload.video
+        ? `Your review has been updated successfully`
+        : `Your review has been updated successfully. Wait for processing video.`,
+      data: {
+        reviewId: review!._id,
+        product: {
+          name: review!.product.name,
+          images: review!.product.images,
+        },
+      },
+    });
+  }
+
+  if (payload.deletedImages) {
+    for (const imageUrl of payload.deletedImages) {
+      deleteFileFromS3(imageUrl);
+    }
+  }
+
+  return updatedReview;
 };
 
 const getAllReviewFromDB = async (
