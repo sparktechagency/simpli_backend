@@ -854,7 +854,7 @@ const deleteReview = async (reviewId: string) => {
 
   await Review.findByIdAndDelete(reviewId);
 
-  return { success: true };
+  return review;
 };
 
 const viewReview = async (profileId: string, reviewId: string) => {
