@@ -58,4 +58,5 @@ router.get(
   auth(USER_ROLE.bussinessOwner),
   CampaignController.getCampaignStats,
 );
+
 export const campaignRoutes = router;

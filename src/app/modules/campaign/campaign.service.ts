@@ -725,7 +725,6 @@ const cancelCampaign = async (
   if (!campaign) {
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
   }
-  //TODO: need to do database operation with review
   const totalCampaignOffer = await Reviewer.countDocuments({
     campaign: id,
     $or: [
@@ -761,8 +760,6 @@ const cancelCampaign = async (
         { new: true, runValidators: true },
       );
       return result;
-
-      return refund;
     } catch (error) {
       console.error('Stripe refund error:', error);
       throw new AppError(
@@ -1209,62 +1206,6 @@ export const getCampaignPerformance = async (
   );
 };
 
-// const getCampaignStats = async (businessId: string) => {
-//   if (!mongoose.Types.ObjectId.isValid(businessId)) {
-//     throw Object.assign(new Error('Invalid business id'), { statusCode: 400 });
-//   }
-
-//   const campaignAggregation = await Campaign.aggregate([
-//     {
-//       $match: {
-//         bussiness: new mongoose.Types.ObjectId(businessId),
-//         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
-//       },
-//     },
-//     {
-//       $facet: {
-//         totalCampaigns: [{ $count: 'total' }],
-//         totalSpent: [
-//           { $group: { _id: null, totalSpent: { $sum: '$totalBugget' } } },
-//         ],
-//         activeCampaigns: [
-//           { $match: { status: CAMPAIGN_STATUS.ACTIVE } },
-//           { $count: 'activeCampaigns' },
-//         ],
-//       },
-//     },
-//   ]);
-
-//   const { totalCampaigns, totalSpent, activeCampaigns } =
-//     campaignAggregation[0];
-
-//   // Total Campaigns
-//   const totalCampaignsCount =
-//     totalCampaigns.length > 0 ? totalCampaigns[0].total : 0;
-
-//   // Total Spent
-//   const totalSpentAmount = totalSpent.length > 0 ? totalSpent[0].totalSpent : 0;
-
-//   // Active Campaigns
-//   const activeCampaignCount =
-//     activeCampaigns.length > 0 ? activeCampaigns[0].activeCampaigns : 0;
-
-//   // Average Rating for active campaigns
-//   const reviewsAggregation = await Review.aggregate([
-//     { $match: { campaign: { $in: activeCampaigns.map((c: any) => c._id) } } },
-//     { $group: { _id: null, averageRating: { $avg: '$rating' } } },
-//   ]);
-
-//   const averageRating =
-//     reviewsAggregation.length > 0 ? reviewsAggregation[0].averageRating : null;
-
-//   return {
-//     totalCampaigns: totalCampaignsCount,
-//     totalSpent: totalSpentAmount,
-//     activeCampaigns: activeCampaignCount,
-//     averageRating: averageRating,
-//   };
-// };
 const getCampaignStats = async (businessId: string) => {
   if (!mongoose.Types.ObjectId.isValid(businessId)) {
     throw Object.assign(new Error('Invalid business id'), { statusCode: 400 });
@@ -1351,6 +1292,7 @@ const CampaignService = {
   getCampaignSummary,
   getCampaignPerformance,
   getCampaignStats,
+  cancelCampaign,
 };
 
 export default CampaignService;

@@ -37,7 +37,7 @@ const acceptCampaignOffer = async (
       campaign: payload.campaign,
     }),
     Campaign.findById(payload.campaign).select(
-      'totalBugget bussiness numberOfReviewers',
+      'totalBugget bussiness numberOfReviewers status',
     ),
   ]);
 
