@@ -20,6 +20,7 @@ import {
 } from '../../utilities/enum';
 import paypalClient from '../../utilities/paypal';
 import stripe from '../../utilities/stripe';
+import { CampaignOfferStatus } from '../campaignOffer/campaignOffer.constant';
 import Product from '../product/product.model';
 import Review from '../review/reviewer.model';
 import Reviewer from '../reviewer/reviewer.model';
@@ -49,6 +50,7 @@ const createCampaign = async (bussinessId: string, payload: ICampaign) => {
   const reviewCost = amountForEachReview * payload.numberOfReviewers;
   const adminFee = (reviewCost * platformFeeForCampaignParcentage) / 100;
   const totalAmount = reviewCost + adminFee;
+  console.log('totalAmount', totalAmount);
   const amountInCents = (totalAmount * 100).toFixed(2);
 
   if (!product) {
@@ -724,9 +726,17 @@ const cancelCampaign = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign not found');
   }
   //TODO: need to do database operation with review
-  const totalReviewCount = 10;
+  const totalCampaignOffer = await Reviewer.countDocuments({
+    campaign: id,
+    $or: [
+      { status: CampaignOfferStatus.accept },
+      { status: CampaignOfferStatus.completed },
+      { status: CampaignOfferStatus.processing },
+    ],
+  });
+
   const amountForEachReview = campaign.amountForEachReview;
-  const totalSpent = totalReviewCount * amountForEachReview;
+  const totalSpent = totalCampaignOffer * amountForEachReview;
   const refundAmount = campaign.totalBugget - totalSpent;
 
   if (campaign.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {
