@@ -48,6 +48,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "paypal-rest-sdk": "^1.8.1",
+    "resend": "^6.9.1",
     "shippo": "^2.15.0",
     "stripe": "^17.2.1",
     "validator": "^13.11.0",

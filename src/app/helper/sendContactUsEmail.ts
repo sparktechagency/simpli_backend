@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import sendEmail from '../utilities/sendEmail';
+import sendResendEmail from '../utilities/sendResendEmail';
 
 const contactUsValidationSchema = z.object({
   body: z.object({
@@ -18,7 +18,7 @@ const sendContactUsEmail = async (req: Request, res: Response) => {
 
     const { name, phone, email, message } = req.body;
 
-    await sendEmail({
+    await sendResendEmail({
       email: 'devsmanik@gmail.com',
       subject: 'Contact Us Info',
       html: `

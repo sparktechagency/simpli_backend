@@ -72,6 +72,10 @@ export default {
     smtp_pass: process.env.SMTP_PASS,
     name: process.env.SERVICE_NAME,
   },
+  resend: {
+    api_key: process.env.RESEND_API_KEY,
+    from: process.env.RESEND_FROM,
+  },
   shippo: {
     api_key: process.env.SHIPPO_API_KEY,
   },

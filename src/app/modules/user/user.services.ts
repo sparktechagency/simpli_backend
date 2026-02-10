@@ -8,7 +8,7 @@ import cron from 'node-cron';
 import config from '../../config';
 import AppError from '../../error/appError';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
-import sendEmail from '../../utilities/sendEmail';
+import sendResendEmail from '../../utilities/sendResendEmail';
 import Bussiness from '../bussiness/bussiness.model';
 import NormalUser from '../normalUser/normalUser.model';
 import { NotificationSetting } from '../notificationSetting/notificationSetting.model';
@@ -55,7 +55,7 @@ const registerBussinessOwner = async (email: string, password: string) => {
     );
     await NotificationSetting.create([{ user: result[0]._id }], { session });
 
-    sendEmail({
+    await sendResendEmail({
       email: email,
       subject: 'Activate Your Account',
       html: registrationSuccessEmailBody(`Hi`, user[0].verifyCode),
@@ -110,8 +110,7 @@ const registerReviewer = async (payload: any) => {
       { profileId: result[0]._id },
       { session },
     );
-    // ! TODO: need to upgrade the email template
-    sendEmail({
+    sendResendEmail({
       email: payload.email,
       subject: 'Activate Your Account',
       html: registrationSuccessEmailBody(
@@ -187,7 +186,7 @@ const resendVerifyCode = async (email: string) => {
       'Something went wrong . Please again resend the code after a few second',
     );
   }
-  sendEmail({
+  sendResendEmail({
     email: user.email,
     subject: 'Activate Your Account',
     html: registrationSuccessEmailBody('Dear', updateUser.verifyCode),

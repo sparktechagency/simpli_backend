@@ -7,7 +7,7 @@ import config from '../../config';
 import AppError from '../../error/appError';
 import changeEmailVerificationBody from '../../mailTemplate/changeEmailVerificationBody';
 import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
-import sendEmail from '../../utilities/sendEmail';
+import sendResendEmail from '../../utilities/sendResendEmail';
 import Bussiness from '../bussiness/bussiness.model';
 import NormalUser from '../normalUser/normalUser.model';
 import Reviewer from '../reviewer/reviewer.model';
@@ -267,12 +267,7 @@ const forgetPassword = async (email: string) => {
     },
   );
 
-  // sendEmail(
-  //   user.email,
-  //   'Reset password code',
-  //   resetPasswordEmailBody(user.username, resetCode),
-  // );
-  sendEmail({
+  sendResendEmail({
     email: user.email,
     subject: 'Reset password code',
     html: resetPasswordEmailBody('Dear', resetCode),
@@ -424,7 +419,7 @@ const resendResetCode = async (email: string) => {
       codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
   );
-  sendEmail({
+  sendResendEmail({
     email: user.email,
     subject: 'Reset password code',
     html: resetPasswordEmailBody('Dear', resetCode),
@@ -454,7 +449,7 @@ const resendVerifyCode = async (email: string) => {
       codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
   );
-  sendEmail({
+  sendResendEmail({
     email: user.email,
     subject: 'Reset password code',
     html: resetPasswordEmailBody('Dear', verifyCode),
@@ -480,7 +475,7 @@ const changeEmail = async (
     emailChangeCode: code,
     codeExpireIn: new Date(Date.now() + 2 * 60000),
   });
-  sendEmail({
+  sendResendEmail({
     email: payload.email,
     subject: 'Email Change Verification Code',
     html: changeEmailVerificationBody('Dear', code),
