@@ -8,6 +8,7 @@ export const CampaignOfferStatus = {
 
 export const CAMPAIGN_OFFER_SHIPPING_STATUS = {
   pending: 'PENDING',
+  queued: 'QUEUED',
   shipped: 'SHIPPED',
   delivered: 'DELIVERED',
 };
