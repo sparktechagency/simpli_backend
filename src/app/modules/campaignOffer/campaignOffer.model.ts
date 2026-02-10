@@ -42,7 +42,6 @@ const CampaignOfferSchema: Schema = new Schema<ICampaignOffer>(
       shipmentId: { type: String, required: false },
       status: {
         type: String,
-        enum: Object.values(CAMPAIGN_OFFER_SHIPPING_STATUS),
         default: CAMPAIGN_OFFER_SHIPPING_STATUS.pending,
       }, // PENDING until shipped
       trackingNumber: { type: String, default: null },

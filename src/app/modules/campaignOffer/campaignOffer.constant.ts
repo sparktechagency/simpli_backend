@@ -11,6 +11,7 @@ export const CAMPAIGN_OFFER_SHIPPING_STATUS = {
   queued: 'QUEUED',
   shipped: 'SHIPPED',
   delivered: 'DELIVERED',
+  purchased: 'PURCHASED',
 };
 
 export const CAMPAIGN_OFFER_DELETE_AFTER_DAYS = 2;

@@ -1,10 +1,7 @@
 import { Types } from 'mongoose';
 import { ENUM_DELIVERY_STATUS } from '../../utilities/enum';
 import { IShippingAddress } from '../shippingAddress/shippingAddress.interface';
-import {
-  CAMPAIGN_OFFER_SHIPPING_STATUS,
-  CampaignOfferStatus,
-} from './campaignOffer.constant';
+import { CampaignOfferStatus } from './campaignOffer.constant';
 
 export interface ICampaignOffer extends Document {
   campaign: Types.ObjectId;
@@ -27,7 +24,8 @@ export interface IShippingInfo {
   amount: number;
   currency: string;
   shipmentId: string;
-  status?: (typeof CAMPAIGN_OFFER_SHIPPING_STATUS)[keyof typeof CAMPAIGN_OFFER_SHIPPING_STATUS]; // e.g., "PENDING", "SHIPPED", "DELIVERED"
+  // status?: (typeof CAMPAIGN_OFFER_SHIPPING_STATUS)[keyof typeof CAMPAIGN_OFFER_SHIPPING_STATUS];
+  status?: string;
   trackingNumber?: string;
   labelUrl?: string;
   trackingUrl?: string;
