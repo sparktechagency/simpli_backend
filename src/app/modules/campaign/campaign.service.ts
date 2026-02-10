@@ -214,7 +214,6 @@ const updateCampaignIntoDB = async (
   ) {
     payload.status = CAMPAIGN_STATUS.SCHEDULED;
   }
-  console.log('payload', payload);
   const result = await Campaign.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,

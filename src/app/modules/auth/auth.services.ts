@@ -349,18 +349,6 @@ const resetPassword = async (payload: {
   if (user.isBlocked) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
-  // verify token -------------
-  // const decoded = jwt.verify(
-  //   token,
-  //   config.jwt_access_secret as string,
-  // ) as JwtPayload;
-  // // console.log(decoded.userId, payload.id);
-  // if (decoded?.userId !== payload?.email) {
-  //   throw new AppError(
-  //     httpStatus.FORBIDDEN,
-  //     'You are forbidden to access this',
-  //   );
-  // }
 
   //hash new password
   const newHashedPassword = await bcrypt.hash(

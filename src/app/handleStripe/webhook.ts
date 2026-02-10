@@ -10,7 +10,6 @@ import handlePaymentSuccess from './handlePaymentSuccess';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleWebhook = async (req: Request, res: Response) => {
   const endpointSecret = config.stripe.webhook_endpoint_secret as string;
-  console.log('Webhook secret================>', endpointSecret);
   const sig = req.headers['stripe-signature'];
 
   try {
@@ -20,14 +19,11 @@ const handleWebhook = async (req: Request, res: Response) => {
       endpointSecret,
     );
 
-    console.log('Webhook hit ===========>', event.type);
-
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
 
-        console.log(session.metadata);
         const paymentIntentId = session.payment_intent;
 
         const paymentIntent = await stripe.paymentIntents.retrieve(
@@ -44,7 +40,6 @@ const handleWebhook = async (req: Request, res: Response) => {
       }
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
-        console.log('account-============<', account);
         if (account.details_submitted) {
           try {
             await StripeService.updateStripeConnectedAccountStatus(account.id);
@@ -60,10 +55,6 @@ const handleWebhook = async (req: Request, res: Response) => {
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const { userId, subscriptionId } = paymentIntent.metadata;
-
-        console.log(
-          `Payment failed for user ${userId}, subscription ${subscriptionId}`,
-        );
 
         break;
       }

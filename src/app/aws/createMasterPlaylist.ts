@@ -45,29 +45,18 @@ const s3 = new S3Client({
 });
 
 export async function createMasterPlaylist(bucket: string, videoId: string) {
-  // First, list what files MediaConvert actually created
   const listCommand = new ListObjectsV2Command({
     Bucket: bucket,
     Prefix: `uploads/videos/review_videos/hls/${videoId}/`,
   });
 
   const listResponse = await s3.send(listCommand);
-  console.log(
-    'Files in HLS folder:',
-    listResponse.Contents?.map((obj) => obj.Key),
-  );
 
   // Find the .m3u8 files (not .ts files)
   const m3u8Files =
     listResponse.Contents?.filter((obj) => obj.Key?.endsWith('.m3u8')).map(
       (obj) => obj.Key?.split('/').pop(),
     ) || [];
-
-  console.log('M3U8 files found:', m3u8Files);
-
-  // MediaConvert typically creates files like: index_360p.m3u8 and index_720p.m3u8
-  // OR it might be: ${videoId}_360p.m3u8 and ${videoId}_720p.m3u8
-  // Let's dynamically find them
 
   const file360p = m3u8Files.find((f) => f?.includes('360p'));
   const file720p = m3u8Files.find((f) => f?.includes('720p'));
@@ -89,8 +78,6 @@ ${file360p}
 ${file720p}
 `;
 
-  console.log('Creating master playlist with content:', masterPlaylist);
-
   await s3.send(
     new PutObjectCommand({
       Bucket: bucket,
@@ -99,6 +86,4 @@ ${file720p}
       ContentType: 'application/vnd.apple.mpegurl',
     }),
   );
-
-  console.log('Master playlist created successfully!');
 }

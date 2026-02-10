@@ -48,7 +48,6 @@ const createComment = async (user: JwtPayload, payload: Partial<IComment>) => {
 };
 
 const createReply = async (user: JwtPayload, payload: IComment) => {
-  console.log('Creating reply with payload:');
   const comment = await Comment.findById(payload.parent);
   if (!comment) {
     throw new AppError(404, 'Parent comment not found');

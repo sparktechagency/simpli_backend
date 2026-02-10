@@ -1,26 +1,3 @@
-// /* eslint-disable no-constant-condition */
-// import { GetJobCommand } from '@aws-sdk/client-mediaconvert';
-// import mcClient from './mediaConverterClient';
-
-// export async function waitForMediaConvertJob(jobId: string) {
-//   while (true) {
-//     const { Job } = await mcClient.send(new GetJobCommand({ Id: jobId }));
-
-//     if (!Job) throw new Error('MediaConvert job not found');
-
-//     if (Job.Status === 'COMPLETE') {
-//       return true;
-//     }
-
-//     if (Job.Status === 'ERROR') {
-//       throw new Error('MediaConvert job failed');
-//     }
-
-//     // wait 5 seconds before next check
-//     await new Promise((res) => setTimeout(res, 5000));
-//   }
-// }
-
 import { GetJobCommand } from '@aws-sdk/client-mediaconvert';
 import mcClient from './mediaConverterClient';
 

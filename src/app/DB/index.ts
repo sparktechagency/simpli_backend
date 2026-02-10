@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import config from '../config';
+import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 import { USER_ROLE } from '../modules/user/user.constant';
 import { User } from '../modules/user/user.model';
-import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 
 const superAdminData = {
   username: 'mradmin',
@@ -17,7 +17,6 @@ const seedSuperAdmin = async () => {
     console.log('Admin already exits');
     return;
   }
-  console.log('what is this');
   const session = await mongoose.startSession();
   session.startTransaction();
 

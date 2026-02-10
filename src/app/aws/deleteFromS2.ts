@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  S3Client,
-  HeadObjectCommand,
   DeleteObjectCommand,
+  HeadObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -22,7 +22,6 @@ export const deleteFileFromS3 = async (fileName: string) => {
   const bucket = process.env.AWS_S3_BUCKET_NAME!;
 
   try {
-    // 1. Check if the file exists in S3
     const headCommand = new HeadObjectCommand({
       Bucket: bucket,
       Key: decodedFileName,

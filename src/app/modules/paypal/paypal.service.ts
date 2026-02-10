@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
-import getPayPalAccessToken from '../../handlePaypal/getAccessToken';
+import httpStatus from 'http-status';
 import config from '../../config';
 import AppError from '../../error/appError';
-import httpStatus from 'http-status';
+import getPayPalAccessToken from '../../handlePaypal/getAccessToken';
 import { User } from '../user/user.model';
 
 const createOnboardingLinkForPartnerAccount = async (userId: string) => {
@@ -51,8 +51,6 @@ const createOnboardingLinkForPartnerAccount = async (userId: string) => {
         },
       },
     );
-
-    // console.log('PayPal Response:', response.data);
 
     const onboardingLink = response.data.links.find(
       (link: any) => link.rel === 'action_url',

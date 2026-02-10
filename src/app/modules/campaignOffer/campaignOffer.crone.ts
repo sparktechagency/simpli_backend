@@ -4,7 +4,6 @@ import Campaign from '../campaign/campaign.model';
 import { CampaignOfferStatus } from './campaignOffer.constant';
 import { CampaignOffer } from './campaignOffer.model';
 cron.schedule('0 0 * * *', async () => {
-  console.log('Running cron job to expire campaigns and offers...');
   const now = new Date();
 
   try {

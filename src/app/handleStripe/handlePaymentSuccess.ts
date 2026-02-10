@@ -22,7 +22,6 @@ const handlePaymentSuccess = async (
   transactionId: string,
   amount: number,
 ) => {
-  console.log(transactionId, amount);
   if (metaData.paymentPurpose == ENUM_PAYMENT_PURPOSE.CAMPAIGN_RUN) {
     await handleCampaignRunPaymentSuccess(
       metaData.campaignId,
