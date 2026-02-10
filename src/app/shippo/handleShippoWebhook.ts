@@ -14,6 +14,7 @@ export const handleShippoWebhook = async (req: Request, res: Response) => {
     // -------------------------------------
     // TRANSACTION CREATED
     // -------------------------------------
+    console.log('Shippo webhook:', event);
     if (
       event.event === 'transaction_created' &&
       event.data.status === 'SUCCESS'
