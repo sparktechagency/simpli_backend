@@ -116,10 +116,7 @@ const changeProductStatus = catchAsync(async (req, res) => {
 });
 
 const getAllProduct = catchAsync(async (req, res) => {
-  const result = await ProductService.getAllProduct(
-    req.query,
-    req.user.profileId,
-  );
+  const result = await ProductService.getAllProduct(req.query, req.user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
