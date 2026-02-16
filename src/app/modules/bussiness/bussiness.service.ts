@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
+import { deleteFileFromS3 } from '../../aws/deleteFromS2';
 import AppError from '../../error/appError';
-import unlinkFile from '../../helper/unLinkFile';
 import { IBussiness } from './bussiness.interface';
 import Bussiness from './bussiness.model';
 
@@ -56,25 +56,24 @@ const updateBussinessInfoIntoDB = async (
     runValidators: true,
   });
 
-  //!TODO : if you use external could for files you need to change here
   if (payload.bussinessLicense) {
     if (bussiness.bussinessLicense) {
-      unlinkFile(bussiness?.bussinessLicense);
+      deleteFileFromS3(bussiness?.bussinessLicense);
     }
   }
   if (payload.incorparationCertificate) {
     if (bussiness.incorparationCertificate) {
-      unlinkFile(bussiness.incorparationCertificate);
+      deleteFileFromS3(bussiness.incorparationCertificate);
     }
   }
   if (payload.coverImage) {
     if (bussiness.coverImage) {
-      unlinkFile(bussiness.coverImage);
+      deleteFileFromS3(bussiness.coverImage);
     }
   }
   if (payload.logo) {
     if (bussiness.logo) {
-      unlinkFile(bussiness.logo);
+      deleteFileFromS3(bussiness.logo);
     }
   }
   return result;

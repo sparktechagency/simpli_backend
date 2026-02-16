@@ -10,7 +10,6 @@ import AppError from '../../error/appError';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import sendResendEmail from '../../utilities/sendResendEmail';
 import Bussiness from '../bussiness/bussiness.model';
-import NormalUser from '../normalUser/normalUser.model';
 import { NotificationSetting } from '../notificationSetting/notificationSetting.model';
 import Product from '../product/product.model';
 import Reviewer from '../reviewer/reviewer.model';
@@ -209,12 +208,17 @@ cron.schedule('*/2 * * * *', async () => {
     if (expiredUsers.length > 0) {
       const expiredUserIds = expiredUsers.map((user) => user._id);
 
-      // Delete corresponding NormalUser documents
-      const normalUserDeleteResult = await NormalUser.deleteMany({
+      // Delete corresponding Reviewer documents
+      const reviewerDeleteResult = await Reviewer.deleteMany({
         user: { $in: expiredUserIds },
       });
 
-      // Delete the expired User documents
+      // Delete corresponding Bussiness documents
+      const bussinessDeleteResult = await Bussiness.deleteMany({
+        user: { $in: expiredUserIds },
+      });
+
+      // Delete expired User documents
       const userDeleteResult = await User.deleteMany({
         _id: { $in: expiredUserIds },
       });
@@ -222,8 +226,13 @@ cron.schedule('*/2 * * * *', async () => {
       console.log(
         `Deleted ${userDeleteResult.deletedCount} expired inactive users`,
       );
+
       console.log(
-        `Deleted ${normalUserDeleteResult.deletedCount} associated NormalUser documents`,
+        `Deleted ${reviewerDeleteResult.deletedCount} associated Reviewer documents`,
+      );
+
+      console.log(
+        `Deleted ${bussinessDeleteResult.deletedCount} associated Bussiness documents`,
       );
     }
   } catch (error) {
