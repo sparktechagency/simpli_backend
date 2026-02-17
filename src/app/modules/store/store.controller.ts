@@ -25,6 +25,7 @@ const updateStore = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const getBussinessStore = catchAsync(async (req, res) => {
   const result = await StoreService.getBussinessStore(req.params.id);
   sendResponse(res, {
