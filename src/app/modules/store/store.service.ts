@@ -6,6 +6,7 @@ import { IStore } from './store.interface';
 import { Store } from './store.model';
 
 const createStore = async (profileId: string, payload: IStore) => {
+  console.log('DEBUG: Current Shippo Instance Key:', shippo);
   const bussiness = await Bussiness.findById(profileId);
   if (!bussiness) {
     throw new AppError(httpStatus.NOT_FOUND, 'Bussiness not found');
