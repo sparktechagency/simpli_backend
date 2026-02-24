@@ -148,6 +148,7 @@ import { ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
 import { ZodError } from 'zod';
 import AppError from '../error/appError';
+import { errorLogger } from '../shared/logger';
 const globalErrorHandler: ErrorRequestHandler = (
   err,
   req,
@@ -195,6 +196,17 @@ const globalErrorHandler: ErrorRequestHandler = (
     errorMessage = `${err.value} is not a valid ID!`;
     errorDetails = err;
   }
+
+  errorLogger.error({
+    message: err.message,
+    stack: err.stack,
+    method: req.method,
+    url: req.originalUrl,
+    ip: req.ip,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+  });
   return res.status(statusCode).json({
     success: false,
     message: errorMessage,
