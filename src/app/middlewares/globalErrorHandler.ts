@@ -197,6 +197,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     errorDetails = err;
   }
 
+  // add error logger on glocal error handler
   errorLogger.error({
     message: err.message,
     stack: err.stack,
