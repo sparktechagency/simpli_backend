@@ -8,6 +8,7 @@ import AppError from '../../error/appError';
 import {
   ENUM_PAYMENT_METHOD,
   ENUM_PAYMENT_PURPOSE,
+  ENUM_PAYMENT_STATUS,
 } from '../../utilities/enum';
 import paypalClient from '../../utilities/paypal';
 import shippo from '../../utilities/shippo';
@@ -164,6 +165,7 @@ const getMyOrders = async (
   const orderQuery = new QueryBuilder(
     Order.find({
       $or: [{ reviewer: profileId }, { bussiness: profileId }],
+      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
     })
       .select(
         '-shipping -shippingAddress -paymentStatus -isReferralAmountPaid ',
@@ -195,10 +197,10 @@ const getMyOrders = async (
 };
 
 const getSingleOrder = async (profileId: string, orderId: string) => {
-  // 1️⃣ Find order
   const order = await Order.findOne({
     $or: [{ reviewer: profileId }, { bussiness: profileId }],
     _id: orderId,
+    paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
   })
     .populate({
       path: 'items.product',
