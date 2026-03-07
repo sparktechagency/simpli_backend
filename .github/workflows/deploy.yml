@@ -58,9 +58,9 @@ jobs:
           ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
 
       # --- Install PM2 on Droplet ---
-      # - name: Install PM2 on Droplet
-      #   run: |
-      #       ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} "sudo npm install -g pm2"
+      - name: Install PM2 on Droplet
+        run: |
+          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} "sudo npm install -g pm2"
 
       # --- Deploy Backend (Node.js + TypeScript) ---
       - name: Deploy Backend to Droplet
