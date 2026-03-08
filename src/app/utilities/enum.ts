@@ -8,6 +8,7 @@ export const ENUM_PRODUCT_STATUS = {
 export const ENUM_PAYMENT_STATUS = {
   PENDING: 'Pending',
   SUCCESS: 'Success',
+  REFUNDED: 'Refunded',
 };
 
 export const ENUM_TIP_BY = {
