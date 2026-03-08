@@ -22,7 +22,10 @@ import Notification from '../notification/notification.model';
 import ShippingAddress from '../shippingAddress/shippingAddress.model';
 import { Store } from '../store/store.model';
 import { USER_ROLE } from '../user/user.constant';
-import { CAMPAIGN_OFFER_DELETE_AFTER_DAYS } from './campaignOffer.constant';
+import {
+  CAMPAIGN_OFFER_DELETE_AFTER_DAYS,
+  CampaignOfferStatus,
+} from './campaignOffer.constant';
 import { ICampaignOffer } from './campaignOffer.interface';
 import { CampaignOffer } from './campaignOffer.model';
 
@@ -190,6 +193,12 @@ const proceedDeliveryForCampaignOffer = async (
   if (!campaignOffer) {
     throw new AppError(httpStatus.NOT_FOUND, 'Campaign offer not found');
   }
+  if (campaignOffer.status != CampaignOfferStatus.accept) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `Your campaign offer not on accepted mode, this is now ${campaignOffer.status}`,
+    );
+  }
 
   const shipment = await shippo.shipments.get(shipmentId);
   const selectedRate = shipment.rates.find(
@@ -210,7 +219,7 @@ const proceedDeliveryForCampaignOffer = async (
   };
 
   campaignOffer.shipping = shippingInfo;
-  campaignOffer.save();
+  await campaignOffer.save();
 
   // Payment handling
   if (payload.paymentMethod === ENUM_PAYMENT_METHOD.STRIPE) {

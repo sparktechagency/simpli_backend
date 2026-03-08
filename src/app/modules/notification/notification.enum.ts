@@ -33,6 +33,7 @@ export const ENUM_NOTIFICATION_TYPE = {
   SYSTEM_UPDATE: 'general',
   GENERAL: 'general',
   CAMPAIGN: 'campaign',
+  FAILED_GENERATE_SHIPPO_LEVEL: 'failed_generate_shippo_lebel',
 } as const;
 
 export type NotificationTypeKey = keyof typeof ENUM_NOTIFICATION_TYPE;

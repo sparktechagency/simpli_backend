@@ -11,6 +11,7 @@ export interface INotification {
     commentId?: Types.ObjectId;
     orderId?: Types.ObjectId;
     campaignId: Types.ObjectId;
+    campaignOfferId: Types.ObjectId;
     amount?: number;
     product?: {
       id: Types.ObjectId;

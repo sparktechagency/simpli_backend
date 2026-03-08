@@ -4,6 +4,8 @@ export const CampaignOfferStatus = {
   completed: 'Completed',
   cancelled: 'Cancelled',
   expired: 'Expired',
+  LABEL_FAILED_REFUNDED: 'LABEL_FAILED_REFUNDED',
+  LABEL_FAILED_REFUND_FAILED: 'LABEL_FAILED_REFUND_FAILED',
 };
 
 export const CAMPAIGN_OFFER_SHIPPING_STATUS = {
@@ -12,6 +14,8 @@ export const CAMPAIGN_OFFER_SHIPPING_STATUS = {
   shipped: 'SHIPPED',
   delivered: 'DELIVERED',
   purchased: 'PURCHASED',
+  LABEL_FAILED_REFUNDED: 'LABEL_FAILED_REFUNDED',
+  LABEL_FAILED_REFUND_FAILED: 'LABEL_FAILED_REFUND_FAILED',
 };
 
 export const CAMPAIGN_OFFER_DELETE_AFTER_DAYS = 2;

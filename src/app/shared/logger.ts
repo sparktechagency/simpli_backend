@@ -5,14 +5,7 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 const { combine, timestamp, label, printf } = format;
 
 // Custom log
-// const myFormat = printf(({ level, message, label, timestamp }: any) => {
-//   const date = new Date(timestamp);
-//   const h = date.getHours();
-//   const m = date.getMinutes();
-//   const s = date.getSeconds();
 
-//   return `${date.toDateString()} ${h}:${m} ${s} [${label}] ${level}: ${message}`;
-// });
 const myFormat = printf(({ level, message, label, timestamp, stack }) => {
   if (typeof message === 'object') {
     return `${timestamp} [${label}] ${level}: ${JSON.stringify(message, null, 2)}`;
