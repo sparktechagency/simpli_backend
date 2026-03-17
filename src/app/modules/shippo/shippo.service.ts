@@ -117,6 +117,7 @@ const getShippingRatesForCheckout = async (
       zip: store.zip,
       country: store.country,
       phone: store.phone,
+      email: store.email,
     },
     addressTo: {
       name: shippingAddress.name,
@@ -126,6 +127,7 @@ const getShippingRatesForCheckout = async (
       zip: shippingAddress.zip,
       country: shippingAddress.country,
       phone: shippingAddress.phone,
+      email: shippingAddress.email,
     },
     parcels: shippoParcels,
     async: false,
@@ -177,15 +179,6 @@ const getShippingRatesForOfferShipment = async (
     massUnit: WeightUnitEnum.Lb, // ✅ use enum
   }));
 
-  // console.log(
-  //   'store',
-  //   store,
-  //   'shipping address',
-  //   shippingAddress,
-  //   'product',
-  //   campaignOffer.product,
-  // );
-
   const shipment = await shippo.shipments.create({
     addressFrom: {
       name: store.name,
@@ -195,6 +188,7 @@ const getShippingRatesForOfferShipment = async (
       zip: store.zip,
       country: store.country,
       phone: store.phone,
+      email: store.email,
     },
     addressTo: {
       name: shippingAddress.name,
@@ -204,6 +198,7 @@ const getShippingRatesForOfferShipment = async (
       zip: shippingAddress.zip,
       country: shippingAddress.country,
       phone: shippingAddress.phone,
+      email: shippingAddress.email,
     },
     parcels: shippoParcels,
     async: false,
